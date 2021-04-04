@@ -1,0 +1,1337 @@
+local hideStuff = false
+
+#include initial_variables
+
+function onLoad()
+    --[[ The onLoad event is called after the game save finishes loading. --]]
+
+    loadObjects()
+    if hideStuff then hideAndLockStuff() end
+    shuffleEverything()
+
+    if isOngoingGame() then loadOngoingGame() end
+
+    -- Lock all the side tables --
+    for _,id in pairs(TableGUIDs) do
+        getObjectFromGUID(id).interactable = false
+    end
+end
+
+function hideAndLockStuff()
+    HideObjects = getObjectsWithTag('Player Part Bag')
+    table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence disks
+    table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
+    table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
+
+    -- disable interactions with tables extensions, game board, influence bag, ...
+    for _,GUID in pairs(DisableGUIDs) do
+        object = getObjectFromGUID(GUID)
+        if object ~= nil then object.interactable = false end
+    end
+
+    -- hide
+    for _, obj in pairs(HideObjects) do
+        obj.setInvisibleTo({"Blue", "White", "Red", "Yellow", "Green", 'Purple'})
+    end
+end
+
+function boardInvertFactor(board)
+    -- Checks which side of the table it's on
+    if board.getPosition().z > 0 then
+        return -1
+    else
+        return 1
+    end
+end
+
+function setupPlayerInfluence(board, PlayerColor)
+  board.setLock(true)
+  local InfluenceBag= getObjectFromGUID(InfluenceDisks_GUID)
+
+  local takeParams = {guid=1}
+
+  local InvPos = boardInvertFactor(board)
+  local Pos=board.getPosition() + Vector(-3.22*InvPos, 3, -5.6*InvPos)
+
+  local NumberDisks = 12
+  -- Eridani receive -2 influence
+  if board.getGUID() == 'eeefaa' then
+    NumberDisks = 10
+    Pos.x = Pos.x + 2*InvPos
+  end
+
+  -- place influence disks
+  for i=0, NumberDisks do
+    Disk = InfluenceBag.takeObject(takeParams)
+    colorRGB = stringColorToRGB(PlayerColor)
+    Disk.setColorTint(colorRGB)
+    Disk.setPosition(Pos)
+    Pos.x = Pos.x + 0.99*InvPos
+  end
+
+  spawnReturnInfluenceButton(board)
+
+end
+
+function spawnReturnInfluenceButton(board)
+    local InvPos = boardInvertFactor(board)
+
+    local data = {
+        click_function = "returnInfluenceDisks",
+        function_owner = self,
+        label = "Return Influence",
+        position = {-1.18, 0.09, 1.1},
+        scale = {0.3, 0.3, 0.3},
+        width = 955,
+        font_size = 110,
+        color = {0.7573, 0.7573, 0.7573, 1}
+    }
+
+    board.createButton(data)
+
+end
+
+function returnInfluenceDisks(board, color)
+
+    -- putTechOnTrack('Orbital', 'Yellow', board)
+
+    local InvPos = boardInvertFactor(board)
+
+    -- First get all discs on the player board
+    local boardObjects = Physics.cast({
+        origin = board.getPosition() + vector(-7.77*InvPos, 0, -5.25*InvPos),
+        type = 3,
+        direction = {0,1,0},
+        max_distance = 0,
+        size = {7.40, 1.69, 2.36},
+        -- debug = true
+    })
+    local discs = objectsHitByCast(boardObjects, 'Influence Disc')
+
+    -- Now get all discs on the reaction board
+    local passCard = getObjectFromGUID(PassCards[ownerOfBoard(board).color])
+    local reactionObjects = Physics.cast({
+        origin = passCard.getPosition(),
+        type = 3,
+        direction = {0,1,0},
+        max_distance = 0,
+        size = passCard.getBounds()['size'] + Vector(0, 5, 0),
+        -- debug = true
+    })
+    local reactionDiscs = objectsHitByCast(reactionObjects, 'Influence Disc')
+
+    -- Add all the discs together in one table
+    for _, v in ipairs(reactionDiscs) do
+        table.insert(discs, v)
+    end
+
+    -- If there are no disks to return, exit
+    if not next(discs) then
+        log('No disks to return.')
+        return false
+    end
+
+    local space = 14
+    InvPos = InvPos * -1
+    -- Return all the disks
+    for _, disc in pairs(discs) do
+        space = getNextOpenInfluenceSpace(board, space - 1)
+        disc.setPositionSmooth(
+            Vector(board.getPosition() + (influenceSpaces[space] * Vector(InvPos, 1, InvPos))),
+            false,
+            true
+        )
+    end
+
+end
+
+function getNextOpenInfluenceSpace(board, start)
+    -- Get the next highest empty influence space after and including `start`
+
+    if start <= 1 then return 1 end
+
+    -- Using an extra -1 multiplier because I messed up the initial position
+    -- tables and I can't be bothered to fix it :)
+    local InvPos = boardInvertFactor(board) * -1
+
+    for i = start, 2, -1 do
+        local influenceObjects = Physics.cast({
+            origin = board.getPosition() + (influenceSpaces[i] * vector(InvPos, 1, InvPos)),
+            type = 3,
+            direction = {0,1,0},
+            max_distance = 0,
+            size = {0.2, 5, 0.2},
+            -- debug = true
+        })
+        if not next(objectsHitByCast(influenceObjects, 'Influence Disc')) then
+            log('Next open influence space: '.. tostring(i))
+            return i
+        end
+    end
+
+    -- Return the first space if everything else is full, stacking tiles if needed
+    log('Next open influence space: 1')
+    return 1
+
+end
+
+function objectsHitByCast(castResult, name)
+    local objects = {}
+    -- Returns true if an object with a given name was hit by a Physics.Cast()
+    for _, obj in ipairs(castResult) do
+        if obj['hit_object'].getName() == name then
+            table.insert(objects, obj['hit_object'])
+        end
+    end
+    return objects
+
+end
+
+-- delay execution of a function until an object is resting
+function triggerFunctionIfResting(objTile, pointerFnc, waitSeconds)
+  waitSeconds = waitSeconds or 1
+  Wait.time(
+      function()
+          Wait.condition(pointerFnc, function() return objTile.resting end )
+      end, waitSeconds )
+end
+
+
+-- handle basic player setup
+function basicSetup2(parameters)
+
+  local PlayerColor = parameters.PlayerColor
+  local Box_GUID = parameters.BoxGuid
+  local FactionName = parameters.FactionName
+
+--   log('Starting basic setup for '..tostring(PlayerColor))
+  -- check if the player already selected a faction
+  if PlayerRace[PlayerColor] ~= nil then
+      print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
+      return false
+  end
+
+  PlayerRace[PlayerColor] = FactionName .. ' '  -- A space so it can be reset in setRace
+
+  local Box = getObjectFromGUID(Box_GUID)
+  local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
+  PlayerPosition.y = 0.15
+
+  local SpawnPos=Box.getPosition() + Vector(0,5,0)
+  local InvPos = -1
+
+  local takeParams = {position = SpawnPos, rotation = vector(0,0,0)}
+  if PlayerPosition.z < 0 then
+    takeParams.rotation = vector(0,180,0)
+    InvPos = 1
+  end
+
+  local destination
+
+  -- take home world and position it
+  local Object = SeekAndTake('Homeworld', Box, takeParams)
+  if (Object~=false) then
+    destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
+    Object.setPositionSmooth(destination,false, true)
+  end
+
+    -- take home world and position it
+    Object = SeekAndTake('Fleet', Box, takeParams)
+    if (Object~=false) then
+        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
+        Object.setPositionSmooth(destination,false, true)
+        Object.setColorTint(Color.fromString(PlayerColor))
+        Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
+    end
+
+  -- take ambassador tiles and position them
+  Object = SeekAndTake('Ambassador', Box, takeParams)
+  if (Object~=false) then
+    destination = PlayerPosition + Vector(19.5*InvPos, 0, 24*InvPos)
+    Object.setPositionSmooth(destination,false, true)
+  end
+
+  -- take action card and position it
+  Object = SeekAndTake('Actions', Box, takeParams)
+  if (Object~=false) then
+    destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
+    Object.setPositionSmooth(destination,false, true)
+  end
+
+  -- take player board and position it
+  Object = SeekAndTake('Player Board', Box, takeParams)
+  if (Object~=false) then
+    destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
+    Object.setPositionSmooth(destination,false, true)
+
+    local Lock = function()
+        Wait.time(
+            function ()
+                log('Setting up board for ' .. tostring(PlayerColor))
+                setupPlayerInfluence(Object, PlayerColor)
+                getBoardInitialTechs(Object)
+            end,
+            2)
+    end
+    triggerFunctionIfResting(Object, Lock)
+  end
+
+  -- place colony ships
+  PlaceColonyShips(Box, takeParams, PlayerPosition)
+  return true
+end
+
+-- search a container for all objects with matching names, then take out a random one
+function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
+  TakeParams.guid = '000000'
+  local container
+  local guids = {}
+--   log('GUID: '..tostring(ContainerOrGUID))
+  if type(ContainerOrGUID) == 'string' then
+    container = getObjectFromGUID(ContainerOrGUID)
+  else
+    container = ContainerOrGUID
+  end
+
+  for k,v in pairs(container.getObjects()) do
+    if string.find(string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname), string.lower(ObjectName)
+    ) then
+      table.insert(guids, v.guid)
+    --   log('Found name: '..string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname))
+    elseif string.find(string.lower(v.description), string.lower(ObjectName)) then
+      table.insert(guids, v.guid)
+    --   log('Found description: '.. v.description)
+    end
+  end
+
+  if #guids == 0 then
+    log('Did not find '..ObjectName)
+    return false
+  end
+
+  TakeParams.guid = guids[math.random(#guids)]
+  return container.takeObject(TakeParams)
+end
+
+function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
+    rot = rot or Vector(0,0,0)
+    local obj = SeekAndTake(ObjectName, ContainerOrGUID, {})
+    local putContainer
+
+    if type(ContainerOrGUID) == 'string' then
+        putContainer = getObjectFromGUID(ContainerOrGUID)
+      else
+        putContainer = ContainerOrGUID
+    end
+    -- log('Position: ' .. tostring(pos))
+
+    if not obj then return false end
+
+    Wait.condition(
+        function ()
+            local clone = obj.clone()
+            clone.setPositionSmooth(pos, false, true)
+            clone.setRotationSmooth(rot, false, true)
+            triggerFunctionIfResting(
+                clone,
+                function () clone.setLock(lock or false) end
+            )
+
+            triggerFunctionIfResting(
+                obj,
+                function ()
+                    putContainer.putObject(obj) -- Return the object to the container it was in
+                end
+            )
+            return clone
+        end,
+        function ()
+            return not obj.spawning
+        end,
+        10
+    )
+
+end
+
+
+-- search a container for all colony ships and place them in front of the player
+function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
+  TakeParams.guid = '000000'
+  local container
+  local guids = {}
+  local Object
+  local offset
+  container = ContainerOrGUID
+
+  for k,v in pairs(container.getObjects()) do
+    if string.find(string.lower(v.name or v.nickname), string.lower('Colony Ship')) then
+      table.insert(guids, v.guid)
+    end
+  end
+
+  if #guids == 0 then return false end
+
+  local Inv = -1;
+  if PlayerPosition.z < 0 then Inv=1 end
+  local StartPosition = PlayerPosition + Vector(-22.4*Inv, 0, 15*Inv)
+  if #guids ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
+  if #guids > 3 then StartPosition = StartPosition + Vector(0, 0, 1*Inv) end
+
+  for k,id in pairs(guids) do
+      TakeParams.guid = guids[id]
+      Object = container.takeObject(TakeParams)
+
+      if k>2 and #guids>3 then offset = Vector((k-2)*2.9*Inv, 0, -2*Inv)
+      else offset = Vector(k*2.9*Inv, 0, 0) end
+      Object.setPositionSmooth(StartPosition + offset, false, true)
+    end
+end
+
+function loadObjects()
+    TableZone = getObjectFromGUID(TableZone)
+    RoundMarker = getObjectFromGUID(RoundMarker_GUID)
+    TechBag = getObjectFromGUID(TechBag_GUID)
+    ReputationBag = getObjectFromGUID(ReputationBag_GUID)
+    DiscoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
+    Sector1Bag = getObjectFromGUID(Sector1Bag_GUID)
+    Sector2Bag = getObjectFromGUID(Sector2Bag_GUID)
+    Sector3Bag = getObjectFromGUID(Sector3Bag_GUID)
+    ExtraS3Bag = getObjectFromGUID(ExtraS3Bag_GUID)
+    OutpostBag = getObjectFromGUID(OutpostBag_GUID)
+    turnBag = getObjectFromGUID(turnBag)
+    turnTracker = getObjectFromGUID(turnTracker)
+    AmbassadorBag = getObjectFromGUID(AmbassadorBag_GUID)
+end
+
+function loadOngoingGame()
+    printToAll('Script is attempting to recover ongoing game state')
+
+    -- Pass state
+    for color,guid in pairs(PassCards) do
+        local obj = getObjectFromGUID(guid)
+        if obj then
+            printToAll(color .. " passed: " .. tostring(obj.is_face_down), color)
+            passed[color] = obj.is_face_down
+        end
+    end
+    -- After four seconds, start the "All players passed" check
+    Wait.time(setPassCheck, 4)
+
+    for color, _ in pairs(PlayerBoardZones) do
+        if hasPlayerBoard(color) then
+            local board = hasPlayerBoard(color)
+            printToAll(color .. " picked " .. board.getName(), color)
+
+            -- Return influence button
+            spawnReturnInfluenceButton(board)
+
+            -- PlayerRace
+            PlayerRace[color] = board.getName()
+
+            -- PlayerMarkers
+            PlayerMarkers[color] = getObjectFromGUID(PassMarkers[string.gsub(PlayerRace[color], ' ', '_')])
+            if not PlayerMarkers[color] then
+                log('Player marker for '..color..' not found')
+                PlayerMarkers[color] = takePassMarker(color)
+            else
+                log('Player marker for '..color..' found: '..tostring(PlayerMarkers[color].getName()))
+            end
+        end
+    end
+    showNextRoundButton()
+
+end
+
+function isOngoingGame()
+    -- Returns true is this is an ongoing game; For instance, if the game was
+    -- loaded from a save or rewound in time.
+    local round = tonumber(RoundMarker.getDescription())
+    if round ~= 0 then return true end
+end
+
+function split (inputstr, sep)
+    -- String Split --
+    if sep == nil then
+            sep = "%s"
+    end
+    local t={}
+    for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+            table.insert(t, str)
+    end
+    return t
+end
+
+function shuffleEverything()
+    -- Shuffle all bags and stacks --
+    TechBag.shuffle()
+    ReputationBag.shuffle()
+    DiscoveryBag.shuffle()
+    Sector1Bag.shuffle()
+    Sector2Bag.shuffle()
+    Sector3Bag.shuffle()
+    OutpostBag.shuffle()
+    AmbassadorBag.shuffle()
+end
+
+function setupTiles(players)
+    -- Arrange various tiles for first turn setup.
+    local trim = Sector3Bag.getQuantity() - outerSectors[players]
+    if trim > 0 then
+        Wait.time(tossOuterSectors, 0.2, trim)
+    end
+    local d = DiscoveryBag.takeObject({rotation = {180,-45,0}})
+    d.setPositionSmooth(Vector(0, 2, 0), false, false)
+    local pos = aBase
+    Wait.time(function()
+            local a = AmbassadorBag.takeObject({rotation = {0,-90,0}})
+            a.setPositionSmooth(pos, false, false)
+            pos = pos + Vector(offsetAmbassador, 0, 0)
+        end, 0.5, 4)
+end
+
+function playersWithoutBoards()
+    players = {}
+    for _, color in pairs(getSeatedPlayers()) do
+        if not hasPlayerBoard(color) then
+            table.insert(players, color)
+        end
+    end
+    return players
+end
+
+-- remove all damage cubes from the table area
+function removeDamageCubes()
+    zoneObjects = TableZone.getObjects()
+    for _,obj in pairs(zoneObjects) do
+        if obj.getName() == "Damage Cube" then destroyObject(obj) end
+    end
+end
+
+function nextRound()
+    -- Main scripting function for round cleanup --
+
+    local players = #getSeatedPlayers()
+    local round = tonumber(RoundMarker.getDescription()) + 1
+    local newTechs = players + 3
+    if round > 8 then
+        broadcastToAll("-- Game Over! --")
+        return
+    elseif round == 2 then
+        if next(playersWithoutBoards()) ~= nil then
+            broadcastToAll("Warning: Not all players have a player board.",
+                Color.Red)
+            printToAll("Players without boards:")
+            for _, color in pairs(playersWithoutBoards()) do
+                printToAll(color, color)
+            end
+            return
+        end
+
+    end
+    removeDamageCubes()
+    unflipColonyAndSkippers()
+    TechBag.shuffle()
+    Wait.time(drawTech, 0.4, newTechs)
+    setPassCards()
+    advanceRoundMarker(round)
+    if round > 1 then
+        Wait.time(function ()
+            updateTurnOrder()
+            moveAllPassMarkersOffBoard()
+        end, 2)
+    end
+end
+
+
+function setupFirstRound()
+    local players = #getSeatedPlayers()
+    local round = tonumber(RoundMarker.getDescription()) + 1
+    local newTechs = players + 3
+
+    printToAll(string.format("- Setting up for %d players -", players),
+    {0.8,0.8,0.8})
+
+    pickRandomNPC()
+
+    if useWarpTiles then fillWithWarp()
+    elseif useGuardians then fillWithGuardians() end
+
+    unflipColonyAndSkippers()
+    shuffleEverything()
+    setupTiles(players)
+    newTechs = (players * 2) + 8
+    Wait.time(drawTech, 0.4, newTechs)
+    setPassCards()
+    advanceRoundMarker(round)
+    moveAllPassMarkersOffBoard()
+    removeUnusedAreas()
+    getObjectFromGUID('516e93').destruct() -- Kill the text box above the button
+    showNextRoundButton()
+end
+
+function pickRandomNPC()
+        -- Pick random NPCs
+        local rt = {0.00, 270.00, 0.00}
+        x = getObjectFromGUID('b61460').takeObject({rotation= rt, position= AncientSpot})
+        x.setLock(true)
+        activeAncientsBag = x
+
+        x = getObjectFromGUID('0a5a7a').takeObject({rotation= rt, position= GuardianSpot})
+        x.setLock(true)
+        activeGuardianBag = x
+
+        -- Pick a GCDS tile and move the GCDS
+        getObjectFromGUID('133a3f').takeObject({rotation= rt, position= GCDSSpot})
+        Wait.time(function ()
+            getObjectFromGUID('4eed67').setPositionSmooth(Vector(0, 2, 0))
+        end, 2)
+
+        npcBag = getObjectFromGUID('5bd793')
+        for _, npc in pairs(getObjectsWithTag('Random NPC')) do
+            npcBag.putObject(npc)
+        end
+end
+
+function allPlayersPassed()
+    -- Return true if all players have placed their pass markers on the turn
+    -- tracker
+    for _, player in pairs(getSeatedPlayers()) do
+        if (hasPlayerBoard(player) and
+            not getObjectFromGUID(PassCards[player]).is_face_down) then
+            -- log(player .. ' was not passed.')
+            return false
+        end
+    end
+    return true
+end
+
+function playersNotPassed()
+    -- Return a table of players that are not passed.
+    unpassedPlayers = {}
+    for _, player in pairs(getSeatedPlayers()) do
+        if (hasPlayerBoard(player) and
+            not getObjectFromGUID(PassCards[player]).is_face_down) then
+            table.insert(unpassedPlayers, player)
+        end
+    end
+    log("Unpassed Players: ")
+    log(unpassedPlayers)
+    return unpassedPlayers
+end
+
+function updateTurnOrder()
+    if not allPlayersPassed() then
+        log(playersNotPassed(), "Players not passed", 'Warning')
+    end
+
+    log(Turns.order, 'Turn order: Old')
+
+    local new_turns = {}
+    for i = 1, 6 do
+        local marker = isMarkerOnPassSpace(i)
+        if marker then
+            new_turns[i] = ownerOfMarker(marker).color
+        --     log("Marker found on spot "..i, "updateTurnOrder")
+        -- else
+        --     log("Marker not found on spot "..i, "updateTurnOrder")
+        end
+    end
+
+    local colorsToAppend = {}
+    for _, color in pairs(getSeatedPlayers()) do
+        local found = false
+        for _, newColor in pairs(new_turns) do
+            if color == newColor then found = true end
+        end
+        if not found then
+            broadcastToAll(tostring(color) .. ' not found on the turn tracker. They will be added to the end of the turn order for next round. The order for the next round should be checked.')
+            table.insert(new_turns, color)
+        end
+    end
+
+    -- Update the turn order
+    Turns.order = new_turns
+    Turns.turn_color = Turns.order[1]
+
+    log(Turns.order, 'Turn Order: New')
+end
+
+function ownerOfBoard(board)
+    -- Returns the Player owner of a particular board
+
+    if type(board) ~= 'string' then
+        board = board.getGUID()
+    end
+
+    -- Search through every board zone for the specified board
+    for color, guid in pairs(PlayerBoardZones) do
+        for _, obj in pairs(getObjectFromGUID(guid).getObjects()) do
+            if obj.getGUID() == board then
+                return Player[color]
+            end
+        end
+    end
+end
+
+function ownerOfMarker(marker)
+    -- Returns the Player owner of a particular marker
+    for plr, mkr in pairs(PlayerMarkers) do
+        if mkr.getGUID() == marker.getGUID() then
+            return Player[plr]
+        end
+    end
+end
+
+function isMarkerOnPassSpace(num)
+    local area = getObjectFromGUID(PassAreas[num])
+    -- log('Area Name: '..area.getName(), 'isMarkerOnPassSpace')
+    -- log(area.getObjects(), 'area.getObjects()')
+
+    for _, obj in pairs(area.getObjects()) do
+        if obj.hasTag("Pass Marker") then
+            log("Pass space " .. num .. ': Occupied') --, 'isMarkerOnPassSpace')
+            return obj
+        end
+    end
+    log("Pass space " .. num .. ': Free') --, 'isMarkerOnPassSpace')
+    return false
+end
+
+function moveAllPassMarkersOffBoard()
+    for playerColor, marker in pairs(PlayerMarkers) do
+        marker.setPositionSmooth(passRestingPositions[playerColor], false, true)
+        marker.setLock(true)
+    end
+end
+
+function movePassMarkerOffBoard(color)
+    marker = PlayerMarkers[color]
+    marker.setPositionSmooth(passRestingPositions[color], false, true)
+    marker.setLock(true)
+end
+
+function advanceRoundMarker(round)
+    -- Move the round token and annouce --
+
+    RoundMarker.setDescription(round)
+    RoundMarker.setPositionSmooth(rdBase + Vector(0,0,offsetRound*round))
+    RoundMarker.setRotationSmooth({0,180,0})
+    broadcastToAll(string.format("-- Round #%d --", round))
+end
+
+function unflipColonyAndSkippers()
+    -- Unflip all colony ships --
+
+    for _,obj in pairs(getAllObjects()) do
+        if obj.getName() == "Colony Ship" then
+            if obj.is_face_down == true then
+                obj.flip()
+            end
+        end
+        if obj.hasTag("Turn Skipper") then
+            if obj.is_face_down == true then
+                obj.flip()
+            end
+        end
+    end
+end
+
+function getNextPassSpot()
+    for i=1, 6 do
+        -- Get the next passed area
+        area = getObjectFromGUID(PassAreas[i])
+        local found = false
+
+        for _, obj in pairs(area.getObjects()) do
+            if obj.hasTag("Pass Marker") then
+                -- print("Occupied at " .. i)
+                found = true
+            end
+        end
+
+        -- Find the first empty area and return it
+        if found == false then
+            -- print("Empty at " .. i)
+            return i
+        end
+    end
+end
+
+function onObjectEnterScriptingZone(zone, obj)
+    addButtonToTechTile(zone, obj)
+
+    -- Discover player boards --
+    if not string.find(zone.getName(), "Player Board Zone") or
+    not obj.hasTag("Board") then
+        return false
+    end
+
+    local color = split(zone.getName(), " ")[1] -- Get the player's name
+    if PlayerRace[color] ~= obj.getName() then
+
+        -- Restart the timer on the set race function
+        if boardSelectCallbackFunction[color] then
+            Wait.stop(boardSelectCallbackFunction[color])
+        end
+
+        boardSelectCallbackFunction[color] =
+            Wait.time(function() setRace(color, zone, obj) end, 2, 0)
+    end
+end
+
+function onObjectLeaveScriptingZone(zone, leave_object)
+    checkIfPlayerChangedBoards(zone, leave_object)
+end
+
+function checkIfPlayerChangedBoards(zone, obj)
+    -- Triggered when a player board leaves a board zone. Check to see if we
+    -- need to reset the player's race
+
+    -- Break out if we're not dealing with player boards or board zones
+    if (string.find(zone.getName(), "Player Board Zone") == nil or
+        not obj.hasTag("Board")) then
+        return false
+    end
+
+    -- Get the player's color
+    local color = split(zone.getName(), " ")[1]
+
+    -- If the player's currently saved race is the same as the race they picked
+    -- then trigger the race reset timer. If the timer runs out and the board
+    -- is still absent from the zone, return the player markers and clear the
+    -- saved race variables.
+    if PlayerRace[color] == obj.getName() then
+        Wait.time(function() resetRace(color, zone, obj) end, 5, 0)
+    end
+end
+
+function resetRace(playerColor, zone, obj)
+
+    -- Check if the board is still in its player's zone. If so, cancel the reset
+    for _, v in pairs(zone.getObjects()) do
+        if v.getGUID() == obj.getGUID() then -- Check if the board is still in the zone
+            return false
+        end
+    end
+
+    -- Don't spam the chat in case multiple checks were started
+    if PlayerRace[playerColor] == obj.getName() then
+        printToAll(playerColor .. " returned " .. obj.getName(), playerColor)
+    end
+
+    PlayerRace[playerColor] = nil
+    if PlayerMarkers[playerColor] ~= nil then
+        PlayerMarkers[playerColor].setColorTint(Color.White)
+        PlayerMarkers[playerColor].setDescription('')
+
+        -- Return the player marker to the bag
+        turnBag.putObject(PlayerMarkers[playerColor])
+    end
+    PlayerMarkers[playerColor] = nil
+end
+
+function setRace(playerColor, zone, obj)
+    -- Check if the player board is still in the zone and didn't just move
+    -- through it, then lock it
+
+    -- Check if the board is still in the zone
+    for _, v in pairs(zone.getObjects()) do
+        if v.getGUID() == obj.getGUID() then
+
+            -- Only print to chat if this is the first time the player selects
+            -- this race (in case they move their board, etc)
+            if PlayerRace[playerColor] ~= obj.getName() then
+                printToAll(playerColor .. " has picked " .. obj.getName(), playerColor)
+            end
+
+            PlayerRace[playerColor] = obj.getName()
+            PlayerMarkers[playerColor] = takePassMarker(playerColor)
+            obj.setLock(true)
+            break
+        end
+    end
+end
+
+function colorPassMarker(marker, playerColor)
+    marker.setColorTint(playerColor)
+    marker.setLock(true)
+end
+
+function takePassMarker(playerColor)
+
+    param = {
+        position = passRestingPositions[playerColor],
+        callback_function = function(obj) colorPassMarker(obj, playerColor) end,
+    }
+    marker = SeekAndTake(PlayerRace[playerColor], turnBag, param)
+
+    -- Check to see if it's on the map
+    if not marker then
+        log('Turn marker ' .. tostring(PlayerRace[playerColor]) ..
+            ' not found anywhere for ' .. playerColor)
+        return false
+    else
+        log('Turn marker ' .. tostring(PlayerRace[playerColor]) ..
+            ' found for ' .. playerColor)
+    end
+    marker.setDescription(Player[playerColor].steam_name)
+    return marker
+end
+
+function putPassMarker(playerColor)
+    turnBag.putObject(PlayerMarkers[playerColor])
+end
+
+function setPassCards()
+    -- Watch and mark pass cards --
+    if passCheck ~= nil then
+        -- Stop the player pass check coroutine
+        Wait.stop(passCheck)
+    end
+
+    for color,guid in pairs(PassCards) do
+        passed[color] = false
+        local obj = getObjectFromGUID(guid)
+        if obj then
+            obj.setName("Actions")
+            obj.setLock(false)
+            if obj.is_face_down == true then
+                obj.flip()
+            end
+        end
+    end
+
+    -- After four seconds, start the "All players passed" check
+    Wait.time(setPassCheck, 4)
+end
+
+function setPassCheck()
+    passCheck = Wait.condition(
+        function() printToAll("- All Players Passed -", {0.8,0.8,0.8}) end,
+        handlePassCards)
+end
+
+function handlePassCards()
+    local check = true
+    for _,color in pairs(getSeatedPlayers()) do
+        if not hasPlayerBoard(color) then return false end
+
+        local obj = getObjectFromGUID(PassCards[color])
+        if passed[color] and not obj.is_face_down then
+            passed[color] = false
+            obj.setName("Actions")
+            obj.setLock(false)
+            broadcastToAll(color .. ' has unflipped their pass marker.', color)
+            movePassMarkerOffBoard(color)
+
+        elseif passed[color] == false then
+            check = false
+            if obj and obj.is_face_down == true then
+
+                passed[color] = true
+                obj.setName("Passed!")
+                setPassMarker(color)
+                Wait.time(function() obj.setLock(true) end, 1)
+            end
+        end
+    end
+    return check
+end
+
+function hasPlayerBoard(color)
+    -- Returns the board if the given player has a board in front of them
+
+    zone = getObjectFromGUID(PlayerBoardZones[color])
+
+    for _, obj in pairs(zone.getObjects()) do
+        if obj.hasTag('Board') then
+            return obj
+        end
+    end
+    return false
+end
+
+function colorInGame(color)
+    for _, presentColor in pairs(getSeatedPlayers()) do
+        if color == presentColor then return true end
+    end
+    return false
+end
+
+function removeUnusedAreas()
+    for color, _ in pairs(PlayerBoardZones) do
+        if not colorInGame(color) then
+            -- log(color .. " is not in game. Removing.")
+            for _, obj in pairs(getObjectsWithTag(color)) do
+                -- Remove the player's area
+                -- log("Destroying "..obj.getName())
+                obj.destruct()
+
+                PassCards[color] = nil
+                PlayerBoardZones[color] = nil
+                PlayerRace[color] = nil
+                passRestingPositions[color] = nil
+                PlayerMarkers[color] = nil
+            end
+        end
+    end
+end
+
+function setPassMarker(color)
+    previousPassArea = getObjectFromGUID(PassAreas[getNextPassSpot() - 1])
+    pos = getObjectFromGUID(PassAreas[getNextPassSpot()]).getPosition()
+
+    -- If the pass marker is already on the track...
+    for _, zone in pairs(PassAreas) do
+
+        -- If it's already on the right spot, just lock and ignore it
+        if (itemInZone(zone, PlayerMarkers[color]) and
+            previousPassArea and
+            zone == previousPassArea.getGUID()) then
+                broadcastToAll(color .. " passes at #" .. getNextPassSpot() - 1, color)
+                PlayerMarkers[color].setLock(true)
+                return false
+
+        -- If it's on the wrong spot, cause some chaos
+        elseif itemInZone(zone, PlayerMarkers[color]) then
+            broadcastToAll("Warning: The turn order is wrong. Please fix.")
+            printToAll("Player "..color.." just flipped their action card to "
+                .. "pass but their pass marker is already on the board. Please "
+                .. "correct the turn order (for all players) and then proceed.",
+                Color.red)
+            return false
+        end
+    end
+
+    broadcastToAll(color .. " passes at #" .. getNextPassSpot(), color)
+    -- log(PlayerMarkers)
+    PlayerMarkers[color].setPosition(pos)
+    PlayerMarkers[color].setLock(true)
+end
+
+function itemInZone(zone, obj)
+    for _, tmp_obj in pairs(getObjectFromGUID(zone).getObjects()) do
+        if tmp_obj.getGUID() == obj.getGUID() then
+            return true
+        end
+    end
+    return false
+end
+
+function tossOuterSectors()
+    -- Toss extra sector 3 tiles for setup --
+    local s = Sector3Bag.takeObject({rotation = {180,90,0}})
+    ExtraS3Bag.putObject(s)
+end
+
+function drawTech()
+    -- Draw and annouce each tech tile --
+    if TechBag.getQuantity() < 1 then
+        return
+    end
+    local t = TechBag.takeObject({rotation = {0,270,0}})
+    moveTech(t)
+    local type = string.sub(t.getDescription(),1,1)
+    printToAll(string.format("New %s", t.getName()), tColor[type])
+    if type == 'R' then
+        Wait.time(drawTech, 0.2, 1)
+    end
+end
+
+function moveTech(t)
+    -- Calculate offsets and place tech tiles in their spot --
+    local code = t.getDescription()
+    local type = string.sub(code,1,1)
+    local num = tonumber(string.sub(code,2)) - 1
+    local x,y,z = tBase[type].x, tBase[type].y, tBase[type].z
+    if type == 'R' then
+        if num % 2 ~= 0 then
+            z = z + offsetRare
+            num = num - 1
+        end
+        x = x + (offsetRare * num/2)
+    else
+        z = z + (offsetTech * num)
+    end
+    t.setPositionSmooth(Vector(x, y+2, z), false, false)
+end
+
+function onObjectPickUp(player, obj)
+    -- Stop players from accidentally taking a stack of techs --
+    -- Also try to fix tiles falling through the player board --
+    if Player[player].lift_height < 0.15 then
+        Player[player].lift_height = 0.15
+    end
+    if obj.tag == "Chip" and obj.getQuantity() > 1 then
+        if string.find(obj.getName(), "Tech %-") ~= nil then
+            obj.drop()
+            obj.setVelocity(Vector(0,0,0))
+        end
+    end
+end
+
+function discardRep(obj)
+    -- Put unchosen reputation tiles back into the bag --
+    if obj ~= nil then
+        if obj.getName() == "Reputation" then
+            obj.setRotation(Vector(0,270,180))
+            ReputationBag.putObject(obj)
+            Wait.time(function() ReputationBag.shuffle() end, 0.5, 1)
+        end
+    end
+end
+
+function onObjectDrop(_, obj)
+    -- Blip the size of sector hexes so they fit together --
+    if obj.use_grid == true then
+        Wait.condition(
+            function() blip(obj) end,
+            function() return rest(obj) end,
+            2)
+    end
+end
+
+function blip(obj)
+    obj.scale(24/25)
+    Wait.time(function() obj.scale(25/24) end, 0.1)
+end
+
+function rest(obj)
+    if obj ~= nil then return obj.resting end
+    return false
+end
+
+function dump(o)
+    if type(o) == 'table' then
+       local s = '{ '
+       for k,v in pairs(o) do
+          if type(k) ~= 'number' then k = '"'..k..'"' end
+          s = s .. '['..k..'] = ' .. dump(v) .. ','
+       end
+       return s .. '} '
+    else
+       return tostring(o)
+    end
+ end
+
+function castAndCheckForTag(position, tag, distance)
+    local dist = distance or 3
+
+    results = Physics.cast({
+        origin = (Vector(position) + Vector(0,-2,0)),
+        direction = {0,1,0},
+        max_distance = dist,
+        type = 1, -- Ray
+        debug = false,
+    })
+
+    -- log(results)
+    for _, v in pairs(results) do
+        if v['hit_object'].hasTag(tag) then
+            return v['hit_object']
+        end
+    end
+
+    return nil
+end
+
+function nextFreeTechSpace(trackColor, board)
+    local InvPos = boardInvertFactor(board)
+    InvPos = Vector(InvPos, 1, InvPos)
+
+    for index, pos in ipairs(techTracks[trackColor]) do
+        local tmpPos = (Vector(pos) * InvPos) + board.getPosition()
+        if not castAndCheckForTag(tmpPos, 'Tech Tile') then
+            return index
+        end
+    end
+    return 7
+end
+
+function putTechOnTrack(techName, trackColor, board, spot, lock)
+    -- Clones a tech in the tech bag and places it at the specified spot number
+    -- If no spot is specified, the next available spot is used.
+
+    local InvPos = boardInvertFactor(board)
+    InvPos = Vector(InvPos, 1, InvPos)
+
+    spot = spot or nextFreeTechSpace(trackColor, board)
+
+    local finalPos = (Vector(techTracks[trackColor][spot]) * InvPos) + board.getPosition()
+    SeekAndClone(techName, TechBag_GUID, finalPos, board.getRotation(), lock)
+    return true
+
+end
+
+function fillWithWarp()
+    local warpSpots = {
+        Purple = {
+            position = Vector(9.12, 1.01, 8.14),
+            rotation = Vector(0.00, 59.64, 0.00)
+        },
+        White = {
+            position = Vector(11.60, 1.01, -3.72),
+            rotation = Vector(0.00, 119.99, 0.00),
+        },
+        Yellow = {
+            position = Vector(2.58, 1.01, -11.93),
+            rotation = Vector(0.00, 179.99, 0.00),
+        },
+        Red = {
+            position = Vector(-9.03, 1.01, -8.19),
+            rotation = Vector(0.00, 240.01, 0.00),
+        },
+        Green = {
+            position = Vector(-11.64, 1.01, 3.77),
+            rotation = Vector(0.00, 300.11, 0.00),
+        },
+        Blue = {
+            position = Vector(-2.58, 1.06, 11.93),
+            rotation = Vector(359.82, 0.01, 359.68),
+        },
+    }
+    local warpBag = getObjectFromGUID('257134')
+
+    for _, color in ipairs(possibleColors) do
+        local found = false
+        for _, seatedColor in ipairs(getSeatedPlayers()) do
+            if color == seatedColor then
+                found = true
+            end
+        end
+
+        if not found then
+            warpBag.takeObject({
+                position = warpSpots[color].position,
+                rotation = warpSpots[color].rotation,
+                callback_function = function (obj)
+                    obj.setLock(true)
+                end
+            })
+        end
+    end
+end
+
+function fillWithGuardians()
+    local GuardiansSpots = {
+        Purple = {
+            position = Vector(10.32, 0.96, 5.95),
+            rotation = Vector(0.00, 60.01, 0.00),
+        },
+        White = {
+            position = Vector(10.32, 0.96, -5.96),
+            rotation = Vector(0.00, 120.00, 0.00),
+        },
+        Yellow = {
+            position = Vector(0.00, 0.96, -11.92),
+            rotation = Vector(0.00, 180.86, 0.00),
+        },
+        Red = {
+            position = Vector(-10.32, 0.96, -5.96),
+            rotation = Vector(0.00, 240.00, 0.00),
+        },
+        Green = {
+            position = Vector(-10.32, 0.96, 5.96),
+            rotation = Vector(0.00, 300.01, 0.00),
+        },
+        Blue = {
+            position = Vector(0.00, 0.96, 11.92),
+            rotation = Vector(0.00, 359.32, 0.00),
+        },
+    }
+
+    local guardianBag = getObjectFromGUID('54fe91')
+    local guardianModelBag = getObjectFromGUID('19e48c')
+    local discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
+
+    if #getSeatedPlayers() < 2 then
+        printToAll('Must have at least two players to fill with guardians.')
+        return false
+    end
+
+    for _, color in ipairs(possibleColors) do
+        local found = false
+        for _, seatedColor in ipairs(getSeatedPlayers()) do
+            if color == seatedColor then
+                found = true
+            end
+        end
+
+        if not found then
+            guardianBag.takeObject({
+                position = GuardiansSpots[color].position,
+                rotation = GuardiansSpots[color].rotation,
+                callback_function = function (obj)
+                    obj.setLock(true)
+                end
+            })
+            discoveryBag.takeObject({
+                position = GuardiansSpots[color].position+Vector(0,1,0),
+                rotation = GuardiansSpots[color].rotation+Vector(0, -45, 180),
+            })
+
+            activeGuardianBag.takeObject({
+                position = GuardiansSpots[color].position+Vector(0,2,0),
+                rotation = GuardiansSpots[color].rotation
+            })
+            guardianModelBag.takeObject({
+                position = GuardiansSpots[color].position+Vector(0,3,0),
+                rotation = GuardiansSpots[color].rotation
+            })
+        end
+    end
+
+end
+
+function getBoardInitialTechs(board)
+    local techs = board.getTable('initialTechs')
+    if not techs then
+        log('No initial techs to add.')
+        return false
+    end
+
+    for _, tech in ipairs(techs) do
+        putTechOnTrack(tech.name,tech.track,board,tech.spot, true)
+    end
+end
+
+function showNextRoundButton()
+    getObjectFromGUID(nextRoundButton_GUID).setInvisibleTo({})
+    getObjectFromGUID(nextRoundButton_GUID).interactable = true
+end
+
+function onObjectLeaveContainer(bag, obj)
+    -- Set tech tile rotation
+    if bag.hasTag('Tech Tile') then
+        obj.setRotation(bag.getRotation())
+    end
+end
+
+function addButtonToTechTile(zone, tile)
+    -- Make sure it's a tech tile
+    if not tile.hasTag('Tech Tile') or zone.getGUID() ~= TechTileZone_GUID then
+      return false
+    end
+
+    local data = {
+      click_function = "acquireTech",
+      function_owner = self,
+      label = "Acquire "..tile.getName(),
+      position = {0, 0.1, 0},
+      scale = {0.5, 0.5, 0.5},
+      width = 2000,
+      height = 2000,
+      font_size = 400,
+      color = {0.7573, 0.7573, 0.7573, 0},
+      tooltip = "Acquire "..tile.getName(),
+    }
+    tile.createButton(data)
+end
+
+function getBoardBelongingToColor(color)
+
+end
+
+function acquireTech(tile, color)
+
+end

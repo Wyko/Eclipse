@@ -1,0 +1,191 @@
+local RoundMarker_GUID = '7ad23d'
+local TechBag_GUID = 'd67d39'
+local ReputationBag_GUID = '3c5d08'
+local DiscoveryBag_GUID = '3c0b57'
+local Sector1Bag_GUID = '2adc64'
+local Sector2Bag_GUID = '3ae266'
+local Sector3Bag_GUID = 'd5cb79'
+local ExtraS3Bag_GUID = '69b446'
+local OutpostBag_GUID = '54fe91'
+local AmbassadorBag_GUID = '0d6bda'
+local nextRoundButton_GUID = '3d6d3a'
+local GuardianSpot = {41.86, 1.39, -6.50}
+local AncientSpot = {41.85, 1.39, -9.09}
+local GCDSSpot = {2.38, 1.15, -0.01}
+local TableZone = '4980a7'
+local TechTileZone_GUID = 'd22a87'
+
+RoundMarker = nil
+local TechBag = nil
+local ReputationBag = nil
+local DiscoveryBag = nil
+local Sector1Bag = nil
+local Sector2Bag = nil
+local Sector3Bag = nil
+local OutpostBag = nil
+local AmbassadorBag = nil
+
+local activeGuardianBag = nil
+local activeAncientsBag = nil
+
+useWarpTiles = false
+
+riseOfTheAncients = false
+
+local possibleColors = {'White', 'Yellow', 'Red', 'Green', 'Blue', 'Purple'}
+
+local PassMarkers = {
+    Descendants_of_Draco = '92bb2c',
+    Hydran_Progress = 'f29b47',
+    Orion_Hegemony = '71550f',
+    Eridani_Empire = 'b73884',
+    Mechanema = 'a0df63',
+    Planta = 'ab6fe5',
+    Terran_Conglomerate = '8d08e7',
+    Terran_Directorate = 'd31524',
+    Terran_Federation = 'c56254',
+    Terran_Alliance = 'f03936',
+    Terran_Republic = '4a699f',
+    Terran_Union = '72e467',
+    Rho_Indi = 'bf12e0',
+    Guardians_of_Magellan = 'c56254',
+    Wardens_of_Magellan = 'ffcf43',
+}
+
+local PlayerMarkers = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local TableGUIDs = {'002b10','f7a579','69781d','4493a4',
+                    'd38d11','63752e','cafe1f'}
+
+local PassCards = { White = '891c67',
+                    Yellow = 'e2c83f',
+                    Red = '9ea7f0',
+                    Green = 'ec66c3',
+                    Blue = 'e1fdba',
+                    Purple = '6f944e'}
+
+local PassAreas = {[1] = 'b959ad',
+                   [2] = 'c3cc14',
+                   [3] = 'dc079b',
+                   [4] = 'a594ec',
+                   [5] = '22e3e7',
+                   [6] = '4a38d2'}
+
+local PlayerBoardZones = {
+    White = 'c98866',
+    Yellow = '150bb8',
+    Red = '9d03e7',
+    Green = 'e1765f',
+    Blue = 'f39a79',
+    Purple = '777f5a',
+}
+
+-- Stores the callback function when a player selects a board
+local boardSelectCallbackFunction = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local PlayerRace = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local passRestingPositions = {
+    White  = {-38.22, 1.03, -7.93},
+    Yellow = {-36.20, 1.03, -7.93},
+    Red    = {-34.18, 1.03, -7.93},
+    Green  = {-32.16, 1.03, -7.93},
+    Blue   = {-30.15, 1.03, -7.93},
+    Purple = {-28.13, 1.03, -7.93}
+}
+
+local influenceSpaces = {
+    [1] = vector(3.20, 1.17, 5.62),
+    [2] = vector(2.21, 1.17, 5.61),
+    [3] = vector(1.21, 1.17, 5.61),
+    [4] = vector(0.22, 1.17, 5.61),
+    [5] = vector(-0.76, 1.17, 5.62),
+    [6] = vector(-1.75, 1.17, 5.62),
+    [7] = vector(-2.73, 1.17, 5.62),
+    [8] = vector(-3.72, 1.17, 5.62),
+    [9] = vector(-4.71, 1.17, 5.63),
+    [10] = vector(-5.70, 1.17, 5.62),
+    [11] = vector(-6.69, 1.17, 5.62),
+    [12] = vector(-7.67, 1.17, 5.62),
+    [13] = vector(-8.67, 1.17, 5.62),
+}
+
+local techTracks = {
+    Yellow = {
+        [1] = {-2.96, 1.17, -3.71},
+        [2] = {-1.13, 1.17, -3.69},
+        [3] = {0.70, 1.17, -3.69},
+        [4] = {2.52, 1.17, -3.69},
+        [5] = {4.35, 1.17, -3.69},
+        [6] = {6.17, 1.17, -3.67},
+        [7] = {8.01, 1.17, -3.69},
+    },
+    Green = {
+        [1] = {-2.96, 1.17,  -1.69},
+        [2] = {-1.13, 1.17,  -1.69},
+        [3] = {0.70,  1.17,  -1.69},
+        [4] = {2.52,  1.17,  -1.69},
+        [5] = {4.35,  1.17,  -1.69},
+        [6] = {6.17,  1.17,  -1.69},
+        [7] = {8.01,  1.17,  -1.69},
+    },
+    Red = {
+        [1] = {-2.96, 1.17,  0.30},
+        [2] = {-1.13, 1.17,  0.30},
+        [3] = {0.70,  1.17,  0.30},
+        [4] = {2.52,  1.17,  0.30},
+        [5] = {4.35,  1.17,  0.30},
+        [6] = {6.17,  1.17,  0.30},
+        [7] = {8.01,  1.17,  0.30},
+    }
+}
+
+local tColor = { M = {1, 0.7, 0.8},
+                 G = {0.7, 1, 0.7},
+                 N = {1, 1, 0.7},
+                 R = {0.7, 0.8, 1}}
+local tBase = {  M = Vector(40.50, 1.38,  9.12),
+                 G = Vector(38.68, 1.38,  9.12),
+                 N = Vector(36.86, 1.38,  9.12),
+                 R = Vector(40.77, 1.04, 13.76)}
+local rBase = Vector(42.44, 1.5, 10.54)
+local aBase = Vector(36.07, 2.5, 16.55)
+local rdBase = Vector(42.5, 1.5, 10.56)
+local offsetTech = -1.814
+local offsetRare = -1.72
+local offsetRound = -1.56
+local offsetAmbassador = -2.04
+local outerSectors = {2, 5, 8, 14, 16, 18}
+local passed = {White = true, Yellow = true, Red = true,
+                Green = true, Blue = true, Purple = true}
+local passCheck = nil
+local turnBag = '9d696e'
+local turnTracker ='bcaf12'
+local InfluenceDisks_GUID = '8f4c6b'
+
+local DisableGUIDs = {
+  '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',
+  '77e0d1', --Turn Tracker
+  '2bd7cb', --Setup Board
+}
