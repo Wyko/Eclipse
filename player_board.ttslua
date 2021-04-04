@@ -155,3 +155,122 @@ function getBoardInitialTechs(board)
         putTechOnTrack(tech.name,tech.track,board,tech.spot, true)
     end
 end
+
+
+function discoverBoardsToSetRace(zone, obj)
+    -- Discover player boards --
+    if not string.find(zone.getName(), "Player Board Zone") or
+    not obj.hasTag("Board") then
+        return false
+    end
+
+    local color = split(zone.getName(), " ")[1] -- Get the player's name
+    if PlayerRace[color] ~= obj.getName() then
+
+        -- Restart the timer on the set race function
+        if boardSelectCallbackFunction[color] then
+            Wait.stop(boardSelectCallbackFunction[color])
+        end
+
+        boardSelectCallbackFunction[color] =
+            Wait.time(function() setRace(color, zone, obj) end, 2, 0)
+    end
+end
+
+function checkIfPlayerChangedBoards(zone, obj)
+    -- Triggered when a player board leaves a board zone. Check to see if we
+    -- need to reset the player's race
+
+    -- Break out if we're not dealing with player boards or board zones
+    if (string.find(zone.getName(), "Player Board Zone") == nil or
+        not obj.hasTag("Board")) then
+        return false
+    end
+
+    -- Get the player's color
+    local color = split(zone.getName(), " ")[1]
+
+    -- If the player's currently saved race is the same as the race they picked
+    -- then trigger the race reset timer. If the timer runs out and the board
+    -- is still absent from the zone, return the player markers and clear the
+    -- saved race variables.
+    if PlayerRace[color] == obj.getName() then
+        Wait.time(function() resetRace(color, zone, obj) end, 5, 0)
+    end
+end
+
+function resetRace(playerColor, zone, obj)
+
+    -- Check if the board is still in its player's zone. If so, cancel the reset
+    for _, v in pairs(zone.getObjects()) do
+        if v.getGUID() == obj.getGUID() then -- Check if the board is still in the zone
+            return false
+        end
+    end
+
+    -- Don't spam the chat in case multiple checks were started
+    if PlayerRace[playerColor] == obj.getName() then
+        printToAll(playerColor .. " returned " .. obj.getName(), playerColor)
+    end
+
+    PlayerRace[playerColor] = nil
+    if PlayerMarkers[playerColor] ~= nil then
+        PlayerMarkers[playerColor].setColorTint(Color.White)
+        PlayerMarkers[playerColor].setDescription('')
+
+        -- Return the player marker to the bag
+        turnBag.putObject(PlayerMarkers[playerColor])
+    end
+    PlayerMarkers[playerColor] = nil
+end
+
+function setRace(playerColor, zone, obj)
+    -- Check if the player board is still in the zone and didn't just move
+    -- through it, then lock it
+
+    -- Check if the board is still in the zone
+    for _, v in pairs(zone.getObjects()) do
+        if v.getGUID() == obj.getGUID() then
+
+            -- Only print to chat if this is the first time the player selects
+            -- this race (in case they move their board, etc)
+            if PlayerRace[playerColor] ~= obj.getName() then
+                printToAll(playerColor .. " has picked " .. obj.getName(), playerColor)
+            end
+
+            PlayerRace[playerColor] = obj.getName()
+            PlayerMarkers[playerColor] = takePassMarker(playerColor)
+            obj.setLock(true)
+            break
+        end
+    end
+end
+
+
+function playersWithoutBoards()
+    players = {}
+    for _, color in pairs(getSeatedPlayers()) do
+        if not hasPlayerBoard(color) then
+            table.insert(players, color)
+        end
+    end
+    return players
+end
+
+
+function ownerOfBoard(board)
+    -- Returns the Player owner of a particular board
+
+    if type(board) ~= 'string' then
+        board = board.getGUID()
+    end
+
+    -- Search through every board zone for the specified board
+    for color, guid in pairs(PlayerBoardZones) do
+        for _, obj in pairs(getObjectFromGUID(guid).getObjects()) do
+            if obj.getGUID() == board then
+                return Player[color]
+            end
+        end
+    end
+end

@@ -170,4 +170,36 @@ function dump(o)
 
  end
 
- 
+
+ function split (inputstr, sep)
+     -- String Split --
+     if sep == nil then
+             sep = "%s"
+     end
+     local t={}
+     for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+             table.insert(t, str)
+     end
+     return t
+ end
+
+ function colorInGame(color)
+     -- Returns true if a player with the given color is seated in game
+
+     for _, presentColor in pairs(getSeatedPlayers()) do
+         if color == presentColor then return true end
+     end
+     return false
+ end
+
+ function itemInZone(zone, obj)
+     -- Returns true if the given object is present inside the given scripting
+     -- zone
+
+     for _, tmp_obj in pairs(getObjectFromGUID(zone).getObjects()) do
+         if tmp_obj.getGUID() == obj.getGUID() then
+             return true
+         end
+     end
+     return false
+ end

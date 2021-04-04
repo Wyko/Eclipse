@@ -1,0 +1,245 @@
+function allPlayersPassed()
+    -- Return true if all players have placed their pass markers on the turn
+    -- tracker
+    for _, player in pairs(getSeatedPlayers()) do
+        if (hasPlayerBoard(player) and
+            not getObjectFromGUID(PassCards[player]).is_face_down) then
+            -- log(player .. ' was not passed.')
+            return false
+        end
+    end
+    return true
+end
+
+function playersNotPassed()
+    -- Return a table of players that are not passed.
+    unpassedPlayers = {}
+    for _, player in pairs(getSeatedPlayers()) do
+        if (hasPlayerBoard(player) and
+            not getObjectFromGUID(PassCards[player]).is_face_down) then
+            table.insert(unpassedPlayers, player)
+        end
+    end
+    log("Unpassed Players: ")
+    log(unpassedPlayers)
+    return unpassedPlayers
+end
+
+function updateTurnOrder()
+    if not allPlayersPassed() then
+        log(playersNotPassed(), "Players not passed", 'Warning')
+    end
+
+    log(Turns.order, 'Turn order: Old')
+
+    local new_turns = {}
+    for i = 1, 6 do
+        local marker = isMarkerOnPassSpace(i)
+        if marker then
+            new_turns[i] = ownerOfMarker(marker).color
+        --     log("Marker found on spot "..i, "updateTurnOrder")
+        -- else
+        --     log("Marker not found on spot "..i, "updateTurnOrder")
+        end
+    end
+
+    local colorsToAppend = {}
+    for _, color in pairs(getSeatedPlayers()) do
+        local found = false
+        for _, newColor in pairs(new_turns) do
+            if color == newColor then found = true end
+        end
+        if not found then
+            broadcastToAll(tostring(color) .. ' not found on the turn tracker. They will be added to the end of the turn order for next round. The order for the next round should be checked.')
+            table.insert(new_turns, color)
+        end
+    end
+
+    -- Update the turn order
+    Turns.order = new_turns
+    Turns.turn_color = Turns.order[1]
+
+    log(Turns.order, 'Turn Order: New')
+end
+
+
+function ownerOfMarker(marker)
+    -- Returns the Player owner of a particular marker
+    for plr, mkr in pairs(PlayerMarkers) do
+        if mkr.getGUID() == marker.getGUID() then
+            return Player[plr]
+        end
+    end
+end
+
+
+function isMarkerOnPassSpace(num)
+    local area = getObjectFromGUID(PassAreas[num])
+    -- log('Area Name: '..area.getName(), 'isMarkerOnPassSpace')
+    -- log(area.getObjects(), 'area.getObjects()')
+
+    for _, obj in pairs(area.getObjects()) do
+        if obj.hasTag("Pass Marker") then
+            log("Pass space " .. num .. ': Occupied') --, 'isMarkerOnPassSpace')
+            return obj
+        end
+    end
+    log("Pass space " .. num .. ': Free') --, 'isMarkerOnPassSpace')
+    return false
+end
+
+function moveAllPassMarkersOffBoard()
+    for playerColor, marker in pairs(PlayerMarkers) do
+        marker.setPositionSmooth(passRestingPositions[playerColor], false, true)
+        marker.setLock(true)
+    end
+end
+
+function movePassMarkerOffBoard(color)
+    marker = PlayerMarkers[color]
+    marker.setPositionSmooth(passRestingPositions[color], false, true)
+    marker.setLock(true)
+end
+
+function getNextPassSpot()
+    for i=1, 6 do
+        -- Get the next passed area
+        area = getObjectFromGUID(PassAreas[i])
+        local found = false
+
+        for _, obj in pairs(area.getObjects()) do
+            if obj.hasTag("Pass Marker") then
+                -- print("Occupied at " .. i)
+                found = true
+            end
+        end
+
+        -- Find the first empty area and return it
+        if found == false then
+            -- print("Empty at " .. i)
+            return i
+        end
+    end
+end
+
+function colorPassMarker(marker, playerColor)
+    marker.setColorTint(playerColor)
+    marker.setLock(true)
+end
+
+function takePassMarker(playerColor)
+
+    param = {
+        position = passRestingPositions[playerColor],
+        callback_function = function(obj) colorPassMarker(obj, playerColor) end,
+    }
+    marker = SeekAndTake(PlayerRace[playerColor], turnBag, param)
+
+    -- Check to see if it's on the map
+    if not marker then
+        log('Turn marker ' .. tostring(PlayerRace[playerColor]) ..
+            ' not found anywhere for ' .. playerColor)
+        return false
+    else
+        log('Turn marker ' .. tostring(PlayerRace[playerColor]) ..
+            ' found for ' .. playerColor)
+    end
+    marker.setDescription(Player[playerColor].steam_name)
+    return marker
+end
+
+function putPassMarker(playerColor)
+    turnBag.putObject(PlayerMarkers[playerColor])
+end
+
+function setPassCards()
+    -- Watch and mark pass cards --
+    if passCheck ~= nil then
+        -- Stop the player pass check coroutine
+        Wait.stop(passCheck)
+    end
+
+    for color,guid in pairs(PassCards) do
+        passed[color] = false
+        local obj = getObjectFromGUID(guid)
+        if obj then
+            obj.setName("Actions")
+            obj.setLock(false)
+            if obj.is_face_down == true then
+                obj.flip()
+            end
+        end
+    end
+
+    -- After four seconds, start the "All players passed" check
+    Wait.time(setPassCheck, 4)
+end
+
+function setPassCheck()
+    passCheck = Wait.condition(
+        function() printToAll("- All Players Passed -", {0.8,0.8,0.8}) end,
+        handlePassCards)
+end
+
+function handlePassCards()
+    local check = true
+    for _,color in pairs(getSeatedPlayers()) do
+        if not hasPlayerBoard(color) then return false end
+
+        local obj = getObjectFromGUID(PassCards[color])
+        if passed[color] and not obj.is_face_down then
+            passed[color] = false
+            obj.setName("Actions")
+            obj.setLock(false)
+            broadcastToAll(color .. ' has unflipped their pass marker.', color)
+            movePassMarkerOffBoard(color)
+
+        elseif passed[color] == false then
+            check = false
+            if obj and obj.is_face_down == true then
+
+                passed[color] = true
+                obj.setName("Passed!")
+                setPassMarker(color)
+                Wait.time(function() obj.setLock(true) end, 1)
+            end
+        end
+    end
+    return check
+end
+
+
+function setPassMarker(color)
+    -- Sets the given color's pass marker onto the track on the next available
+    -- free space
+
+    previousPassArea = getObjectFromGUID(PassAreas[getNextPassSpot() - 1])
+    pos = getObjectFromGUID(PassAreas[getNextPassSpot()]).getPosition()
+
+    -- If the pass marker is already on the track...
+    for _, zone in pairs(PassAreas) do
+
+        -- If it's already on the right spot, just lock and ignore it
+        if (itemInZone(zone, PlayerMarkers[color]) and
+            previousPassArea and
+            zone == previousPassArea.getGUID()) then
+                broadcastToAll(color .. " passes at #" .. getNextPassSpot() - 1, color)
+                PlayerMarkers[color].setLock(true)
+                return false
+
+        -- If it's on the wrong spot, cause some chaos
+        elseif itemInZone(zone, PlayerMarkers[color]) then
+            broadcastToAll("Warning: The turn order is wrong. Please fix.")
+            printToAll("Player "..color.." just flipped their action card to "
+                .. "pass but their pass marker is already on the board. Please "
+                .. "correct the turn order (for all players) and then proceed.",
+                Color.red)
+            return false
+        end
+    end
+
+    broadcastToAll(color .. " passes at #" .. getNextPassSpot(), color)
+    -- log(PlayerMarkers)
+    PlayerMarkers[color].setPosition(pos)
+    PlayerMarkers[color].setLock(true)
+end
