@@ -1,0 +1,6 @@
+function setTechRotation(bag, obj)
+    -- Set tech tile rotation when they exit a bag
+    if bag.hasTag('Tech Tile') then
+        obj.setRotation(bag.getRotation())
+    end
+end
