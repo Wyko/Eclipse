@@ -1,3 +1,12 @@
+function onLoad()
+    loadObjects()
+    lockSideTables()
+    shuffleEverything()
+
+    if hideStuff then hideAndLockStuff() end
+    if isOngoingGame() then loadOngoingGame() end
+end
+
 function onObjectLeaveContainer(bag, obj)
     setTechRotation(bag, obj)
 end

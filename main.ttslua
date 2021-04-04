@@ -1,6 +1,8 @@
 local hideStuff = false
 
 #include initial_variables
+#include builtin_functions
+
 
 function onLoad()
     --[[ The onLoad event is called after the game save finishes loading. --]]
@@ -1300,12 +1302,7 @@ function showNextRoundButton()
     getObjectFromGUID(nextRoundButton_GUID).interactable = true
 end
 
-function onObjectLeaveContainer(bag, obj)
-    -- Set tech tile rotation
-    if bag.hasTag('Tech Tile') then
-        obj.setRotation(bag.getRotation())
-    end
-end
+
 
 function addButtonToTechTile(zone, tile)
     -- Make sure it's a tech tile
