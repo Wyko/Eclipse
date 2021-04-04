@@ -1,0 +1,42 @@
+-- remove all damage cubes from the table area
+function removeDamageCubes()
+    zoneObjects = TableZone.getObjects()
+    for _,obj in pairs(zoneObjects) do
+        if obj.getName() == "Damage Cube" then destroyObject(obj) end
+    end
+end
+
+function nextRound()
+    -- Main scripting function for round cleanup --
+
+    local players = #getSeatedPlayers()
+    local round = tonumber(RoundMarker.getDescription()) + 1
+    local newTechs = players + 3
+    if round > 8 then
+        broadcastToAll("-- Game Over! --")
+        return
+    elseif round == 2 then
+        if next(playersWithoutBoards()) ~= nil then
+            broadcastToAll("Warning: Not all players have a player board.",
+                Color.Red)
+            printToAll("Players without boards:")
+            for _, color in pairs(playersWithoutBoards()) do
+                printToAll(color, color)
+            end
+            return
+        end
+
+    end
+    removeDamageCubes()
+    unflipColonyAndSkippers()
+    TechBag.shuffle()
+    Wait.time(drawTech, 0.4, newTechs)
+    setPassCards()
+    advanceRoundMarker(round)
+    if round > 1 then
+        Wait.time(function ()
+            updateTurnOrder()
+            moveAllPassMarkersOffBoard()
+        end, 2)
+    end
+end

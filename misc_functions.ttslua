@@ -96,3 +96,78 @@ function dump(o)
             Wait.condition(pointerFnc, function() return objTile.resting end )
         end, waitSeconds )
  end
+
+
+ function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
+   -- Search a container for all objects with matching names, then take out a random one
+   TakeParams.guid = '000000'
+   local container
+   local guids = {}
+ --   log('GUID: '..tostring(ContainerOrGUID))
+   if type(ContainerOrGUID) == 'string' then
+     container = getObjectFromGUID(ContainerOrGUID)
+   else
+     container = ContainerOrGUID
+   end
+
+   for k,v in pairs(container.getObjects()) do
+     if string.find(string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname), string.lower(ObjectName)
+     ) then
+       table.insert(guids, v.guid)
+     --   log('Found name: '..string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname))
+     elseif string.find(string.lower(v.description), string.lower(ObjectName)) then
+       table.insert(guids, v.guid)
+     --   log('Found description: '.. v.description)
+     end
+   end
+
+   if #guids == 0 then
+     log('Did not find '..ObjectName)
+     return false
+   end
+
+   TakeParams.guid = guids[math.random(#guids)]
+   return container.takeObject(TakeParams)
+ end
+
+ function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
+     rot = rot or Vector(0,0,0)
+     local obj = SeekAndTake(ObjectName, ContainerOrGUID, {})
+     local putContainer
+
+     if type(ContainerOrGUID) == 'string' then
+         putContainer = getObjectFromGUID(ContainerOrGUID)
+       else
+         putContainer = ContainerOrGUID
+     end
+     -- log('Position: ' .. tostring(pos))
+
+     if not obj then return false end
+
+     Wait.condition(
+         function ()
+             local clone = obj.clone()
+             clone.setPositionSmooth(pos, false, true)
+             clone.setRotationSmooth(rot, false, true)
+             triggerFunctionIfResting(
+                 clone,
+                 function () clone.setLock(lock or false) end
+             )
+
+             triggerFunctionIfResting(
+                 obj,
+                 function ()
+                     putContainer.putObject(obj) -- Return the object to the container it was in
+                 end
+             )
+             return clone
+         end,
+         function ()
+             return not obj.spawning
+         end,
+         10
+     )
+
+ end
+
+ 

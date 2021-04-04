@@ -6,6 +6,8 @@ local hideStuff = false
 #include game_setup
 #include player_board
 #include technology
+#include turn_order_management
+#include next_round
 
 
 
@@ -14,267 +16,17 @@ local hideStuff = false
 
 
 
--- delay execution of a function until an object is resting
-function triggerFunctionIfResting(objTile, pointerFnc, waitSeconds)
-  waitSeconds = waitSeconds or 1
-  Wait.time(
-      function()
-          Wait.condition(pointerFnc, function() return objTile.resting end )
-      end, waitSeconds )
-end
 
 
--- handle basic player setup
-function basicSetup2(parameters)
-
-  local PlayerColor = parameters.PlayerColor
-  local Box_GUID = parameters.BoxGuid
-  local FactionName = parameters.FactionName
-
---   log('Starting basic setup for '..tostring(PlayerColor))
-  -- check if the player already selected a faction
-  if PlayerRace[PlayerColor] ~= nil then
-      print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
-      return false
-  end
-
-  PlayerRace[PlayerColor] = FactionName .. ' '  -- A space so it can be reset in setRace
-
-  local Box = getObjectFromGUID(Box_GUID)
-  local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
-  PlayerPosition.y = 0.15
-
-  local SpawnPos=Box.getPosition() + Vector(0,5,0)
-  local InvPos = -1
-
-  local takeParams = {position = SpawnPos, rotation = vector(0,0,0)}
-  if PlayerPosition.z < 0 then
-    takeParams.rotation = vector(0,180,0)
-    InvPos = 1
-  end
-
-  local destination
-
-  -- take home world and position it
-  local Object = SeekAndTake('Homeworld', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-  end
-
-    -- take home world and position it
-    Object = SeekAndTake('Fleet', Box, takeParams)
-    if (Object~=false) then
-        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
-        Object.setPositionSmooth(destination,false, true)
-        Object.setColorTint(Color.fromString(PlayerColor))
-        Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
-    end
-
-  -- take ambassador tiles and position them
-  Object = SeekAndTake('Ambassador', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(19.5*InvPos, 0, 24*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-  end
-
-  -- take action card and position it
-  Object = SeekAndTake('Actions', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-  end
-
-  -- take player board and position it
-  Object = SeekAndTake('Player Board', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-
-    local Lock = function()
-        Wait.time(
-            function ()
-                log('Setting up board for ' .. tostring(PlayerColor))
-                setupPlayerInfluence(Object, PlayerColor)
-                getBoardInitialTechs(Object)
-            end,
-            2)
-    end
-    triggerFunctionIfResting(Object, Lock)
-  end
-
-  -- place colony ships
-  PlaceColonyShips(Box, takeParams, PlayerPosition)
-  return true
-end
-
--- search a container for all objects with matching names, then take out a random one
-function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
-  TakeParams.guid = '000000'
-  local container
-  local guids = {}
---   log('GUID: '..tostring(ContainerOrGUID))
-  if type(ContainerOrGUID) == 'string' then
-    container = getObjectFromGUID(ContainerOrGUID)
-  else
-    container = ContainerOrGUID
-  end
-
-  for k,v in pairs(container.getObjects()) do
-    if string.find(string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname), string.lower(ObjectName)
-    ) then
-      table.insert(guids, v.guid)
-    --   log('Found name: '..string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname))
-    elseif string.find(string.lower(v.description), string.lower(ObjectName)) then
-      table.insert(guids, v.guid)
-    --   log('Found description: '.. v.description)
-    end
-  end
-
-  if #guids == 0 then
-    log('Did not find '..ObjectName)
-    return false
-  end
-
-  TakeParams.guid = guids[math.random(#guids)]
-  return container.takeObject(TakeParams)
-end
-
-function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
-    rot = rot or Vector(0,0,0)
-    local obj = SeekAndTake(ObjectName, ContainerOrGUID, {})
-    local putContainer
-
-    if type(ContainerOrGUID) == 'string' then
-        putContainer = getObjectFromGUID(ContainerOrGUID)
-      else
-        putContainer = ContainerOrGUID
-    end
-    -- log('Position: ' .. tostring(pos))
-
-    if not obj then return false end
-
-    Wait.condition(
-        function ()
-            local clone = obj.clone()
-            clone.setPositionSmooth(pos, false, true)
-            clone.setRotationSmooth(rot, false, true)
-            triggerFunctionIfResting(
-                clone,
-                function () clone.setLock(lock or false) end
-            )
-
-            triggerFunctionIfResting(
-                obj,
-                function ()
-                    putContainer.putObject(obj) -- Return the object to the container it was in
-                end
-            )
-            return clone
-        end,
-        function ()
-            return not obj.spawning
-        end,
-        10
-    )
-
-end
 
 
--- search a container for all colony ships and place them in front of the player
-function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
-  TakeParams.guid = '000000'
-  local container
-  local guids = {}
-  local Object
-  local offset
-  container = ContainerOrGUID
 
-  for k,v in pairs(container.getObjects()) do
-    if string.find(string.lower(v.name or v.nickname), string.lower('Colony Ship')) then
-      table.insert(guids, v.guid)
-    end
-  end
 
-  if #guids == 0 then return false end
 
-  local Inv = -1;
-  if PlayerPosition.z < 0 then Inv=1 end
-  local StartPosition = PlayerPosition + Vector(-22.4*Inv, 0, 15*Inv)
-  if #guids ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
-  if #guids > 3 then StartPosition = StartPosition + Vector(0, 0, 1*Inv) end
 
-  for k,id in pairs(guids) do
-      TakeParams.guid = guids[id]
-      Object = container.takeObject(TakeParams)
 
-      if k>2 and #guids>3 then offset = Vector((k-2)*2.9*Inv, 0, -2*Inv)
-      else offset = Vector(k*2.9*Inv, 0, 0) end
-      Object.setPositionSmooth(StartPosition + offset, false, true)
-    end
-end
 
-function loadObjects()
-    TableZone = getObjectFromGUID(TableZone)
-    RoundMarker = getObjectFromGUID(RoundMarker_GUID)
-    TechBag = getObjectFromGUID(TechBag_GUID)
-    ReputationBag = getObjectFromGUID(ReputationBag_GUID)
-    DiscoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
-    Sector1Bag = getObjectFromGUID(Sector1Bag_GUID)
-    Sector2Bag = getObjectFromGUID(Sector2Bag_GUID)
-    Sector3Bag = getObjectFromGUID(Sector3Bag_GUID)
-    ExtraS3Bag = getObjectFromGUID(ExtraS3Bag_GUID)
-    OutpostBag = getObjectFromGUID(OutpostBag_GUID)
-    turnBag = getObjectFromGUID(turnBag)
-    turnTracker = getObjectFromGUID(turnTracker)
-    AmbassadorBag = getObjectFromGUID(AmbassadorBag_GUID)
-end
 
-function loadOngoingGame()
-    printToAll('Script is attempting to recover ongoing game state')
-
-    -- Pass state
-    for color,guid in pairs(PassCards) do
-        local obj = getObjectFromGUID(guid)
-        if obj then
-            printToAll(color .. " passed: " .. tostring(obj.is_face_down), color)
-            passed[color] = obj.is_face_down
-        end
-    end
-    -- After four seconds, start the "All players passed" check
-    Wait.time(setPassCheck, 4)
-
-    for color, _ in pairs(PlayerBoardZones) do
-        if hasPlayerBoard(color) then
-            local board = hasPlayerBoard(color)
-            printToAll(color .. " picked " .. board.getName(), color)
-
-            -- Return influence button
-            spawnReturnInfluenceButton(board)
-
-            -- PlayerRace
-            PlayerRace[color] = board.getName()
-
-            -- PlayerMarkers
-            PlayerMarkers[color] = getObjectFromGUID(PassMarkers[string.gsub(PlayerRace[color], ' ', '_')])
-            if not PlayerMarkers[color] then
-                log('Player marker for '..color..' not found')
-                PlayerMarkers[color] = takePassMarker(color)
-            else
-                log('Player marker for '..color..' found: '..tostring(PlayerMarkers[color].getName()))
-            end
-        end
-    end
-    showNextRoundButton()
-
-end
-
-function isOngoingGame()
-    -- Returns true is this is an ongoing game; For instance, if the game was
-    -- loaded from a save or rewound in time.
-    local round = tonumber(RoundMarker.getDescription())
-    if round ~= 0 then return true end
-end
 
 function split (inputstr, sep)
     -- String Split --
@@ -288,33 +40,7 @@ function split (inputstr, sep)
     return t
 end
 
-function shuffleEverything()
-    -- Shuffle all bags and stacks --
-    TechBag.shuffle()
-    ReputationBag.shuffle()
-    DiscoveryBag.shuffle()
-    Sector1Bag.shuffle()
-    Sector2Bag.shuffle()
-    Sector3Bag.shuffle()
-    OutpostBag.shuffle()
-    AmbassadorBag.shuffle()
-end
 
-function setupTiles(players)
-    -- Arrange various tiles for first turn setup.
-    local trim = Sector3Bag.getQuantity() - outerSectors[players]
-    if trim > 0 then
-        Wait.time(tossOuterSectors, 0.2, trim)
-    end
-    local d = DiscoveryBag.takeObject({rotation = {180,-45,0}})
-    d.setPositionSmooth(Vector(0, 2, 0), false, false)
-    local pos = aBase
-    Wait.time(function()
-            local a = AmbassadorBag.takeObject({rotation = {0,-90,0}})
-            a.setPositionSmooth(pos, false, false)
-            pos = pos + Vector(offsetAmbassador, 0, 0)
-        end, 0.5, 4)
-end
 
 function playersWithoutBoards()
     players = {}
@@ -326,48 +52,7 @@ function playersWithoutBoards()
     return players
 end
 
--- remove all damage cubes from the table area
-function removeDamageCubes()
-    zoneObjects = TableZone.getObjects()
-    for _,obj in pairs(zoneObjects) do
-        if obj.getName() == "Damage Cube" then destroyObject(obj) end
-    end
-end
 
-function nextRound()
-    -- Main scripting function for round cleanup --
-
-    local players = #getSeatedPlayers()
-    local round = tonumber(RoundMarker.getDescription()) + 1
-    local newTechs = players + 3
-    if round > 8 then
-        broadcastToAll("-- Game Over! --")
-        return
-    elseif round == 2 then
-        if next(playersWithoutBoards()) ~= nil then
-            broadcastToAll("Warning: Not all players have a player board.",
-                Color.Red)
-            printToAll("Players without boards:")
-            for _, color in pairs(playersWithoutBoards()) do
-                printToAll(color, color)
-            end
-            return
-        end
-
-    end
-    removeDamageCubes()
-    unflipColonyAndSkippers()
-    TechBag.shuffle()
-    Wait.time(drawTech, 0.4, newTechs)
-    setPassCards()
-    advanceRoundMarker(round)
-    if round > 1 then
-        Wait.time(function ()
-            updateTurnOrder()
-            moveAllPassMarkersOffBoard()
-        end, 2)
-    end
-end
 
 
 function setupFirstRound()
@@ -584,100 +269,12 @@ function getNextPassSpot()
     end
 end
 
-function onObjectEnterScriptingZone(zone, obj)
-    addButtonToTechTile(zone, obj)
-
-    -- Discover player boards --
-    if not string.find(zone.getName(), "Player Board Zone") or
-    not obj.hasTag("Board") then
-        return false
-    end
-
-    local color = split(zone.getName(), " ")[1] -- Get the player's name
-    if PlayerRace[color] ~= obj.getName() then
-
-        -- Restart the timer on the set race function
-        if boardSelectCallbackFunction[color] then
-            Wait.stop(boardSelectCallbackFunction[color])
-        end
-
-        boardSelectCallbackFunction[color] =
-            Wait.time(function() setRace(color, zone, obj) end, 2, 0)
-    end
-end
 
 function onObjectLeaveScriptingZone(zone, leave_object)
     checkIfPlayerChangedBoards(zone, leave_object)
 end
 
-function checkIfPlayerChangedBoards(zone, obj)
-    -- Triggered when a player board leaves a board zone. Check to see if we
-    -- need to reset the player's race
 
-    -- Break out if we're not dealing with player boards or board zones
-    if (string.find(zone.getName(), "Player Board Zone") == nil or
-        not obj.hasTag("Board")) then
-        return false
-    end
-
-    -- Get the player's color
-    local color = split(zone.getName(), " ")[1]
-
-    -- If the player's currently saved race is the same as the race they picked
-    -- then trigger the race reset timer. If the timer runs out and the board
-    -- is still absent from the zone, return the player markers and clear the
-    -- saved race variables.
-    if PlayerRace[color] == obj.getName() then
-        Wait.time(function() resetRace(color, zone, obj) end, 5, 0)
-    end
-end
-
-function resetRace(playerColor, zone, obj)
-
-    -- Check if the board is still in its player's zone. If so, cancel the reset
-    for _, v in pairs(zone.getObjects()) do
-        if v.getGUID() == obj.getGUID() then -- Check if the board is still in the zone
-            return false
-        end
-    end
-
-    -- Don't spam the chat in case multiple checks were started
-    if PlayerRace[playerColor] == obj.getName() then
-        printToAll(playerColor .. " returned " .. obj.getName(), playerColor)
-    end
-
-    PlayerRace[playerColor] = nil
-    if PlayerMarkers[playerColor] ~= nil then
-        PlayerMarkers[playerColor].setColorTint(Color.White)
-        PlayerMarkers[playerColor].setDescription('')
-
-        -- Return the player marker to the bag
-        turnBag.putObject(PlayerMarkers[playerColor])
-    end
-    PlayerMarkers[playerColor] = nil
-end
-
-function setRace(playerColor, zone, obj)
-    -- Check if the player board is still in the zone and didn't just move
-    -- through it, then lock it
-
-    -- Check if the board is still in the zone
-    for _, v in pairs(zone.getObjects()) do
-        if v.getGUID() == obj.getGUID() then
-
-            -- Only print to chat if this is the first time the player selects
-            -- this race (in case they move their board, etc)
-            if PlayerRace[playerColor] ~= obj.getName() then
-                printToAll(playerColor .. " has picked " .. obj.getName(), playerColor)
-            end
-
-            PlayerRace[playerColor] = obj.getName()
-            PlayerMarkers[playerColor] = takePassMarker(playerColor)
-            obj.setLock(true)
-            break
-        end
-    end
-end
 
 function colorPassMarker(marker, playerColor)
     marker.setColorTint(playerColor)
