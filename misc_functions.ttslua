@@ -86,3 +86,13 @@ function dump(o)
          end
      end
  end
+
+
+ function triggerFunctionIfResting(objTile, pointerFnc, waitSeconds)
+     -- Delay execution of a function until an object is resting
+     waitSeconds = waitSeconds or 1
+     Wait.time
+        function()
+            Wait.condition(pointerFnc, function() return objTile.resting end )
+        end, waitSeconds )
+ end
