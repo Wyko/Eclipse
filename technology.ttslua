@@ -1,0 +1,27 @@
+function nextFreeTechSpace(trackColor, board)
+    local InvPos = boardInvertFactor(board)
+    InvPos = Vector(InvPos, 1, InvPos)
+
+    for index, pos in ipairs(techTracks[trackColor]) do
+        local tmpPos = (Vector(pos) * InvPos) + board.getPosition()
+        if not castAndCheckForTag(tmpPos, 'Tech Tile') then
+            return index
+        end
+    end
+    return 7
+end
+
+function putTechOnTrack(techName, trackColor, board, spot, lock)
+    -- Clones a tech in the tech bag and places it at the specified spot number
+    -- If no spot is specified, the next available spot is used.
+
+    local InvPos = boardInvertFactor(board)
+    InvPos = Vector(InvPos, 1, InvPos)
+
+    spot = spot or nextFreeTechSpace(trackColor, board)
+
+    local finalPos = (Vector(techTracks[trackColor][spot]) * InvPos) + board.getPosition()
+    SeekAndClone(techName, TechBag_GUID, finalPos, board.getRotation(), lock)
+    return true
+
+end

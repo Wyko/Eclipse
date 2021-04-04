@@ -1,0 +1,184 @@
+function hideAndLockStuff()
+    HideObjects = getObjectsWithTag('Player Part Bag')
+    table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence disks
+    table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
+    table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
+
+    -- disable interactions with tables extensions, game board, influence bag, ...
+    for _,GUID in pairs(DisableGUIDs) do
+        object = getObjectFromGUID(GUID)
+        if object ~= nil then object.interactable = false end
+    end
+
+    -- hide
+    for _, obj in pairs(HideObjects) do
+        obj.setInvisibleTo({"Blue", "White", "Red", "Yellow", "Green", 'Purple'})
+    end
+end
+
+
+function fillWithWarp()
+    local warpSpots = {
+        Purple = {
+            position = Vector(9.12, 1.01, 8.14),
+            rotation = Vector(0.00, 59.64, 0.00)
+        },
+        White = {
+            position = Vector(11.60, 1.01, -3.72),
+            rotation = Vector(0.00, 119.99, 0.00),
+        },
+        Yellow = {
+            position = Vector(2.58, 1.01, -11.93),
+            rotation = Vector(0.00, 179.99, 0.00),
+        },
+        Red = {
+            position = Vector(-9.03, 1.01, -8.19),
+            rotation = Vector(0.00, 240.01, 0.00),
+        },
+        Green = {
+            position = Vector(-11.64, 1.01, 3.77),
+            rotation = Vector(0.00, 300.11, 0.00),
+        },
+        Blue = {
+            position = Vector(-2.58, 1.06, 11.93),
+            rotation = Vector(359.82, 0.01, 359.68),
+        },
+    }
+    local warpBag = getObjectFromGUID('257134')
+
+    for _, color in ipairs(possibleColors) do
+        local found = false
+        for _, seatedColor in ipairs(getSeatedPlayers()) do
+            if color == seatedColor then
+                found = true
+            end
+        end
+
+        if not found then
+            warpBag.takeObject({
+                position = warpSpots[color].position,
+                rotation = warpSpots[color].rotation,
+                callback_function = function (obj)
+                    obj.setLock(true)
+                end
+            })
+        end
+    end
+end
+
+
+function fillWithGuardians()
+    local GuardiansSpots = {
+        Purple = {
+            position = Vector(10.32, 0.96, 5.95),
+            rotation = Vector(0.00, 60.01, 0.00),
+        },
+        White = {
+            position = Vector(10.32, 0.96, -5.96),
+            rotation = Vector(0.00, 120.00, 0.00),
+        },
+        Yellow = {
+            position = Vector(0.00, 0.96, -11.92),
+            rotation = Vector(0.00, 180.86, 0.00),
+        },
+        Red = {
+            position = Vector(-10.32, 0.96, -5.96),
+            rotation = Vector(0.00, 240.00, 0.00),
+        },
+        Green = {
+            position = Vector(-10.32, 0.96, 5.96),
+            rotation = Vector(0.00, 300.01, 0.00),
+        },
+        Blue = {
+            position = Vector(0.00, 0.96, 11.92),
+            rotation = Vector(0.00, 359.32, 0.00),
+        },
+    }
+
+    local guardianBag = getObjectFromGUID('54fe91')
+    local guardianModelBag = getObjectFromGUID('19e48c')
+    local discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
+
+    if #getSeatedPlayers() < 2 then
+        printToAll('Must have at least two players to fill with guardians.')
+        return false
+    end
+
+    for _, color in ipairs(possibleColors) do
+        local found = false
+        for _, seatedColor in ipairs(getSeatedPlayers()) do
+            if color == seatedColor then
+                found = true
+            end
+        end
+
+        if not found then
+            guardianBag.takeObject({
+                position = GuardiansSpots[color].position,
+                rotation = GuardiansSpots[color].rotation,
+                callback_function = function (obj)
+                    obj.setLock(true)
+                end
+            })
+            discoveryBag.takeObject({
+                position = GuardiansSpots[color].position+Vector(0,1,0),
+                rotation = GuardiansSpots[color].rotation+Vector(0, -45, 180),
+            })
+
+            activeGuardianBag.takeObject({
+                position = GuardiansSpots[color].position+Vector(0,2,0),
+                rotation = GuardiansSpots[color].rotation
+            })
+            guardianModelBag.takeObject({
+                position = GuardiansSpots[color].position+Vector(0,3,0),
+                rotation = GuardiansSpots[color].rotation
+            })
+        end
+    end
+end
+
+
+function showNextRoundButton()
+    getObjectFromGUID(nextRoundButton_GUID).setInvisibleTo({})
+    getObjectFromGUID(nextRoundButton_GUID).interactable = true
+end
+
+
+
+function tossOuterSectors()
+    -- Toss extra sector 3 tiles for setup --
+    local s = Sector3Bag.takeObject({rotation = {180,90,0}})
+    ExtraS3Bag.putObject(s)
+end
+
+function drawTech()
+    -- Draw and annouce each tech tile --
+    if TechBag.getQuantity() < 1 then
+        return
+    end
+    local t = TechBag.takeObject({rotation = {0,270,0}})
+    moveTech(t)
+    local type = string.sub(t.getDescription(),1,1)
+    printToAll(string.format("New %s", t.getName()), tColor[type])
+    if type == 'R' then
+        Wait.time(drawTech, 0.2, 1)
+    end
+end
+
+function moveTech(t)
+    -- Calculate offsets and place tech tiles in their spot --
+    local code = t.getDescription()
+    local type = string.sub(code,1,1)
+    local num = tonumber(string.sub(code,2)) - 1
+    local x,y,z = tBase[type].x, tBase[type].y, tBase[type].z
+    if type == 'R' then
+        if num % 2 ~= 0 then
+            z = z + offsetRare
+            num = num - 1
+        end
+        x = x + (offsetRare * num/2)
+    else
+        z = z + (offsetTech * num)
+    end
+    t.setPositionSmooth(Vector(x, y+2, z), false, false)
+end

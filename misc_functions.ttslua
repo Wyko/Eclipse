@@ -4,3 +4,73 @@ function setTechRotation(bag, obj)
         obj.setRotation(bag.getRotation())
     end
 end
+
+function lockSideTables()
+    -- Lock all the side tables --
+    for _,id in pairs(TableGUIDs) do
+        getObjectFromGUID(id).interactable = false
+    end
+end
+
+
+function castAndCheckForTag(position, tag, distance)
+    -- Performs a Physics.cast and returns the first object with the given tag
+
+    local dist = distance or 3
+
+    results = Physics.cast({
+        origin = (Vector(position) + Vector(0,-2,0)),
+        direction = {0,1,0},
+        max_distance = dist,
+        type = 1, -- Ray
+        debug = false,
+    })
+
+    -- log(results)
+    for _, v in pairs(results) do
+        if v['hit_object'].hasTag(tag) then
+            return v['hit_object']
+        end
+    end
+
+    return nil
+end
+
+
+function objectsHitByCast(castResult, name)
+    -- Returns true if an object with a given name was hit by a Physics.Cast()
+
+    local objects = {}
+    for _, obj in ipairs(castResult) do
+        if obj['hit_object'].getName() == name then
+            table.insert(objects, obj['hit_object'])
+        end
+    end
+    return objects
+end
+
+
+function blip(obj)
+    obj.scale(24/25)
+    Wait.time(function() obj.scale(25/24) end, 0.1)
+end
+
+
+function rest(obj)
+    if obj ~= nil then return obj.resting end
+    return false
+end
+
+
+function dump(o)
+    if type(o) == 'table' then
+       local s = '{ '
+       for k,v in pairs(o) do
+          if type(k) ~= 'number' then k = '"'..k..'"' end
+          s = s .. '['..k..'] = ' .. dump(v) .. ','
+       end
+       return s .. '} '
+    else
+       return tostring(o)
+    end
+ end

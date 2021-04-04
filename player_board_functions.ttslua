@@ -1,0 +1,140 @@
+function boardInvertFactor(board)
+    -- Checks which side of the table it's on
+    if board.getPosition().z > 0 then
+        return -1
+    else
+        return 1
+    end
+end
+
+function setupPlayerInfluence(board, PlayerColor)
+    -- Spawns influence disks on the player's boards
+
+    board.setLock(true)
+    local InfluenceBag= getObjectFromGUID(InfluenceDisks_GUID)
+
+    local takeParams = {guid=1}
+
+    local InvPos = boardInvertFactor(board)
+    local Pos=board.getPosition() + Vector(-3.22*InvPos, 3, -5.6*InvPos)
+
+    local NumberDisks = 12
+    -- Eridani receive -2 influence
+    if board.getGUID() == 'eeefaa' then
+        NumberDisks = 10
+        Pos.x = Pos.x + 2*InvPos
+    end
+
+    -- place influence disks
+    for i=0, NumberDisks do
+        Disk = InfluenceBag.takeObject(takeParams)
+        colorRGB = stringColorToRGB(PlayerColor)
+        Disk.setColorTint(colorRGB)
+        Disk.setPosition(Pos)
+        Pos.x = Pos.x + 0.99*InvPos
+    end
+
+    spawnReturnInfluenceButton(board)
+end
+
+function spawnReturnInfluenceButton(board)
+    -- Spawns the Return Influence button underneath each player's board
+
+    local InvPos = boardInvertFactor(board)
+    local data = {
+        click_function = "returnInfluenceDisks",
+        function_owner = self,
+        label = "Return Influence",
+        position = {-1.18, 0.09, 1.1},
+        scale = {0.3, 0.3, 0.3},
+        width = 955,
+        font_size = 110,
+        color = {0.7573, 0.7573, 0.7573, 1}
+    }
+
+    board.createButton(data)
+end
+
+
+function returnInfluenceDisks(board, color)
+    -- Returns influence disks from the action spots on the board and the pass
+    -- marker to the influence track for each player
+
+    local InvPos = boardInvertFactor(board)
+
+    -- First get all discs on the player board
+    local boardObjects = Physics.cast({
+        origin = board.getPosition() + vector(-7.77*InvPos, 0, -5.25*InvPos),
+        type = 3,
+        direction = {0,1,0},
+        max_distance = 0,
+        size = {7.40, 1.69, 2.36},
+        -- debug = true
+    })
+    local discs = objectsHitByCast(boardObjects, 'Influence Disc')
+
+    -- Now get all discs on the reaction board
+    local passCard = getObjectFromGUID(PassCards[ownerOfBoard(board).color])
+    local reactionObjects = Physics.cast({
+        origin = passCard.getPosition(),
+        type = 3,
+        direction = {0,1,0},
+        max_distance = 0,
+        size = passCard.getBounds()['size'] + Vector(0, 5, 0),
+        -- debug = true
+    })
+    local reactionDiscs = objectsHitByCast(reactionObjects, 'Influence Disc')
+
+    -- Add all the discs together in one table
+    for _, v in ipairs(reactionDiscs) do
+        table.insert(discs, v)
+    end
+
+    -- If there are no disks to return, exit
+    if not next(discs) then
+        log('No disks to return.')
+        return false
+    end
+
+    local space = 14
+    InvPos = InvPos * -1
+    -- Return all the disks
+    for _, disc in pairs(discs) do
+        space = getNextOpenInfluenceSpace(board, space - 1)
+        disc.setPositionSmooth(
+            Vector(board.getPosition() + (influenceSpaces[space] * Vector(InvPos, 1, InvPos))),
+            false,
+            true
+        )
+    end
+end
+
+function getNextOpenInfluenceSpace(board, start)
+    -- Get the next highest empty influence space after and including `start`
+
+    if start <= 1 then return 1 end
+
+    -- Using an extra -1 multiplier because I messed up the initial position
+    -- tables and I can't be bothered to fix it :)
+    local InvPos = boardInvertFactor(board) * -1
+
+    for i = start, 2, -1 do
+        local influenceObjects = Physics.cast({
+            origin = board.getPosition() + (influenceSpaces[i] * vector(InvPos, 1, InvPos)),
+            type = 3,
+            direction = {0,1,0},
+            max_distance = 0,
+            size = {0.2, 5, 0.2},
+            -- debug = true
+        })
+        if not next(objectsHitByCast(influenceObjects, 'Influence Disc')) then
+            log('Next open influence space: '.. tostring(i))
+            return i
+        end
+    end
+
+    -- Return the first space if everything else is full, stacking tiles if needed
+    log('Next open influence space: 1')
+    return 1
+
+end
