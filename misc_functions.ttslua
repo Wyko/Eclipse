@@ -74,3 +74,15 @@ function dump(o)
        return tostring(o)
     end
  end
+
+
+ function discardRep(obj)
+     -- Put unchosen reputation tiles back into the bag --
+     if obj ~= nil then
+         if obj.getName() == "Reputation" then
+             obj.setRotation(Vector(0,270,180))
+             ReputationBag.putObject(obj)
+             Wait.time(function() ReputationBag.shuffle() end, 0.5, 1)
+         end
+     end
+ end

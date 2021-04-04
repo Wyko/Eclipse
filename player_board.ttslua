@@ -138,3 +138,20 @@ function getNextOpenInfluenceSpace(board, start)
     return 1
 
 end
+
+
+function getBoardInitialTechs(board)
+    -- Checks the script on each player board for the initialTechs variable,
+    -- then clones techs from the tech bag to fill that board with it's starting
+    -- tech
+
+    local techs = board.getTable('initialTechs')
+    if not techs then
+        log('No initial techs to add.')
+        return false
+    end
+
+    for _, tech in ipairs(techs) do
+        putTechOnTrack(tech.name,tech.track,board,tech.spot, true)
+    end
+end

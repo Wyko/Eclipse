@@ -23,5 +23,34 @@ function putTechOnTrack(techName, trackColor, board, spot, lock)
     local finalPos = (Vector(techTracks[trackColor][spot]) * InvPos) + board.getPosition()
     SeekAndClone(techName, TechBag_GUID, finalPos, board.getRotation(), lock)
     return true
+end
+
+
+function addButtonToTechTile(zone, tile)
+    -- Make sure it's a tech tile
+    if not tile.hasTag('Tech Tile') or zone.getGUID() ~= TechTileZone_GUID then
+      return false
+    end
+
+    local data = {
+      click_function = "acquireTech",
+      function_owner = self,
+      label = "Acquire "..tile.getName(),
+      position = {0, 0.1, 0},
+      scale = {0.5, 0.5, 0.5},
+      width = 2000,
+      height = 2000,
+      font_size = 400,
+      color = {0.7573, 0.7573, 0.7573, 0},
+      tooltip = "Acquire "..tile.getName(),
+    }
+    tile.createButton(data)
+end
+
+function getBoardBelongingToColor(color)
+
+end
+
+function acquireTech(tile, color)
 
 end

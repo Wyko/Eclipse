@@ -10,3 +10,29 @@ end
 function onObjectLeaveContainer(bag, obj)
     setTechRotation(bag, obj)
 end
+
+
+function onObjectDrop(_, obj)
+    -- Blip the size of sector hexes so they fit together --
+    if obj.use_grid == true then
+        Wait.condition(
+            function() blip(obj) end,
+            function() return rest(obj) end,
+            2)
+    end
+end
+
+
+function onObjectPickUp(player, obj)
+    -- Stop players from accidentally taking a stack of techs --
+    -- Also try to fix tiles falling through the player board --
+    if Player[player].lift_height < 0.15 then
+        Player[player].lift_height = 0.15
+    end
+    if obj.tag == "Chip" and obj.getQuantity() > 1 then
+        if string.find(obj.getName(), "Tech %-") ~= nil then
+            obj.drop()
+            obj.setVelocity(Vector(0,0,0))
+        end
+    end
+end
