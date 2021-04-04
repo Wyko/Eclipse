@@ -274,3 +274,17 @@ function ownerOfBoard(board)
         end
     end
 end
+
+
+function hasPlayerBoard(color)
+    -- Returns the board if the given player has a board in front of them
+
+    zone = getObjectFromGUID(PlayerBoardZones[color])
+
+    for _, obj in pairs(zone.getObjects()) do
+        if obj.hasTag('Board') then
+            return obj
+        end
+    end
+    return false
+end

@@ -36,3 +36,12 @@ function onObjectPickUp(player, obj)
         end
     end
 end
+
+function onObjectEnterScriptingZone(zone, obj)
+    addButtonToTechTile(zone, obj)
+    discoverBoardsToSetRace(zone, obj)
+end
+
+function onObjectLeaveScriptingZone(zone, leave_object)
+    checkIfPlayerChangedBoards(zone, leave_object)
+end

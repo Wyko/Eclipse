@@ -8,17 +8,3 @@ local hideStuff = false
 #include technology
 #include turn_order_management
 #include next_round
-
-
-
-function itemInZone(zone, obj)
-    -- Returns true if the given object is present inside the given scripting
-    -- zone
-    
-    for _, tmp_obj in pairs(getObjectFromGUID(zone).getObjects()) do
-        if tmp_obj.getGUID() == obj.getGUID() then
-            return true
-        end
-    end
-    return false
-end

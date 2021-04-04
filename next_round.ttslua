@@ -40,3 +40,30 @@ function nextRound()
         end, 2)
     end
 end
+
+
+function advanceRoundMarker(round)
+    -- Move the round token and annouce --
+
+    RoundMarker.setDescription(round)
+    RoundMarker.setPositionSmooth(rdBase + Vector(0,0,offsetRound*round))
+    RoundMarker.setRotationSmooth({0,180,0})
+    broadcastToAll(string.format("-- Round #%d --", round))
+end
+
+function unflipColonyAndSkippers()
+    -- Unflip all colony ships --
+
+    for _,obj in pairs(getAllObjects()) do
+        if obj.getName() == "Colony Ship" then
+            if obj.is_face_down == true then
+                obj.flip()
+            end
+        end
+        if obj.hasTag("Turn Skipper") then
+            if obj.is_face_down == true then
+                obj.flip()
+            end
+        end
+    end
+end
