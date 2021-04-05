@@ -166,6 +166,20 @@ local factions = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
         ['color'] = false
+    },
+    ['Rho Indi'] = {
+        ['GUID'] = nil,
+        ['money'] = {x = 4.16, z = 8.55, rotation = 330},
+        ['science'] = {x = 4.16, z = 8.55, rotation = 330},
+        ['materials'] = {x = 3.25, z = 8.55, rotation = 330},
+        ['popLocation'] = {{x = 1.29, z = -.17}, {x = -.97, z = -1.61}, {x = -.69, z = 1.71}},
+        ['placedMoney'] = 1,
+        ['placedScience'] = 1,
+        ['placedMaterials'] = 1,
+        ['missingDiscs'] = 0,
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['color'] = false
     }
 }
 

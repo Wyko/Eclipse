@@ -205,8 +205,39 @@ local resourceBoards_GUID = {
     Purple = 'b50d53'
 }
 
+function getNextCube(type, color)
+    -- Returns the next unused population cube of a type of resource from a
+    -- given Player color
+
+    local resourceBoard = getObjectFromGUID(resourceBoards_GUID[color])
+    if DEBUG then
+        assert(resourceBoard, 'No resource board found for '..tostring(color))
+        assert(#resourceProduction[type]>1)
+    end
+
+    for _, pos in ipairs(resourceProduction[type]) do
+        local n_pos = (resourceBoard.getPosition() +
+            Vector(pos.position[1]*boardInvertFactor(resourceBoard), pos.position[2], pos.position[3]))
+        local pop = castAndCheckForTag(n_pos, 'Population', 3)
+        if pop then return pop end
+    end
+    log('No '..tostring(type)..' pop cube found for '..tostring(color), 'getNextCube')
+    return nil
+end
+
 function placePopulations(hex, color, advanced)
     -- Fully fills a hex with populations
+
+    for _, type in pairs({'money', 'materials', 'science'}) do
+        for _, pos in pairs(hex.getVar(type)) do
+            log("Type: "..tostring(type)..", Color: "..tostring(color), 'placePopulations')
+            local cube = getNextCube(type, color)
+            local n_pos = hex.positionToWorld(pos)
+            
+            cube.setPositionSmooth(n_pos, false, true)
+            cube.setRotation(hex.getRotation())
+        end
+    end
 
 
 end

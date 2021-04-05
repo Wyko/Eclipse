@@ -219,6 +219,11 @@ function basicSetup2(parameters)
             function () return (not homeworld.spawning) end
         )
 
+        -- Put down population cubes
+        Wait.condition(
+            function () placePopulations(homeworld, PlayerColor, _) end,
+            function () return homeworld.resting end
+        )
     end
 
     -- take fleet and position it

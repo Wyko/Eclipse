@@ -23,7 +23,7 @@ function castAndCheckForTag(position, tag, distance)
         direction = {0,1,0},
         max_distance = dist,
         type = 1, -- Ray
-        debug = false,
+        debug = DEBUG,
     })
 
     -- log(results)
