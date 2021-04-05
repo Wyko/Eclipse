@@ -60,9 +60,9 @@ function returnInfluenceDisks(board, color)
     -- Returns influence disks from the action spots on the board and the pass
     -- marker to the influence track for each player
 
-    if DEBUG then
-        getNextCube('materials', color)
-    end
+    -- if DEBUG then
+    --     getNextCube('materials', color)
+    -- end
 
     local InvPos = boardInvertFactor(board)
 

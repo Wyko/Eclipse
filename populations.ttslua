@@ -229,12 +229,12 @@ function placePopulations(hex, color, advanced)
     -- Fully fills a hex with populations
 
     for _, type in pairs({'money', 'materials', 'science'}) do
-        for _, pos in pairs(hex.getVar(type)) do
+        for _, local_pos in pairs(hex.getVar(type)) do
             log("Type: "..tostring(type)..", Color: "..tostring(color), 'placePopulations')
             local cube = getNextCube(type, color)
-            local n_pos = hex.positionToWorld(pos)
-            
-            cube.setPositionSmooth(n_pos, false, true)
+
+            f_pos = getRelativePosition(hex, local_pos)
+            cube.setPositionSmooth(f_pos, false, true)
             cube.setRotation(hex.getRotation())
         end
     end

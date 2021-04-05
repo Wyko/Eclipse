@@ -205,3 +205,19 @@ function itemInZone(zone, obj)
      end
      return false
 end
+
+function getRelativePosition(object, local_pos)
+    -- This was annoying to figure out. Given a vector which was first found on
+    -- on object placed at 0,0,0 with zero rotation, returns the new vector after
+    -- the object is moved and / or rotated elsewhere. Ignores scale!
+    
+    if type(local_pos) == 'table' then
+        local_pos = Vector(local_pos)
+    end
+
+    local scaled_pos = vector(
+        local_pos.x / object.getScale().x,
+        local_pos.y / object.getScale().y,
+        local_pos.z / object.getScale().z)
+    return object.positionToWorld(scaled_pos)
+end
