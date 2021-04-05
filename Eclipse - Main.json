@@ -286,7 +286,7 @@
     "SkipEmpty": false,
     "DisableInteractions": false,
     "PassTurns": true,
-    "TurnColor": "Blue"
+    "TurnColor": "White"
   },
   "TabStates": {
     "0": {
