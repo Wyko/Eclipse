@@ -39,10 +39,10 @@ function cameraPosition(player, button)
     lookAtPlayer(player, color, 6)
   elseif button == "showTech" then
       Player[color].lookAt({
-         position = {x = 38, y = 0, z = 12},
+         position = {33.88, 1.31, 3.67},
          pitch = 65,
          yaw = 90,
-         distance = 20,
+         distance = 40,
       })
   elseif button == "showUpgrades" then
       Player[color].lookAt({
@@ -57,44 +57,42 @@ function cameraPosition(player, button)
 end
 
 function lookAtPlayer(player, color, number)
-    local playerOffset = _FactionHelper.getPlayerOffsets()
-    local playerCount = _ZoneHelper.getPlayerCount()
-
-    if (number > playerCount) then
-        return
+    local PlayerPosition = Player[PlayerNumberToColor[number]].getHandTransform(int).position
+    local InvPos = -1
+    local rotation = 180
+    if PlayerPosition.z < 0 then
+        InvPos = 1
+        rotation = 0
     end
+    destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
 
-    local colorToLookAt = _ZoneHelper.getZones()[number].color
-    local x = playerOffset[playerCount][colorToLookAt].center.x
-    local z = playerOffset[playerCount][colorToLookAt].center.z
-    local rotation = playerOffset[playerCount][colorToLookAt].center.rotation
+    local x = destination.x
+    local z = destination.z
 
-    if (rotation == 0) then
-        rotation = rotation + 180
-    else
-        rotation = rotation -180
-    end
+    -- if (rotation == 0) then
+    --     rotation = rotation + 180
+    -- else
+    --     rotation = rotation -180
+    -- end
 
     Player[color].lookAt({
        position = Vector(x,0,z),
-       pitch = 65,
+       pitch = 60,
        yaw = rotation,
-       distance = 40,
+       distance = 50,
     })
 end
 
 function lookAtMap(player, color)
-    local playerOffset = _FactionHelper.getPlayerOffsets()
-    local playerCount = _ZoneHelper.getPlayerCount()
-    local x = playerOffset[playerCount][color].homeSystem.x
-    local z = playerOffset[playerCount][color].homeSystem.z
-    local rotation = playerOffset[playerCount][color].homeSystem.rotation
+    local PlayerPosition = player.getHandTransform(int).position
+    local rotation = 180
+    if PlayerPosition.z < 0 then rotation = 0 end
 
     Player[color].lookAt({
-       position = Vector(x,0,z),
-       pitch = 65,
+       position = Vector(0,0,0),
+       pitch = 120,
        yaw = rotation + 180,
-       distance = 40,
+       distance = 85,
     })
 end
 
