@@ -172,4 +172,9 @@ local factions = {
 function place_homeworld(homeworld, color)
     local pos = HomeworldLocations[color].position
     local rot = HomeworldLocations[color].rotation
+
+    homeworld.setRotation(rot)
+    homeworld.setPositionSmooth(pos, false, true)
+    
+
 end
