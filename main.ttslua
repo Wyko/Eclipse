@@ -8,3 +8,4 @@ local hideStuff = true
 #include technology
 #include turn_order_management
 #include next_round
+#include camera

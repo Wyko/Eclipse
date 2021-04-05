@@ -2,6 +2,7 @@ function onLoad()
     loadObjects()
     lockSideTables()
     shuffleEverything()
+    onLoad_Camera()
 
     if hideStuff then hideAndLockStuff() end
     if isOngoingGame() then loadOngoingGame() end
