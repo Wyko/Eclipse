@@ -11,7 +11,7 @@ function nextFreeTechSpace(trackColor, board)
             return index
         end
     end
-    return 7
+    return nil
 end
 
 function putTechOnTrack(tech, trackColor, board, spot, lock)
@@ -23,6 +23,12 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
     InvPos = Vector(InvPos, 1, InvPos)
 
     spot = spot or nextFreeTechSpace(trackColor, board)
+    if not spot then
+        broadcastToColor(
+            "No free space on your " .. trackColor .. " track.",
+            ownerOfBoard(board).color)
+        return false
+    end
 
     local finalPos = (Vector(techTracks[trackColor][spot]) * InvPos) + board.getPosition()
 
@@ -68,6 +74,12 @@ function addButtonToTechTile(zone, tile)
       return false
     end
 
+    local techType = string.sub(tile.getDescription(),1,1)
+    if techType == 'R' then
+        return false
+    end
+
+
     local data = {
       click_function = "acquireTech",
       function_owner = self,
@@ -81,6 +93,22 @@ function addButtonToTechTile(zone, tile)
       tooltip = "Acquire "..tile.getName(),
     }
     tile.createButton(data)
+end
+
+function removeButtonFromTechTile(zone, tile)
+    -- Make sure it's a tech tile
+    if (not tile.hasTag('Tech Tile') or zone.getGUID() ~= TechTileZone_GUID) then
+      return false
+    end
+    local techType = string.sub(tile.getDescription(),1,1)
+    if techType == 'R' then
+        return false
+    end
+
+    -- if not obj.getButtons() then return false end
+    for _, button in pairs(tile.getButtons()) do
+        tile.removeButton(button.index)
+    end
 end
 
 function acquireTech(tile, color)

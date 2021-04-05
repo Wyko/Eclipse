@@ -1,4 +1,4 @@
-local hideStuff = false
+local hideStuff = true
 
 #include initial_variables
 #include misc_functions
