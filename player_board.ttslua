@@ -246,7 +246,6 @@ function setRace(playerColor, zone, obj)
     end
 end
 
-
 function playersWithoutBoards()
     players = {}
     for _, color in pairs(getSeatedPlayers()) do
@@ -256,7 +255,6 @@ function playersWithoutBoards()
     end
     return players
 end
-
 
 function ownerOfBoard(board)
     -- Returns the Player owner of a particular board
@@ -274,7 +272,6 @@ function ownerOfBoard(board)
         end
     end
 end
-
 
 function hasPlayerBoard(color)
     -- Returns the board if the given player has a board in front of them
