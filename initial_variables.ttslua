@@ -106,6 +106,15 @@ local PlayerRace = {
     Purple = nil
 }
 
+local PlayerNumberToColor = {
+    [1] = 'White',
+    [2] = 'Yellow',
+    [3] = 'Red',
+    [4] = 'Green',
+    [5] = 'Blue',
+    [6] = 'Purple',
+}
+
 local passRestingPositions = {
     White  = {-38.22, 1.03, -7.93},
     Yellow = {-36.20, 1.03, -7.93},
@@ -183,6 +192,8 @@ local passCheck = nil
 local turnBag = '9d696e'
 local turnTracker ='bcaf12'
 local InfluenceDisks_GUID = '8f4c6b'
+
+local shown = {buttons = false}
 
 local DisableGUIDs = {
   '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',

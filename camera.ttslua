@@ -1,0 +1,123 @@
+function showButtons(player, value, id)
+   if shown.buttons == false then
+      UI.show("buttons")
+      shown.buttons = true
+      UI.setAttribute("showButtons", "text", "▲")
+   else
+      UI.hide("buttons")
+      shown.buttons = false
+      UI.setAttribute("showButtons", "text", "▼")
+   end
+end
+
+function onLoad_Camera()
+        UI.hide("buttons")
+        shown.buttons = false
+        UI.setAttribute("showButtons", "text", "▼")
+end
+
+function cameraControls(player, value, id)
+   if id == "showCamControls" then
+      showForPlayer({panel = "CameraControl", color = player.color})
+   end
+end
+
+function cameraPosition(player, button)
+   local color
+   color = player.color
+   if button == "1" then
+     lookAtPlayer(player, color, 1)
+  elseif button == "2" then
+     lookAtPlayer(player, color, 2)
+  elseif button == "3" then
+     lookAtPlayer(player, color, 3)
+  elseif button == "4" then
+      lookAtPlayer(player, color, 4)
+  elseif button == "5" then
+     lookAtPlayer(player, color, 5)
+ elseif button == "6" then
+    lookAtPlayer(player, color, 6)
+  elseif button == "showTech" then
+      Player[color].lookAt({
+         position = {33.88, 1.31, 3.67},
+         pitch = 65,
+         yaw = 90,
+         distance = 40,
+      })
+  elseif button == "showUpgrades" then
+      Player[color].lookAt({
+         position = {x = 38, y = 0, z = -7.5},
+         pitch = 65,
+         yaw = 90,
+         distance = 20,
+      })
+  elseif button == "showMap" then
+       lookAtMap(player, color)
+   end
+end
+
+function lookAtPlayer(player, color, number)
+    local PlayerPosition = Player[PlayerNumberToColor[number]].getHandTransform(int).position
+    local InvPos = -1
+    local rotation = 180
+    if PlayerPosition.z < 0 then
+        InvPos = 1
+        rotation = 0
+    end
+    destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
+
+    local x = destination.x
+    local z = destination.z
+
+    -- if (rotation == 0) then
+    --     rotation = rotation + 180
+    -- else
+    --     rotation = rotation -180
+    -- end
+
+    Player[color].lookAt({
+       position = Vector(x,0,z),
+       pitch = 60,
+       yaw = rotation,
+       distance = 50,
+    })
+end
+
+function lookAtMap(player, color)
+    local PlayerPosition = player.getHandTransform(int).position
+    local rotation = 180
+    if PlayerPosition.z < 0 then rotation = 0 end
+
+    Player[color].lookAt({
+       position = Vector(0,0,0),
+       pitch = 120,
+       yaw = rotation + 180,
+       distance = 85,
+    })
+end
+
+function showForPlayer(params)
+   local panel = params.panel
+   local color = params.color
+   local opened = self.UI.getAttribute(panel, "visibility")
+   if opened == nil then opened = "" end
+
+   if opened:find(color) then
+      opened = opened:gsub("|" .. color, "")
+      opened = opened:gsub(color .. "|", "")
+      opened = opened:gsub(color, "")
+      self.UI.setAttribute(panel, "visibility", opened)
+      if opened == "" then
+         self.UI.setAttribute(panel, "active", "false")
+         shown[panel] = false
+      end
+   else
+      if shown[panel] ~= true then
+         self.UI.setAttribute(panel, "active", "true")
+         self.UI.setAttribute(panel, "visibility", color)
+         shown[panel] = true
+      else
+         self.UI.setAttribute(panel, "visibility", opened .. "|" .. color)
+      end
+   end
+end
