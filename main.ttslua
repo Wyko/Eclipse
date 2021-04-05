@@ -9,3 +9,4 @@ local hideStuff = true
 #include turn_order_management
 #include next_round
 #include camera
+#include race_setup

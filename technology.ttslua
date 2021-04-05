@@ -79,7 +79,6 @@ function addButtonToTechTile(zone, tile)
         return false
     end
 
-
     local data = {
       click_function = "acquireTech",
       function_owner = self,
@@ -116,6 +115,7 @@ function acquireTech(tile, color)
     -- given color
 
     local board = getBoardBelongingToColor(color)
+    local msg = Player[color].steam_name .. " acquires " .. tile.getName()
 
     if not board then
         broadcastToColor("Cannot acquire tech. You do not have a board.", color)
@@ -125,6 +125,7 @@ function acquireTech(tile, color)
     local techType = string.sub(tile.getDescription(),1,1)
     local trackColor = techTypeToTrackColor(techType)
 
+    printToAll(msg, color)
     putTechOnTrack(tile, trackColor, board, _, true)
 
 end
