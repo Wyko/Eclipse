@@ -16,7 +16,6 @@ function hideAndLockStuff()
     end
 end
 
-
 function fillWithWarp()
     local warpSpots = {
         Purple = {
@@ -65,7 +64,6 @@ function fillWithWarp()
         end
     end
 end
-
 
 function fillWithGuardians()
     local GuardiansSpots = {
@@ -137,13 +135,10 @@ function fillWithGuardians()
     end
 end
 
-
 function showNextRoundButton()
     getObjectFromGUID(nextRoundButton_GUID).setInvisibleTo({})
     getObjectFromGUID(nextRoundButton_GUID).interactable = true
 end
-
-
 
 function tossOuterSectors()
     -- Toss extra sector 3 tiles for setup --
@@ -186,85 +181,85 @@ end
 function basicSetup2(parameters)
     -- Handle basic player setup
 
-  local PlayerColor = parameters.PlayerColor
-  local Box_GUID = parameters.BoxGuid
-  local FactionName = parameters.FactionName
+    local PlayerColor = parameters.PlayerColor
+    local Box_GUID = parameters.BoxGuid
+    local FactionName = parameters.FactionName
 
---   log('Starting basic setup for '..tostring(PlayerColor))
-  -- check if the player already selected a faction
-  if PlayerRace[PlayerColor] ~= nil then
-      print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
-      return false
-  end
+    --     log('Starting basic setup for '..tostring(PlayerColor))
+    -- check if the player already selected a faction
+    if PlayerRace[PlayerColor] ~= nil then
+            print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
+            return false
+    end
 
-  PlayerRace[PlayerColor] = FactionName .. ' '  -- A space so it can be reset in setRace
+    PlayerRace[PlayerColor] = FactionName .. ' '    -- A space so it can be reset in setRace
 
-  local Box = getObjectFromGUID(Box_GUID)
-  local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
-  PlayerPosition.y = 0.15
+    local Box = getObjectFromGUID(Box_GUID)
+    local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
+    PlayerPosition.y = 0.15
 
-  local SpawnPos=Box.getPosition() + Vector(0,5,0)
-  local InvPos = -1
+    local SpawnPos=Box.getPosition() + Vector(0,5,0)
+    local InvPos = -1
 
-  local takeParams = {position = SpawnPos, rotation = vector(0,0,0)}
-  if PlayerPosition.z < 0 then
-    takeParams.rotation = vector(0,180,0)
-    InvPos = 1
-  end
+    local takeParams = {position = SpawnPos, rotation = vector(0,0,0)}
+    if PlayerPosition.z < 0 then
+        takeParams.rotation = vector(0,180,0)
+        InvPos = 1
+    end
 
-  local destination
-
-  -- take home world and position it
-  local Object = SeekAndTake('Homeworld', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-  end
+    local destination
 
     -- take home world and position it
-    Object = SeekAndTake('Fleet', Box, takeParams)
+    local Object = SeekAndTake('Homeworld', Box, takeParams)
     if (Object~=false) then
-        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
+        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
         Object.setPositionSmooth(destination,false, true)
-        Object.setColorTint(Color.fromString(PlayerColor))
-        Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
     end
 
-  -- take ambassador tiles and position them
-  Object = SeekAndTake('Ambassador', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(19.5*InvPos, 0, 24*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-  end
+        -- take home world and position it
+        Object = SeekAndTake('Fleet', Box, takeParams)
+        if (Object~=false) then
+                destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
+                Object.setPositionSmooth(destination,false, true)
+                Object.setColorTint(Color.fromString(PlayerColor))
+                Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
+        end
 
-  -- take action card and position it
-  Object = SeekAndTake('Actions', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-  end
-
-  -- take player board and position it
-  Object = SeekAndTake('Player Board', Box, takeParams)
-  if (Object~=false) then
-    destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
-    Object.setPositionSmooth(destination,false, true)
-
-    local Lock = function()
-        Wait.time(
-            function ()
-                log('Setting up board for ' .. tostring(PlayerColor))
-                setupPlayerInfluence(Object, PlayerColor)
-                getBoardInitialTechs(Object)
-            end,
-            2)
+    -- take ambassador tiles and position them
+    Object = SeekAndTake('Ambassador', Box, takeParams)
+    if (Object~=false) then
+        destination = PlayerPosition + Vector(19.5*InvPos, 0, 24*InvPos)
+        Object.setPositionSmooth(destination,false, true)
     end
-    triggerFunctionIfResting(Object, Lock)
-  end
 
-  -- place colony ships
-  PlaceColonyShips(Box, takeParams, PlayerPosition)
-  return true
+    -- take action card and position it
+    Object = SeekAndTake('Actions', Box, takeParams)
+    if (Object~=false) then
+        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
+        Object.setPositionSmooth(destination,false, true)
+    end
+
+    -- take player board and position it
+    Object = SeekAndTake('Player Board', Box, takeParams)
+    if (Object~=false) then
+        destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
+        Object.setPositionSmooth(destination,false, true)
+
+        local Lock = function()
+                Wait.time(
+                        function ()
+                                log('Setting up board for ' .. tostring(PlayerColor))
+                                setupPlayerInfluence(Object, PlayerColor)
+                                getBoardInitialTechs(Object)
+                        end,
+                        2)
+        end
+        triggerFunctionIfResting(Object, Lock)
+    end
+
+    -- place colony ships
+    PlaceColonyShips(Box, takeParams, PlayerPosition)
+    return true
 end
 
 function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
@@ -299,7 +294,6 @@ function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
       Object.setPositionSmooth(StartPosition + offset, false, true)
     end
 end
-
 
 function loadOngoingGame()
     printToAll('Script is attempting to recover ongoing game state')
@@ -347,7 +341,6 @@ function isOngoingGame()
     if round ~= 0 then return true end
 end
 
-
 function shuffleEverything()
     -- Shuffle all bags and stacks --
     TechBag.shuffle()
@@ -375,7 +368,6 @@ function setupTiles(players)
             pos = pos + Vector(offsetAmbassador, 0, 0)
         end, 0.5, 4)
 end
-
 
 function setupFirstRound()
     local players = #getSeatedPlayers()
@@ -425,7 +417,6 @@ function pickRandomNPC()
             npcBag.putObject(npc)
         end
 end
-
 
 function removeUnusedAreas()
     for color, _ in pairs(PlayerBoardZones) do

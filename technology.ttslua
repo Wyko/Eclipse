@@ -25,8 +25,9 @@ function putTechOnTrack(techName, trackColor, board, spot, lock)
     return true
 end
 
-
 function addButtonToTechTile(zone, tile)
+    -- Adds an invisible "Acquire Tech" button to each tile
+
     -- Make sure it's a tech tile
     if not tile.hasTag('Tech Tile') or zone.getGUID() ~= TechTileZone_GUID then
       return false
@@ -47,10 +48,49 @@ function addButtonToTechTile(zone, tile)
     tile.createButton(data)
 end
 
-function getBoardBelongingToColor(color)
+function acquireTech(tile, color)
+    -- Takes the given technology tile and moves it to the player board of the
+    -- given color
 
+    local board = getBoardBelongingToColor(color)
+    local techType = string.sub(t.getDescription(),1,1)
+    local trackColor = techTypeToTrackColor(techType)
+    local final_pos = nextFreeTechSpace(trackColor, board)
+
+    -- If it's a bag, then you have to use takeObject()
+    if obj.tag == "Chip" and obj.getQuantity() > 1 then
+        obj.takeObject({
+            position          = final_pos,
+            rotation          = board.getRotation(),
+            callback_function = function (obj)
+                    triggerFunctionIfResting(
+                        obj,
+                        function ()
+                            obj.setLock(true)
+                        end
+                    )
+                end
+        })
+    else
+        obj.setPositionSmooth(final_pos, false, true)
+        obj.setRotation(board.getRotation())
+        triggerFunctionIfResting(
+            obj,
+            function ()
+                obj.setLock(true)
+            end
+        )
+    end
 end
 
-function acquireTech(tile, color)
-
+function techTypeToTrackColor(type)
+    if techType == 'R' then
+        return 'Rare'
+    elseif techType == 'M' then
+        return 'Red'
+    elseif techType == 'G' then
+        return 'Green'
+    elseif techType == 'N' then
+        return 'Yellow'
+    end
 end

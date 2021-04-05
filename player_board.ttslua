@@ -288,3 +288,13 @@ function hasPlayerBoard(color)
     end
     return false
 end
+
+function getBoardBelongingToColor(color)
+    -- Returns the player board belonging to the given color
+
+    for _, obj in pairs(PlayerBoardZones[color]) do
+        if obj.hasTags('Board') then
+            return obj
+        end
+    end
+end
