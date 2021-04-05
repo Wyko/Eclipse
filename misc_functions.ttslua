@@ -88,19 +88,19 @@ function dump(o)
  end
 
 
-function triggerFunctionIfResting(objTile, pointerFnc, waitSeconds)
+function triggerFunctionIfResting(obj, pointerFnc, waitSeconds)
     -- Delay execution of a function until an object is resting
     waitSeconds = waitSeconds or 1
     Wait.time(
         function()
-            Wait.condition(pointerFnc, function() return objTile.resting end )
+            Wait.condition(pointerFnc, function() return obj.resting end )
         end,
         waitSeconds
     )
 end
 
 
- function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
+function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
    -- Search a container for all objects with matching names, then take out a random one
    TakeParams.guid = '000000'
    local container
@@ -130,9 +130,9 @@ end
 
    TakeParams.guid = guids[math.random(#guids)]
    return container.takeObject(TakeParams)
- end
+end
 
- function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
+function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
      rot = rot or Vector(0,0,0)
      local obj = SeekAndTake(ObjectName, ContainerOrGUID, {})
      local putContainer
@@ -170,10 +170,10 @@ end
          10
      )
 
- end
+end
 
 
- function split (inputstr, sep)
+function split (inputstr, sep)
      -- String Split --
      if sep == nil then
              sep = "%s"
@@ -183,18 +183,18 @@ end
              table.insert(t, str)
      end
      return t
- end
+end
 
- function colorInGame(color)
+function colorInGame(color)
      -- Returns true if a player with the given color is seated in game
 
      for _, presentColor in pairs(getSeatedPlayers()) do
          if color == presentColor then return true end
      end
      return false
- end
+end
 
- function itemInZone(zone, obj)
+function itemInZone(zone, obj)
      -- Returns true if the given object is present inside the given scripting
      -- zone
 
@@ -204,4 +204,4 @@ end
          end
      end
      return false
- end
+end
