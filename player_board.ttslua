@@ -279,7 +279,7 @@ end
 function hasPlayerBoard(color)
     -- Returns the board if the given player has a board in front of them
 
-    zone = getObjectFromGUID(PlayerBoardZones[color])
+    local zone = getObjectFromGUID(PlayerBoardZones[color])
 
     for _, obj in pairs(zone.getObjects()) do
         if obj.hasTag('Board') then
@@ -292,8 +292,12 @@ end
 function getBoardBelongingToColor(color)
     -- Returns the player board belonging to the given color
 
-    for _, obj in pairs(PlayerBoardZones[color]) do
-        if obj.hasTags('Board') then
+    local zone = getObjectFromGUID(PlayerBoardZones[color])
+    -- log(zone, 'getBoardBelongingToColor')
+    -- log(zone.getObjects(), 'getBoardBelongingToColor')
+
+    for _, obj in pairs(zone.getObjects()) do
+        if obj.hasTag('Board') then
             return obj
         end
     end

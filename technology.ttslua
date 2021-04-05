@@ -53,7 +53,15 @@ function acquireTech(tile, color)
     -- given color
 
     local board = getBoardBelongingToColor(color)
-    local techType = string.sub(t.getDescription(),1,1)
+
+    if not board then
+        broadcastToColor(
+            "Cannot acquire tech. You do not have a board.",
+            color)
+        return false
+    end
+
+    local techType = string.sub(tile.getDescription(),1,1)
     local trackColor = techTypeToTrackColor(techType)
     local final_pos = nextFreeTechSpace(trackColor, board)
 
