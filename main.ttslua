@@ -1,4 +1,4 @@
-local hideStuff = true
+local hideStuff = false
 
 #include initial_variables
 #include misc_functions
@@ -10,3 +10,4 @@ local hideStuff = true
 #include next_round
 #include camera
 #include race_setup
+#include populations

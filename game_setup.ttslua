@@ -210,20 +210,25 @@ function basicSetup2(parameters)
     local destination
 
     -- take home world and position it
-    local Object = SeekAndTake('Homeworld', Box, takeParams)
-    if (Object~=false) then
-        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
-        Object.setPositionSmooth(destination,false, true)
+    local homeworld = SeekAndTake('Homeworld', Box, takeParams)
+    if (homeworld~=false) then
+        -- destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
+        -- Object.setPositionSmooth(destination,false, true)
+        Wait.condition(
+            function () placeHomeworld(homeworld, PlayerColor) end,
+            function () return (not homeworld.spawning) end
+        )
+
     end
 
-        -- take home world and position it
-        Object = SeekAndTake('Fleet', Box, takeParams)
-        if (Object~=false) then
-                destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
-                Object.setPositionSmooth(destination,false, true)
-                Object.setColorTint(Color.fromString(PlayerColor))
-                Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
-        end
+    -- take fleet and position it
+    Object = SeekAndTake('Fleet', Box, takeParams)
+    if (Object~=false) then
+            destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
+            Object.setPositionSmooth(destination,false, true)
+            Object.setColorTint(Color.fromString(PlayerColor))
+            Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
+    end
 
     -- take ambassador tiles and position them
     Object = SeekAndTake('Ambassador', Box, takeParams)

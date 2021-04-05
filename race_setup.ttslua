@@ -169,12 +169,12 @@ local factions = {
     }
 }
 
-function place_homeworld(homeworld, color)
-    local pos = HomeworldLocations[color].position
-    local rot = HomeworldLocations[color].rotation
+function placeHomeworld(homeworld, color)
+    -- Moves the specified homeworld object to its correct location
 
-    homeworld.setRotation(rot)
-    homeworld.setPositionSmooth(pos, false, true)
-    
-
+    homeworld.setPositionSmooth(HomeworldLocations[color].position, false, true)
+    homeworld.setRotation(HomeworldLocations[color].rotation)
+    triggerFunctionIfResting(
+        homeworld,
+        function () homeworld.setLock(true) end)
 end
