@@ -1,6 +1,6 @@
 function hideAndLockStuff()
     HideObjects = getObjectsWithTag('Player Part Bag')
-    table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence disks
+    table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence discs
     table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
     table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
 
@@ -209,21 +209,14 @@ function basicSetup2(parameters)
 
     local destination
 
-    -- take home world and position it
-    local Object = SeekAndTake('Homeworld', Box, takeParams)
+    -- take fleet and position it
+    Object = SeekAndTake('Fleet', Box, takeParams)
     if (Object~=false) then
-        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
-        Object.setPositionSmooth(destination,false, true)
+            destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
+            Object.setPositionSmooth(destination,false, true)
+            Object.setColorTint(Color.fromString(PlayerColor))
+            Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
     end
-
-        -- take home world and position it
-        Object = SeekAndTake('Fleet', Box, takeParams)
-        if (Object~=false) then
-                destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
-                Object.setPositionSmooth(destination,false, true)
-                Object.setColorTint(Color.fromString(PlayerColor))
-                Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
-        end
 
     -- take ambassador tiles and position them
     Object = SeekAndTake('Ambassador', Box, takeParams)
@@ -240,21 +233,34 @@ function basicSetup2(parameters)
     end
 
     -- take player board and position it
-    Object = SeekAndTake('Player Board', Box, takeParams)
-    if (Object~=false) then
+    local board = SeekAndTake('Player Board', Box, takeParams)
+    if (board~=false) then
         destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
-        Object.setPositionSmooth(destination,false, true)
+        board.setPositionSmooth(destination,false, true)
 
-        local Lock = function()
-                Wait.time(
-                        function ()
-                                log('Setting up board for ' .. tostring(PlayerColor))
-                                setupPlayerInfluence(Object, PlayerColor)
-                                getBoardInitialTechs(Object)
-                        end,
-                        2)
-        end
-        triggerFunctionIfResting(Object, Lock)
+        triggerFunctionIfResting(board,
+            function()
+                log('Setting up board for ' .. tostring(PlayerColor))
+                setupPlayerInfluence(board, PlayerColor)
+                getBoardInitialTechs(board)
+            end)
+    end
+
+    -- take home world and position it
+    local homeworld = SeekAndTake('Homeworld', Box, takeParams)
+    if (homeworld~=false) then
+        -- destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
+        -- Object.setPositionSmooth(destination,false, true)
+        Wait.condition(
+            function () placeHomeworld(homeworld, PlayerColor) end,
+            function () return (not homeworld.spawning) end
+        )
+
+        -- Setup race
+        Wait.condition(
+            function () raceSetup(homeworld, PlayerColor, board.getName()) end,
+            function () return homeworld.resting end
+        )
     end
 
     -- place colony ships

@@ -23,7 +23,7 @@ function castAndCheckForTag(position, tag, distance)
         direction = {0,1,0},
         max_distance = dist,
         type = 1, -- Ray
-        debug = false,
+        debug = DEBUG,
     })
 
     -- log(results)
@@ -204,4 +204,31 @@ function itemInZone(zone, obj)
          end
      end
      return false
+end
+
+function getRelativePosition(object, local_pos)
+    -- This was annoying to figure out. Given a vector which was first found on
+    -- on object placed at 0,0,0 with zero rotation, returns the new vector after
+    -- the object is moved and / or rotated elsewhere. Ignores scale!
+
+    if type(local_pos) == 'table' then
+        local_pos = Vector(local_pos)
+    end
+    assert(object ~= nil, "getRelativePosition: Object is nil")
+    assert(local_pos ~= nil, "getRelativePosition: local_pos is nil for "..object.getName())
+
+    local scaled_pos = vector(
+        local_pos.x / object.getScale().x,
+        local_pos.y / object.getScale().y,
+        local_pos.z / object.getScale().z)
+    return object.positionToWorld(scaled_pos)
+end
+
+function debugAssert(...)
+    -- Just a little wrapper for a common assert
+
+    local arg = {...}
+    if DEBUG then
+        assert(unpack(arg))
+    end
 end

@@ -19,8 +19,6 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
     -- If no spot is specified, the next available spot is used.
     -- tech can be a techName (to be searched from the bag) or an Object
 
-    local InvPos = boardInvertFactor(board)
-    InvPos = Vector(InvPos, 1, InvPos)
 
     spot = spot or nextFreeTechSpace(trackColor, board)
     if not spot then
@@ -30,24 +28,30 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
         return false
     end
 
+    -- local finalPos = getRelativePosition(board, techTracks[trackColor][spot])
+
+    local InvPos = boardInvertFactor(board)
+    InvPos = Vector(InvPos, 1, InvPos)
     local finalPos = (Vector(techTracks[trackColor][spot]) * InvPos) + board.getPosition()
 
     log(type(tech), 'putTechOnTrack:type(tech)')
     if type(tech) == 'string' then
+        log('Preparing clone', 'putTechOnTrack')
         SeekAndClone(tech, TechBag_GUID, finalPos, board.getRotation(), lock)
 
     elseif tech.tag == "Chip" and tech.getQuantity() > 1 then
         -- If we're supplied an actual object, then just move it
         -- If it's a bag, then you have to use takeObject()
+
+        log('Preparing to takeObject for '..tostring(tech), 'putTechOnTrack')
         tech.takeObject({
             position          = finalPos,
             rotation          = board.getRotation(),
-            callback_function = function (obj)
+            callback_function = function (tech)
+                    debugAssert(tech ~= nil, 'putTechOnTrack3: Tech is nil')
                     triggerFunctionIfResting(
                         tech,
-                        function ()
-                            tech.setLock(lock)
-                        end
+                        function () tech.setLock(lock) end
                     )
                 end
         })
@@ -58,6 +62,7 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
         triggerFunctionIfResting(
             tech,
             function ()
+                debugAssert(tech ~= nil, 'putTechOnTrack2: Tech is nil')
                 tech.setLock(lock)
             end
         )
@@ -78,7 +83,6 @@ function addButtonToTechTile(zone, tile)
     if techType == 'R' then
         return false
     end
-
 
     local data = {
       click_function = "acquireTech",
@@ -117,16 +121,20 @@ function acquireTech(tile, color)
 
     local board = getBoardBelongingToColor(color)
 
+    debugAssert(board ~= nil, "acquireTech: No board found for player "..tostring(color))
+    debugAssert(tile ~= nil, "acquireTech: No tile found for player "..tostring(color))
+
     if not board then
         broadcastToColor("Cannot acquire tech. You do not have a board.", color)
         return false
     end
 
+    local msg = Player[color].steam_name .. " acquires " .. tile.getName()
     local techType = string.sub(tile.getDescription(),1,1)
     local trackColor = techTypeToTrackColor(techType)
 
+    printToAll(msg, color)
     putTechOnTrack(tile, trackColor, board, _, true)
-
 end
 
 function techTypeToTrackColor(techType)

@@ -191,7 +191,7 @@ local passed = {White = true, Yellow = true, Red = true,
 local passCheck = nil
 local turnBag = '9d696e'
 local turnTracker ='bcaf12'
-local InfluenceDisks_GUID = '8f4c6b'
+local InfluenceDiscs_GUID = '8f4c6b'
 
 local shown = {buttons = false}
 
@@ -199,6 +199,33 @@ local DisableGUIDs = {
   '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',
   '77e0d1', --Turn Tracker
   '2bd7cb', --Setup Board
+}
+
+local HomeworldLocations = {
+    White  = {
+        position = {10.32, 0.96, -5.96},
+        rotation = {0.00, 120.00, 0.00}
+    },
+    Yellow = {
+        position = {0.00, 0.96, -11.92},
+        rotation = {0.00, 180, 0.00}
+    },
+    Red    = {
+        position = {-10.32, 0.96, -5.96},
+        rotation = {0.00, 240.00, 0.00}
+    },
+    Green  = {
+        position = {-10.32, 0.96, 5.96},
+        rotation = {0.00, 300, 0.00}
+    },
+    Blue   = {
+        position = {0.00, 0.96, 11.92},
+        rotation = {0.00, 360, 0.00}
+    },
+    Purple = {
+        position = {10.32, 0.96, 5.95},
+        rotation = {0.00, 60, 0.00}
+    },
 }
 
 function loadObjects()

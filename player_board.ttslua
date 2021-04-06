@@ -7,34 +7,50 @@ function boardInvertFactor(board)
     end
 end
 
-function setupPlayerInfluence(board, PlayerColor)
-    -- Spawns influence disks on the player's boards
+function setupPlayerInfluence(board, PlayerColor, amountOfInfluence)
+    -- Spawns influence discs on the player's board
 
     board.setLock(true)
-    local InfluenceBag= getObjectFromGUID(InfluenceDisks_GUID)
 
-    local takeParams = {guid=1}
+    local NumberDiscs = amountOfInfluence or 12
+    local lastSpawn = 14-NumberDiscs
 
-    local InvPos = boardInvertFactor(board)
-    local Pos=board.getPosition() + Vector(-3.22*InvPos, 3, -5.6*InvPos)
-
-    local NumberDisks = 12
     -- Eridani receive -2 influence
     if board.getGUID() == 'eeefaa' then
-        NumberDisks = 10
-        Pos.x = Pos.x + 2*InvPos
+        NumberDiscs = 10
     end
 
-    -- place influence disks
-    for i=0, NumberDisks do
-        Disk = InfluenceBag.takeObject(takeParams)
-        colorRGB = stringColorToRGB(PlayerColor)
-        Disk.setColorTint(colorRGB)
-        Disk.setPosition(Pos)
-        Pos.x = Pos.x + 0.99*InvPos
+    -- place influence discs, omitting the last spot, since it goes to the
+    -- homeworld
+    for i=13, lastSpawn, -1 do
+        local pos = getRelativePosition(board, influenceSpaces[i])
+        spawnInfluenceDisc(pos, PlayerColor)
     end
 
     spawnReturnInfluenceButton(board)
+end
+
+function spawnInfluenceDisc(pos, color)
+    assert(pos ~= nil, "spawnInfluenceDisc: pos is nil")
+    assert(type(pos)=='table', 'spawnInfluenceDisc: pos is '..type(pos))
+
+    local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
+    local takeParams = {guid=1}
+    local disc = influenceBag.takeObject(takeParams)
+
+    Wait.condition(
+        function ()
+            disc.setColorTint(color)
+            log(pos, 'spawnInfluenceDisc:pos')
+            disc.setPosition(pos)
+        end,
+        function ()
+            return (not disc.spawning)
+        end,
+        4
+        )
+
+    return disc
 end
 
 function spawnReturnInfluenceButton(board)
@@ -42,7 +58,7 @@ function spawnReturnInfluenceButton(board)
 
     local InvPos = boardInvertFactor(board)
     local data = {
-        click_function = "returnInfluenceDisks",
+        click_function = "returnInfluenceDiscs",
         function_owner = self,
         label = "Return Influence",
         position = {-1.18, 0.09, 1.1},
@@ -56,9 +72,14 @@ function spawnReturnInfluenceButton(board)
 end
 
 
-function returnInfluenceDisks(board, color)
-    -- Returns influence disks from the action spots on the board and the pass
+function returnInfluenceDiscs(board, color)
+    -- Returns influence discs from the action spots on the board and the pass
     -- marker to the influence track for each player
+
+    -- if DEBUG then
+    --     getNextUnusedInfluence(board)
+    --     return nil
+    -- end
 
     local InvPos = boardInvertFactor(board)
 
@@ -67,7 +88,7 @@ function returnInfluenceDisks(board, color)
         origin = board.getPosition() + vector(-7.77*InvPos, 0, -5.25*InvPos),
         type = 3,
         direction = {0,1,0},
-        max_distance = 0,
+        max_distance = 4,
         size = {7.40, 1.69, 2.36},
         -- debug = true
     })
@@ -90,15 +111,15 @@ function returnInfluenceDisks(board, color)
         table.insert(discs, v)
     end
 
-    -- If there are no disks to return, exit
+    -- If there are no discs to return, exit
     if not next(discs) then
-        log('No disks to return.')
+        log('No discs to return.')
         return false
     end
 
     local space = 14
     InvPos = InvPos * -1
-    -- Return all the disks
+    -- Return all the discs
     for _, disc in pairs(discs) do
         space = getNextOpenInfluenceSpace(board, space - 1)
         disc.setPositionSmooth(
@@ -112,6 +133,7 @@ end
 function getNextOpenInfluenceSpace(board, start)
     -- Get the next highest empty influence space after and including `start`
 
+    start = start or 13
     if start <= 1 then return 1 end
 
     -- Using an extra -1 multiplier because I messed up the initial position
@@ -136,7 +158,24 @@ function getNextOpenInfluenceSpace(board, start)
     -- Return the first space if everything else is full, stacking tiles if needed
     log('Next open influence space: 1')
     return 1
+end
 
+function getNextUnusedInfluence(boardOrColor)
+    -- Returns the next influence disc on the track
+
+    local board
+    if type(boardOrColor) == 'string' then
+        board = getBoardBelongingToColor(boardOrColor)
+    else board = boardOrColor end
+    assert(board ~= nil, "getNextUnusedInfluence: No board found")
+
+    for _, space in pairs(influenceSpaces) do
+        local pos = getRelativePosition(board, space)
+        local disc = castAndCheckForTag(pos, 'Influence Disc')
+        if disc ~= nil then
+            return disc
+        end
+    end
 end
 
 
@@ -246,7 +285,6 @@ function setRace(playerColor, zone, obj)
     end
 end
 
-
 function playersWithoutBoards()
     players = {}
     for _, color in pairs(getSeatedPlayers()) do
@@ -256,7 +294,6 @@ function playersWithoutBoards()
     end
     return players
 end
-
 
 function ownerOfBoard(board)
     -- Returns the Player owner of a particular board
@@ -274,7 +311,6 @@ function ownerOfBoard(board)
         end
     end
 end
-
 
 function hasPlayerBoard(color)
     -- Returns the board if the given player has a board in front of them

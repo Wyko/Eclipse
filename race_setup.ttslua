@@ -1,0 +1,101 @@
+local factions = {
+    ['Planta'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Descendants of Draco'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Mechanema'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Hydran Progress'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['types'] = {'money', 'materials', 'science', 'adv_science'},
+    },
+    ['Eridani Empire'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Orion Hegemony'] = {
+        ['startingShip'] = 'cruiser',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Republic'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Union'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Directorate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Alliance'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Conglomerate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Federation'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Rho Indi'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 2,
+    },
+    ['Exiles'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Wardens of Magellan'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Guardians of Magellan'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+}
+
+function raceSetup(homeworld, color, race)
+    if factions[race] == nil then
+        broadcastToColor("Unfortunately, your race doesn't seem to be configured in this script yet. No setup automation is possible.", color)
+        return false
+    end
+    placePopulations(homeworld, color, factions[race].types)
+    spawnInfluenceDisc(homeworld.getPosition()+vector(0, 1, 0), color)
+end
+
+function placeHomeworld(homeworld, color)
+    -- Moves the specified homeworld object to its correct location
+
+    homeworld.setPosition(HomeworldLocations[color].position)
+    homeworld.setRotation(HomeworldLocations[color].rotation)
+    triggerFunctionIfResting(
+        homeworld,
+        function () homeworld.setLock(true) end)
+end
+
+function placeInfluenceOnHex(hex, color)
+    -- Places the next available influence disc on the given hex
+
+    log("Hex: ".. tostring(hex.getName()) .. ", Color: " .. tostring(color),
+        'placeInfluenceOnHex')
+    local disc = getNextUnusedInfluence(color)
+    assert(disc ~= nil, "placeInfluenceOnHex: No disc found.")
+
+    disc.setPositionSmooth(hex.getPosition()+vector(0, 1, 0), false, true)
+end
+
+function placeStartingResources(color)
+
+end
