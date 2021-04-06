@@ -221,7 +221,10 @@ function basicSetup2(parameters)
 
         -- Put down population cubes
         Wait.condition(
-            function () placePopulations(homeworld, PlayerColor, _) end,
+            function ()
+                placePopulations(homeworld, PlayerColor)
+                placeInfluenceOnHex(homeworld, PlayerColor)
+            end,
             function () return homeworld.resting end
         )
     end

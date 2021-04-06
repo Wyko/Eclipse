@@ -71,7 +71,7 @@ function returnInfluenceDisks(board, color)
         origin = board.getPosition() + vector(-7.77*InvPos, 0, -5.25*InvPos),
         type = 3,
         direction = {0,1,0},
-        max_distance = 0,
+        max_distance = 4,
         size = {7.40, 1.69, 2.36},
         -- debug = true
     })
@@ -140,7 +140,22 @@ function getNextOpenInfluenceSpace(board, start)
     -- Return the first space if everything else is full, stacking tiles if needed
     log('Next open influence space: 1')
     return 1
+end
 
+function getNextUnusedInfluence(boardOrColor)
+    -- Returns the next influence disk on the track
+
+    if type(boardOrColor) == 'string' then
+        board = getBoardBelongingToColor(boardOrColor)
+    else board = boardOrColor end
+
+    for _, space in pairs(influenceSpaces) do
+        local pos = getRelativePosition(board, space)
+        local disc = castAndCheckForTag(pos, 'Influence Disc')
+        if disc ~= nil then
+            return disc
+        end
+    end
 end
 
 

@@ -1,3 +1,58 @@
+local factions = {
+    ['Planta'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Descendants of Draco'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Mechanema'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Hydran Progress'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Eridani'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Orion Hegemony'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Republic'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Union'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Directorate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Alliance'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Conglomerate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Terran Federation'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Rho Indi'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+}
+
 function placeHomeworld(homeworld, color)
     -- Moves the specified homeworld object to its correct location
 
@@ -6,4 +61,19 @@ function placeHomeworld(homeworld, color)
     triggerFunctionIfResting(
         homeworld,
         function () homeworld.setLock(true) end)
+end
+
+function placeInfluenceOnHex(hex, color)
+    -- Places the next available influence disk on the given hex
+
+    log("Hex: ".. tostring(hex.getName()) .. ", Color: " .. tostring(color),
+        'placeInfluenceOnHex')
+    local disc = getNextUnusedInfluence(color)
+    assert(disc ~= nil, "No disc found.")
+
+    disc.setPositionSmooth(hex.getPosition(), false, true)
+end
+
+function placeStartingResources(color)
+
 end

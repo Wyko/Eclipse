@@ -210,7 +210,7 @@ function getRelativePosition(object, local_pos)
     -- This was annoying to figure out. Given a vector which was first found on
     -- on object placed at 0,0,0 with zero rotation, returns the new vector after
     -- the object is moved and / or rotated elsewhere. Ignores scale!
-    
+
     if type(local_pos) == 'table' then
         local_pos = Vector(local_pos)
     end
