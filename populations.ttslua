@@ -210,6 +210,7 @@ function getNextCube(type, color)
     -- given Player color
 
     local resourceBoard = getObjectFromGUID(resourceBoards_GUID[color])
+    type = string.gsub(type, 'adv_', '')
     if DEBUG then
         assert(resourceBoard, 'No resource board found for '..tostring(color))
         assert(#resourceProduction[type]>1)
@@ -225,10 +226,11 @@ function getNextCube(type, color)
     return nil
 end
 
-function placePopulations(hex, color, advanced)
+function placePopulations(hex, color, types)
     -- Fully fills a hex with populations
+    typesToFill = types or {'money', 'materials', 'science'}
 
-    for _, type in pairs({'money', 'materials', 'science'}) do
+    for _, type in pairs(typesToFill) do
         for _, local_pos in pairs(hex.getVar(type)) do
             log("Type: "..tostring(type)..", Color: "..tostring(color), 'placePopulations')
             local cube = getNextCube(type, color)

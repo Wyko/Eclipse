@@ -14,13 +14,14 @@ local factions = {
     ['Hydran Progress'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
+        ['types'] = {'money', 'materials', 'science', 'adv_science'},
     },
     ['Eridani'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
     },
     ['Orion Hegemony'] = {
-        ['startingShip'] = 'interceptor',
+        ['startingShip'] = 'cruiser',
         ['numStartingShips'] = 1,
     },
     ['Terran Republic'] = {
@@ -49,9 +50,14 @@ local factions = {
     },
     ['Rho Indi'] = {
         ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
+        ['numStartingShips'] = 2,
     },
 }
+
+function raceSetup(homeworld, color, race)
+    placePopulations(homeworld, color, factions[race].types)
+    spawnInfluenceDisc(homeworld.getPosition(), color)
+end
 
 function placeHomeworld(homeworld, color)
     -- Moves the specified homeworld object to its correct location

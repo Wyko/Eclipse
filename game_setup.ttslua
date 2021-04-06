@@ -233,24 +233,17 @@ function basicSetup2(parameters)
     end
 
     -- take player board and position it
-    Object = SeekAndTake('Player Board', Box, takeParams)
-    if (Object~=false) then
+    local board = SeekAndTake('Player Board', Box, takeParams)
+    if (board~=false) then
         destination = PlayerPosition + Vector(0, -0.14, 19*InvPos)
-        Object.setPositionSmooth(destination,false, true)
+        board.setPositionSmooth(destination,false, true)
 
-        local Lock = function()
-            log('Setting up board for ' .. tostring(PlayerColor))
-            setupPlayerInfluence(Object, PlayerColor)
-            getBoardInitialTechs(Object)
-            -- Wait.time(
-            --     function ()
-            --         log('Setting up board for ' .. tostring(PlayerColor))
-            --         setupPlayerInfluence(Object, PlayerColor)
-            --         getBoardInitialTechs(Object)
-            --     end,
-            --     2)
-        end
-        triggerFunctionIfResting(Object, Lock)
+        triggerFunctionIfResting(board,
+            function()
+                log('Setting up board for ' .. tostring(PlayerColor))
+                setupPlayerInfluence(board, PlayerColor)
+                getBoardInitialTechs(board)
+            end)
     end
 
     -- take home world and position it
@@ -263,12 +256,9 @@ function basicSetup2(parameters)
             function () return (not homeworld.spawning) end
         )
 
-        -- Put down population cubes
+        -- Setup race
         Wait.condition(
-            function ()
-                placePopulations(homeworld, PlayerColor)
-                spawnInfluenceDisc(homeworld.getPosition(), PlayerColor)
-            end,
+            function () raceSetup(homeworld, PlayerColor, board.getName()) end,
             function () return homeworld.resting end
         )
     end
