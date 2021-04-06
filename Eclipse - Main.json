@@ -74475,4 +74475,19 @@
           "Hands": false,
           "CustomMesh": {
             "MeshURL": "http://cloud-3.steamusercontent.com/ugc/1267149075135815155/D67C8BF5CF04C084F5A3801C27DB59D7F1F37A2D/",
-            "DiffuseURL":
+            "DiffuseURL": "http://cloud-3.steamusercontent.com/ugc/1267149075135609165/C31794E9753FBD0E7063D05B240096A4420AAFDF/",
+            "NormalURL": "",
+            "ColliderURL": "http://cloud-3.steamusercontent.com/ugc/1267149075135815155/D67C8BF5CF04C084F5A3801C27DB59D7F1F37A2D/",
+            "Convex": true,
+            "MaterialIndex": 1,
+            "TypeIndex": 0,
+            "CastShadows": true
+          },
+          "LuaScript": "",
+          "LuaScriptState": "",
+          "XmlUI": ""
+        }
+      ]
+    }
+  ]
+}
