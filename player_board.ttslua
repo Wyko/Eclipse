@@ -12,45 +12,44 @@ function setupPlayerInfluence(board, PlayerColor, amountOfInfluence)
 
     board.setLock(true)
 
-    local Pos = getRelativePosition(object, local_pos)
     local NumberDiscs = amountOfInfluence or 12
+    local lastSpawn = 14-NumberDiscs
 
     -- Eridani receive -2 influence
     if board.getGUID() == 'eeefaa' then
         NumberDiscs = 10
     end
 
-    -- place influence discs
-    for i=1, NumberDiscs do
-        local spot = getNextOpenInfluenceSpace(board)
-        spawnInfluenceDisc(spot, PlayerColor)
+    -- place influence discs, omitting the last spot, since it goes to the
+    -- homeworld
+    for i=13, lastSpawn, -1 do
+        local pos = getRelativePosition(board, influenceSpaces[i])
+        spawnInfluenceDisc(pos, PlayerColor)
     end
 
     spawnReturnInfluenceButton(board)
 end
 
-function spawnInfluenceDisc(location, color)
-    -- local takeParams = {
-    --     guid = 1,
-    --     position = pos,
-    --     callback_function = function (disc)
-    --         disc.setColorTint(color)
-    --     end
-    -- }
-    -- return influenceBag.takeObject(takeParams)
-    local pos = location:copy()
+function spawnInfluenceDisc(pos, color)
+    assert(pos ~= nil, "spawnInfluenceDisc: pos is nil")
     assert(type(pos)=='table', 'spawnInfluenceDisc: pos is '..type(pos))
+
     local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
     local takeParams = {guid=1}
     local disc = influenceBag.takeObject(takeParams)
 
     Wait.condition(
         function ()
-            log(pos, 'spawnInfluenceDisc:pos2')
             disc.setColorTint(color)
+            log(pos, 'spawnInfluenceDisc:pos')
             disc.setPosition(pos)
         end,
-        function () return (not disc.spawning) end, 4)
+        function ()
+            return (not disc.spawning)
+        end,
+        4
+        )
+
     return disc
 end
 
@@ -134,6 +133,7 @@ end
 function getNextOpenInfluenceSpace(board, start)
     -- Get the next highest empty influence space after and including `start`
 
+    start = start or 13
     if start <= 1 then return 1 end
 
     -- Using an extra -1 multiplier because I messed up the initial position
