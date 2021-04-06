@@ -1,6 +1,6 @@
 function hideAndLockStuff()
     HideObjects = getObjectsWithTag('Player Part Bag')
-    table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence disks
+    table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence discs
     table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
     table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
 
@@ -209,26 +209,6 @@ function basicSetup2(parameters)
 
     local destination
 
-    -- take home world and position it
-    local homeworld = SeekAndTake('Homeworld', Box, takeParams)
-    if (homeworld~=false) then
-        -- destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
-        -- Object.setPositionSmooth(destination,false, true)
-        Wait.condition(
-            function () placeHomeworld(homeworld, PlayerColor) end,
-            function () return (not homeworld.spawning) end
-        )
-
-        -- Put down population cubes
-        Wait.condition(
-            function ()
-                placePopulations(homeworld, PlayerColor)
-                placeInfluenceOnHex(homeworld, PlayerColor)
-            end,
-            function () return homeworld.resting end
-        )
-    end
-
     -- take fleet and position it
     Object = SeekAndTake('Fleet', Box, takeParams)
     if (Object~=false) then
@@ -259,15 +239,38 @@ function basicSetup2(parameters)
         Object.setPositionSmooth(destination,false, true)
 
         local Lock = function()
-                Wait.time(
-                        function ()
-                                log('Setting up board for ' .. tostring(PlayerColor))
-                                setupPlayerInfluence(Object, PlayerColor)
-                                getBoardInitialTechs(Object)
-                        end,
-                        2)
+            log('Setting up board for ' .. tostring(PlayerColor))
+            setupPlayerInfluence(Object, PlayerColor)
+            getBoardInitialTechs(Object)
+            -- Wait.time(
+            --     function ()
+            --         log('Setting up board for ' .. tostring(PlayerColor))
+            --         setupPlayerInfluence(Object, PlayerColor)
+            --         getBoardInitialTechs(Object)
+            --     end,
+            --     2)
         end
         triggerFunctionIfResting(Object, Lock)
+    end
+
+    -- take home world and position it
+    local homeworld = SeekAndTake('Homeworld', Box, takeParams)
+    if (homeworld~=false) then
+        -- destination = PlayerPosition + Vector(-16.5*InvPos, 0, 6*InvPos)
+        -- Object.setPositionSmooth(destination,false, true)
+        Wait.condition(
+            function () placeHomeworld(homeworld, PlayerColor) end,
+            function () return (not homeworld.spawning) end
+        )
+
+        -- Put down population cubes
+        Wait.condition(
+            function ()
+                placePopulations(homeworld, PlayerColor)
+                spawnInfluenceDisc(homeworld.getPosition(), PlayerColor)
+            end,
+            function () return homeworld.resting end
+        )
     end
 
     -- place colony ships

@@ -64,12 +64,12 @@ function placeHomeworld(homeworld, color)
 end
 
 function placeInfluenceOnHex(hex, color)
-    -- Places the next available influence disk on the given hex
+    -- Places the next available influence disc on the given hex
 
     log("Hex: ".. tostring(hex.getName()) .. ", Color: " .. tostring(color),
         'placeInfluenceOnHex')
     local disc = getNextUnusedInfluence(color)
-    assert(disc ~= nil, "No disc found.")
+    assert(disc ~= nil, "placeInfluenceOnHex: No disc found.")
 
     disc.setPositionSmooth(hex.getPosition(), false, true)
 end

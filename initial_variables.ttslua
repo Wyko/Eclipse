@@ -191,7 +191,7 @@ local passed = {White = true, Yellow = true, Red = true,
 local passCheck = nil
 local turnBag = '9d696e'
 local turnTracker ='bcaf12'
-local InfluenceDisks_GUID = '8f4c6b'
+local InfluenceDiscs_GUID = '8f4c6b'
 
 local shown = {buttons = false}
 
