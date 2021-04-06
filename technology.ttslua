@@ -48,13 +48,10 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
             position          = finalPos,
             rotation          = board.getRotation(),
             callback_function = function (tech)
-                    assert(tech ~= nil, 'putTechOnTrack3: Tech is nil')
+                    debugAssert(tech ~= nil, 'putTechOnTrack3: Tech is nil')
                     triggerFunctionIfResting(
                         tech,
-                        function ()
-                            assert(tech ~= nil, 'putTechOnTrack1: Tech is nil')
-                            tech.setLock(lock)
-                        end
+                        function () tech.setLock(lock) end
                     )
                 end
         })
@@ -65,7 +62,7 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
         triggerFunctionIfResting(
             tech,
             function ()
-                assert(tech ~= nil, 'putTechOnTrack2: Tech is nil')
+                debugAssert(tech ~= nil, 'putTechOnTrack2: Tech is nil')
                 tech.setLock(lock)
             end
         )
@@ -124,10 +121,8 @@ function acquireTech(tile, color)
 
     local board = getBoardBelongingToColor(color)
 
-    if DEBUG then
-        assert(board ~= nil, "acquireTech: No board found for player "..tostring(color))
-        assert(tile ~= nil, "acquireTech: No tile found for player "..tostring(color))
-    end
+    debugAssert(board ~= nil, "acquireTech: No board found for player "..tostring(color))
+    debugAssert(tile ~= nil, "acquireTech: No tile found for player "..tostring(color))
 
     if not board then
         broadcastToColor("Cannot acquire tech. You do not have a board.", color)

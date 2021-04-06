@@ -211,10 +211,8 @@ function getNextCube(type, color)
 
     local resourceBoard = getObjectFromGUID(resourceBoards_GUID[color])
     type = string.gsub(type, 'adv_', '')
-    if DEBUG then
-        assert(resourceBoard, 'No resource board found for '..tostring(color))
-        assert(#resourceProduction[type]>1)
-    end
+    debugAssert(resourceBoard, 'No resource board found for '..tostring(color))
+    debugAssert(#resourceProduction[type]>1, "#resourceProduction[type] is < 1")
 
     for _, pos in ipairs(resourceProduction[type]) do
         local n_pos = (resourceBoard.getPosition() +

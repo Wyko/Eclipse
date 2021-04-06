@@ -223,3 +223,12 @@ function getRelativePosition(object, local_pos)
         local_pos.z / object.getScale().z)
     return object.positionToWorld(scaled_pos)
 end
+
+function debugAssert(...)
+    -- Just a little wrapper for a common assert
+
+    local arg = {...}
+    if DEBUG then
+        assert(unpack(arg))
+    end
+end
