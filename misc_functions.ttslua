@@ -214,6 +214,8 @@ function getRelativePosition(object, local_pos)
     if type(local_pos) == 'table' then
         local_pos = Vector(local_pos)
     end
+    assert(object ~= nil, "getRelativePosition: Object is nil")
+    assert(local_pos ~= nil, "getRelativePosition: local_pos is nil for "..object.getName())
 
     local scaled_pos = vector(
         local_pos.x / object.getScale().x,

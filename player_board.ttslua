@@ -7,40 +7,51 @@ function boardInvertFactor(board)
     end
 end
 
-function setupPlayerInfluence(board, PlayerColor)
-    -- Spawns influence discs on the player's boards
+function setupPlayerInfluence(board, PlayerColor, amountOfInfluence)
+    -- Spawns influence discs on the player's board
 
     board.setLock(true)
 
-    local InvPos = boardInvertFactor(board)
-    local Pos=board.getPosition() + Vector((-3.22)*InvPos, 3, -5.6*InvPos)
+    local Pos = getRelativePosition(object, local_pos)
+    local NumberDiscs = amountOfInfluence or 12
 
-    local NumberDiscs = 12
     -- Eridani receive -2 influence
     if board.getGUID() == 'eeefaa' then
         NumberDiscs = 10
-        Pos.x = Pos.x + 2*InvPos
     end
 
     -- place influence discs
     for i=1, NumberDiscs do
-        Pos.x = Pos.x + 0.99*InvPos
-        spawnInfluenceDisc(Pos, PlayerColor)
+        local spot = getNextOpenInfluenceSpace(board)
+        spawnInfluenceDisc(spot, PlayerColor)
     end
 
     spawnReturnInfluenceButton(board)
 end
 
-function spawnInfluenceDisc(pos, color)
+function spawnInfluenceDisc(location, color)
+    -- local takeParams = {
+    --     guid = 1,
+    --     position = pos,
+    --     callback_function = function (disc)
+    --         disc.setColorTint(color)
+    --     end
+    -- }
+    -- return influenceBag.takeObject(takeParams)
+    local pos = location:copy()
+    assert(type(pos)=='table', 'spawnInfluenceDisc: pos is '..type(pos))
     local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
-    local takeParams = {
-        guid = 1,
-        position = pos,
-        callback_function = function (disc)
+    local takeParams = {guid=1}
+    local disc = influenceBag.takeObject(takeParams)
+
+    Wait.condition(
+        function ()
+            log(pos, 'spawnInfluenceDisc:pos2')
             disc.setColorTint(color)
-        end
-    }
-    return influenceBag.takeObject(takeParams)
+            disc.setPosition(pos)
+        end,
+        function () return (not disc.spawning) end, 4)
+    return disc
 end
 
 function spawnReturnInfluenceButton(board)
