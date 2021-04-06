@@ -19,8 +19,6 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
     -- If no spot is specified, the next available spot is used.
     -- tech can be a techName (to be searched from the bag) or an Object
 
-    local InvPos = boardInvertFactor(board)
-    InvPos = Vector(InvPos, 1, InvPos)
 
     spot = spot or nextFreeTechSpace(trackColor, board)
     if not spot then
@@ -30,22 +28,31 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
         return false
     end
 
+    -- local finalPos = getRelativePosition(board, techTracks[trackColor][spot])
+
+    local InvPos = boardInvertFactor(board)
+    InvPos = Vector(InvPos, 1, InvPos)
     local finalPos = (Vector(techTracks[trackColor][spot]) * InvPos) + board.getPosition()
 
     log(type(tech), 'putTechOnTrack:type(tech)')
     if type(tech) == 'string' then
+        log('Preparing clone', 'putTechOnTrack')
         SeekAndClone(tech, TechBag_GUID, finalPos, board.getRotation(), lock)
 
     elseif tech.tag == "Chip" and tech.getQuantity() > 1 then
         -- If we're supplied an actual object, then just move it
         -- If it's a bag, then you have to use takeObject()
+
+        log('Preparing to takeObject for '..tostring(tech), 'putTechOnTrack')
         tech.takeObject({
             position          = finalPos,
             rotation          = board.getRotation(),
-            callback_function = function (obj)
+            callback_function = function (tech)
+                    assert(tech ~= nil, 'putTechOnTrack3: Tech is nil')
                     triggerFunctionIfResting(
                         tech,
                         function ()
+                            assert(tech ~= nil, 'putTechOnTrack1: Tech is nil')
                             tech.setLock(lock)
                         end
                     )
@@ -58,6 +65,7 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
         triggerFunctionIfResting(
             tech,
             function ()
+                assert(tech ~= nil, 'putTechOnTrack2: Tech is nil')
                 tech.setLock(lock)
             end
         )
