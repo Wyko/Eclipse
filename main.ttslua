@@ -1,6 +1,6 @@
 local hideStuff = true
 
-local DEBUG = false
+local DEBUG = true
 
 #include initial_variables
 #include misc_functions

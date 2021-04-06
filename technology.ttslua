@@ -115,19 +115,23 @@ function acquireTech(tile, color)
     -- given color
 
     local board = getBoardBelongingToColor(color)
-    local msg = Player[color].steam_name .. " acquires " .. tile.getName()
+
+    if DEBUG then
+        assert(board ~= nil, "acquireTech: No board found for player "..tostring(color))
+        assert(tile ~= nil, "acquireTech: No tile found for player "..tostring(color))
+    end
 
     if not board then
         broadcastToColor("Cannot acquire tech. You do not have a board.", color)
         return false
     end
 
+    local msg = Player[color].steam_name .. " acquires " .. tile.getName()
     local techType = string.sub(tile.getDescription(),1,1)
     local trackColor = techTypeToTrackColor(techType)
 
     printToAll(msg, color)
     putTechOnTrack(tile, trackColor, board, _, true)
-
 end
 
 function techTypeToTrackColor(techType)
