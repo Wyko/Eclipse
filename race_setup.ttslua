@@ -16,7 +16,7 @@ local factions = {
         ['numStartingShips'] = 1,
         ['types'] = {'money', 'materials', 'science', 'adv_science'},
     },
-    ['Eridani'] = {
+    ['Eridani Empire'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
     },
@@ -52,17 +52,33 @@ local factions = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 2,
     },
+    ['Exiles'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Wardens of Magellan'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
+    ['Guardians of Magellan'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+    },
 }
 
 function raceSetup(homeworld, color, race)
+    if factions[race] == nil then
+        broadcastToColor("Unfortunately, your race doesn't seem to be configured in this script yet. No setup automation is possible.", color)
+        return false
+    end
     placePopulations(homeworld, color, factions[race].types)
-    spawnInfluenceDisc(homeworld.getPosition(), color)
+    spawnInfluenceDisc(homeworld.getPosition()+vector(0, 1, 0), color)
 end
 
 function placeHomeworld(homeworld, color)
     -- Moves the specified homeworld object to its correct location
 
-    homeworld.setPositionSmooth(HomeworldLocations[color].position, false, true)
+    homeworld.setPosition(HomeworldLocations[color].position)
     homeworld.setRotation(HomeworldLocations[color].rotation)
     triggerFunctionIfResting(
         homeworld,
@@ -77,7 +93,7 @@ function placeInfluenceOnHex(hex, color)
     local disc = getNextUnusedInfluence(color)
     assert(disc ~= nil, "placeInfluenceOnHex: No disc found.")
 
-    disc.setPositionSmooth(hex.getPosition(), false, true)
+    disc.setPositionSmooth(hex.getPosition()+vector(0, 1, 0), false, true)
 end
 
 function placeStartingResources(color)
