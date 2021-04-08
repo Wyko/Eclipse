@@ -756,16 +756,10 @@ function placeStartingResources(color, race)
     local faction = factions[race]
     debugAssert(faction ~= nil, "placeStartingResources: Did not find faction")
 
-    spawnResourceMarker('money', color)
-    spawnResourceMarker('materials', color)
-    spawnResourceMarker('science', color)
-
     for _, resource in ipairs{"money", "materials", "science"} do
         local marker = spawnResourceMarker(resource, color)
         setPlayerResource(resource, color, faction[resource])
     end
-
-
 end
 
 function spawnResourceMarker(type, color)
