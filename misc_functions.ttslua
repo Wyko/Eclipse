@@ -37,12 +37,15 @@ function castAndCheckForTag(position, tag, distance)
 end
 
 
-function objectsHitByCast(castResult, name)
+function objectsHitByCast(castResult, name, tag)
     -- Returns true if an object with a given name was hit by a Physics.Cast()
 
+    if castResult == nil then return {} end
+    
     local objects = {}
     for _, obj in ipairs(castResult) do
-        if obj['hit_object'].getName() == name then
+        if (obj['hit_object'].getName() == name or
+            (tag ~= nil and obj['hit_object'].hasTag(tag))) then
             table.insert(objects, obj['hit_object'])
         end
     end
@@ -231,4 +234,27 @@ function debugAssert(...)
     if DEBUG then
         assert(unpack(arg))
     end
+end
+
+
+function castBoxAndCheck(objToCheck, name, tag)
+    local obj
+    if type(objToCheck) == string then
+        obj = getObjectFromGUID(objToCheck)
+    else
+        obj = objToCheck
+    end
+    assert((name or tag), "No name or tag given")
+
+    local results = Physics.cast({
+        origin       = obj.getPosition(),
+        direction    = Vector(0,1,0),
+        type         = 3,
+        size         = obj.getBounds(),
+        orientation  = Vector(0,1,0),
+        max_distance = 4,
+        debug        = DEBUG,
+    }) -- returns {{Vector point, Vector normal, float distance, Object hit_object}, ...}
+
+    return objectsHitByCast(castResult, name, tag)
 end

@@ -1,0 +1,50 @@
+local dropCon = nil
+
+function onCollisionEnter(collision_info)
+    if dropCon ~= nil then Wait.stop(dropCon) end
+
+    dropCon = Wait.condition(
+        function ()
+            recordPosition(collision_info.collision_object)
+        end,
+        function ()
+            return self.resting
+        end,
+        2
+    )
+end
+
+function recordPosition(obj)
+    local rec = getObjectFromGUID('dc846e')
+    local positions = rec.getTable('positions')
+    positions = positions or {}
+    positions[obj.getName()] = positions[obj.getName()] or {}
+
+    local x = {
+        ['position'] = obj.positionToLocal(self.getPosition()),
+        ['rotation'] = self.getRotation()
+    }
+    -- positions[obj.getName()][tostring(#positions[obj.getName()]+1)] = x
+
+    table.insert(positions[obj.getName()], #positions[obj.getName()]+1, x)
+    rec.setTable('positions', positions)
+
+    local msg = string.gsub(obj.getName(), ' ', '_')..'_positions = {'
+    for i, pos in pairs(positions[obj.getName()]) do
+        msg = msg.."\n    ["..i.."] = {\n        ['position'] = {"
+        msg = msg.."\n            ['x'] = " .. pos['position'].x .. ","
+        msg = msg.."\n            ['y'] = " .. pos['position'].y .. ","
+        msg = msg.."\n            ['z'] = " .. pos['position'].z .. "},"
+        msg = msg.."\n        ['rotation'] = {"
+        msg = msg.."\n            ['x'] = " .. pos['rotation'].x .. ","
+        msg = msg.."\n            ['y'] = " .. pos['rotation'].y .. ","
+        msg = msg.."\n            ['z'] = " .. pos['rotation'].z .. "}},"
+    end
+    msg = msg.."\n}"
+    -- log(positions)
+    log(msg)
+    -- log(obj.positionToLocal(self.getPosition()))
+    -- x = JSON.encode_pretty(positions)
+    -- log(x)
+    -- log(JSON.decode(x))
+end

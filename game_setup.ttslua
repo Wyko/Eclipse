@@ -1,5 +1,9 @@
 function hideAndLockStuff()
     HideObjects = getObjectsWithTag('Player Part Bag')
+
+    table.insert(HideObjects, getObjectFromGUID(materialsResourceMarker_GUID))
+    table.insert(HideObjects, getObjectFromGUID(moneyResourceMarker_GUID))
+    table.insert(HideObjects, getObjectFromGUID(scienceResourceMarker_GUID))
     table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence discs
     table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
     table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))

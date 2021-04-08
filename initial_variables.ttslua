@@ -7,13 +7,14 @@ local Sector2Bag_GUID = '3ae266'
 local Sector3Bag_GUID = 'd5cb79'
 local ExtraS3Bag_GUID = '69b446'
 local OutpostBag_GUID = '54fe91'
-local AmbassadorBag_GUID = '0d6bda'
+local AmbassadorBag_GUID = '460e45'
 local nextRoundButton_GUID = '3d6d3a'
 local GuardianSpot = {41.86, 1.39, -6.50}
 local AncientSpot = {41.85, 1.39, -9.09}
 local GCDSSpot = {2.38, 1.15, -0.01}
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
+
 
 RoundMarker = nil
 local TechBag = nil
@@ -59,6 +60,43 @@ local PlayerMarkers = {
     Green = nil,
     Blue = nil,
     Purple = nil
+}
+
+local materialsResourceMarker_GUID = '1f8225'
+local scienceResourceMarker_GUID = 'f83ba1'
+local moneyResourceMarker_GUID = '500402'
+
+local PlayerResourceMarkers = {
+    White = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Yellow = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Red = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Green = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Blue = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Purple = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    }
 }
 
 local TableGUIDs = {'002b10','f7a579','69781d','4493a4',

@@ -12,5 +12,5 @@ local DEBUG = true
 #include next_round
 #include camera
 #include race_setup
-#include populations
+#include resource_setup
 #include console++

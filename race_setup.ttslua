@@ -2,115 +2,115 @@ local factions = {
     ['Planta'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 2,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 2,
     },
     ['Descendants of Draco'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 3,
-        ['startingScience'] = 4,
-        ['startingMoney'] = 5,
+        ['materials'] = 3,
+        ['science'] = 4,
+        ['money'] = 2,
     },
     ['Mechanema'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Hydran Progress'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 2,
-        ['startingScience'] = 6,
-        ['startingMoney'] = 2,
+        ['materials'] = 2,
+        ['science'] = 6,
+        ['money'] = 2,
         ['types'] = {'money', 'materials', 'science', 'adv_science'},
     },
     ['Eridani Empire'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 26,
+        ['materials'] = 4,
+        ['science'] = 2,
+        ['money'] = 26,
     },
     ['Orion Hegemony'] = {
         ['startingShip'] = 'cruiser',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Terran Republic'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Terran Union'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Terran Directorate'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Terran Alliance'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Terran Conglomerate'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Terran Federation'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
     },
     ['Rho Indi'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 2,
-        ['startingMaterials'] = 3,
-        ['startingScience'] = 3,
-        ['startingMoney'] = 2,
+        ['materials'] = 3,
+        ['science'] = 3,
+        ['money'] = 2,
     },
     ['Exiles'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 4,
-        ['startingScience'] = 2,
-        ['startingMoney'] = 3,
+        ['materials'] = 4,
+        ['science'] = 2,
+        ['money'] = 3,
     },
     ['Wardens of Magellan'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 3,
-        ['startingScience'] = 2,
-        ['startingMoney'] = 3,
+        ['materials'] = 3,
+        ['science'] = 2,
+        ['money'] = 2,
     },
     ['Guardians of Magellan'] = {
         ['startingShip'] = 'interceptor',
         ['numStartingShips'] = 1,
-        ['startingMaterials'] = 3,
-        ['startingScience'] = 2,
-        ['startingMoney'] = 2,
+        ['materials'] = 3,
+        ['science'] = 2,
+        ['money'] = 2,
     },
 }
 
@@ -121,6 +121,7 @@ function raceSetup(homeworld, color, race)
     end
     placePopulations(homeworld, color, factions[race].types)
     spawnInfluenceDisc(homeworld.getPosition()+vector(0, 1, 0), color)
+    placeStartingResources(color, race)
 end
 
 function placeHomeworld(homeworld, color)
@@ -142,8 +143,4 @@ function placeInfluenceOnHex(hex, color)
     assert(disc ~= nil, "placeInfluenceOnHex: No disc found.")
 
     disc.setPositionSmooth(hex.getPosition()+vector(0, 1, 0), false, true)
-end
-
-function placeStartingResources(color)
-
 end
