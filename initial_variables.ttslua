@@ -237,6 +237,7 @@ local DisableGUIDs = {
   '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',
   '77e0d1', --Turn Tracker
   '2bd7cb', --Setup Board
+  'b9e58d', --Side Table
 }
 
 local HomeworldLocations = {
