@@ -157,7 +157,10 @@ function basicSetup2(parameters)
     local FactionName = parameters.FactionName
 
     local Box_GUID = parameters.BoxGuid or factions[FactionName].Box_GUID
-    assert(Box_GUID ~= nil)
+    local Box = getObjectFromGUID(Box_GUID)
+    assert(Box ~= nil)
+    assert(Box.getPosition() ~= nil)
+    assert(factions[FactionName].numStartingInfluence ~= nil)
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
@@ -168,11 +171,10 @@ function basicSetup2(parameters)
 
     PlayerRace[PlayerColor] = FactionName .. ' '    -- A space so it can be reset in setRace
 
-    local Box = getObjectFromGUID(Box_GUID)
     local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
     PlayerPosition.y = 0.15
 
-    local SpawnPos=Box.getPosition() + Vector(0,5,0)
+    local SpawnPos=Vector(Box.getPosition()) + Vector(0,5,0)
     local InvPos = -1
 
     local takeParams = {position = SpawnPos, rotation = vector(0,0,0)}
@@ -215,7 +217,9 @@ function basicSetup2(parameters)
         triggerFunctionIfResting(board,
             function()
                 log('Setting up board for ' .. tostring(PlayerColor))
-                setupPlayerInfluence(board, PlayerColor)
+                setupPlayerInfluence(board,
+                                     PlayerColor,
+                                     factions[FactionName].numStartingInfluence)
                 getBoardInitialTechs(board)
             end)
     end
@@ -383,7 +387,6 @@ function setupFirstRound()
     getObjectFromGUID('516e93').destruct() -- Kill the text box above the button
     showNextRoundButton()
 end
-
 
 
 function pickRandomNPC()

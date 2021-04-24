@@ -12,7 +12,7 @@ function setupPlayerInfluence(board, PlayerColor, amountOfInfluence)
 
     board.setLock(true)
 
-    local NumberDiscs = amountOfInfluence or 12
+    local NumberDiscs = (amountOfInfluence - 1) or 12
     local lastSpawn = 14-NumberDiscs
 
     -- Eridani receive -2 influence
