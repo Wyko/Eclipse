@@ -36,12 +36,11 @@ function castAndCheckForTag(position, tag, distance)
     return nil
 end
 
-
 function objectsHitByCast(castResult, name, tag)
     -- Returns true if an object with a given name was hit by a Physics.Cast()
 
     if castResult == nil then return {} end
-    
+
     local objects = {}
     for _, obj in ipairs(castResult) do
         if (obj['hit_object'].getName() == name or
@@ -52,18 +51,15 @@ function objectsHitByCast(castResult, name, tag)
     return objects
 end
 
-
 function blip(obj)
     obj.scale(24/25)
     Wait.time(function() obj.scale(25/24) end, 0.1)
 end
 
-
 function rest(obj)
     if obj ~= nil then return obj.resting end
     return false
 end
-
 
 function dump(o)
     if type(o) == 'table' then
@@ -76,7 +72,7 @@ function dump(o)
     else
        return tostring(o)
     end
- end
+end
 
 
  function discardRep(obj)
@@ -90,7 +86,6 @@ function dump(o)
      end
  end
 
-
 function triggerFunctionIfResting(obj, pointerFnc, waitSeconds)
     -- Delay execution of a function until an object is resting
     waitSeconds = waitSeconds or 1
@@ -101,7 +96,6 @@ function triggerFunctionIfResting(obj, pointerFnc, waitSeconds)
         waitSeconds
     )
 end
-
 
 function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
    -- Search a container for all objects with matching names, then take out a random one
@@ -175,7 +169,6 @@ function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
 
 end
 
-
 function split (inputstr, sep)
      -- String Split --
      if sep == nil then
@@ -236,7 +229,6 @@ function debugAssert(...)
     end
 end
 
-
 function castBoxAndCheck(objToCheck, name, tag)
     local obj
     if type(objToCheck) == string then
@@ -258,3 +250,16 @@ function castBoxAndCheck(objToCheck, name, tag)
 
     return objectsHitByCast(castResult, name, tag)
 end
+
+function onObjectNumberTyped(object, player_color, number)
+    if object == ReputationBag and number > 5 then
+        broadcastToColor(
+            "You may only draw a maximum of 5 reputation tiles.",
+            player_color)
+        return true
+    end
+end
+
+-- function onObjectNumberTyped(object, player_color, number)
+--     broadcastToAll(player_color .. " typed " .. number .. " whilst hovering over a " .. object.type)
+-- end

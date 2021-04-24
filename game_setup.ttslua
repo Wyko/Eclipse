@@ -150,38 +150,6 @@ function tossOuterSectors()
     ExtraS3Bag.putObject(s)
 end
 
-function drawTech()
-    -- Draw and annouce each tech tile --
-    if TechBag.getQuantity() < 1 then
-        return
-    end
-    local t = TechBag.takeObject({rotation = {0,270,0}})
-    moveTech(t)
-    local type = string.sub(t.getDescription(),1,1)
-    printToAll(string.format("New %s", t.getName()), tColor[type])
-    if type == 'R' then
-        Wait.time(drawTech, 0.2, 1)
-    end
-end
-
-function moveTech(t)
-    -- Calculate offsets and place tech tiles in their spot --
-    local code = t.getDescription()
-    local type = string.sub(code,1,1)
-    local num = tonumber(string.sub(code,2)) - 1
-    local x,y,z = tBase[type].x, tBase[type].y, tBase[type].z
-    if type == 'R' then
-        if num % 2 ~= 0 then
-            z = z + offsetRare
-            num = num - 1
-        end
-        x = x + (offsetRare * num/2)
-    else
-        z = z + (offsetTech * num)
-    end
-    t.setPositionSmooth(Vector(x, y+2, z), false, false)
-end
-
 function basicSetup2(parameters)
     -- Handle basic player setup
 
@@ -371,12 +339,19 @@ function setupTiles(players)
     end
     local d = DiscoveryBag.takeObject({rotation = {180,-45,0}})
     d.setPositionSmooth(Vector(0, 2, 0), false, false)
-    local pos = aBase
-    Wait.time(function()
-            local a = AmbassadorBag.takeObject({rotation = {0,-90,0}})
-            a.setPositionSmooth(pos, false, false)
-            pos = pos + Vector(offsetAmbassador, 0, 0)
-        end, 0.5, 4)
+
+    setup_minor_species()
+end
+
+function setup_minor_species()
+    -- Set up the minor species board
+    board = getObjectFromGUID(Minor_Species_Board_GUID)
+    for i=1,4 do
+        local a = AmbassadorBag.takeObject({rotation = {0,-90,0}})
+        pos = board.positionToWorld(
+            Minor_Species_Board_positions[i]['position']) + vector(0, 1, 0)
+        a.setPositionSmooth(pos, false, false)
+    end
 end
 
 function setupFirstRound()
@@ -395,8 +370,8 @@ function setupFirstRound()
     unflipColonyAndSkippers()
     shuffleEverything()
     setupTiles(players)
-    newTechs = (players * 2) + 8
-    Wait.time(drawTech, 0.4, newTechs)
+    techsToDraw = (players * 2) + 8
+    startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)
     moveAllPassMarkersOffBoard()
@@ -404,6 +379,8 @@ function setupFirstRound()
     getObjectFromGUID('516e93').destruct() -- Kill the text box above the button
     showNextRoundButton()
 end
+
+
 
 function pickRandomNPC()
         -- Pick random NPCs

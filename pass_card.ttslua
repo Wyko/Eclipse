@@ -1,0 +1,74 @@
+local button_Pass = {
+    click_function = "flipThis",
+    function_owner = self,
+    label = "Pass",
+    position = {0, 0.0, 1.4},
+    scale = {0.5, 0.5, 0.5},
+    width = 1400,
+    height = 400,
+    font_size = 300,
+    tooltip = "Pass for the rest of the round.",
+    alignment = 3}
+
+local button_UnPass = {
+    click_function = "flipThis",
+    function_owner = self,
+    label = "Un-Pass",
+    position = {0, 0.0, 1.4},
+    rotation = {0,0,180},
+    scale = {0.5, 0.5, 0.5},
+    width = 1400,
+    height = 400,
+    font_size = 300,
+    tooltip = "Takes your marker off the turn tracker and tells everyone you didn't pass.\n\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.",
+    alignment = 3}
+
+function onLoad()
+    setButton()
+end
+
+function onRotate(spin, flip, player_color, old_spin, old_flip)
+    removeAllButtons()
+    Wait.condition(
+        function ()
+            setButton()
+        end,
+        function ()
+            return self.resting
+        end)
+end
+
+function setButton()
+    if not self.is_face_down then
+        createPassButton()
+    else
+        createUnPassButton()
+    end
+end
+
+function flipThis()
+    if not self.is_face_down then
+        Turns.turn_color = Turns.getNextTurnColor()
+    end
+    self.flip()
+end
+
+function createPassButton()
+    removeAllButtons()
+    self.createButton(button_Pass)
+end
+
+function createUnPassButton()
+    removeAllButtons()
+    self.createButton(button_UnPass)
+end
+
+function removeAllButtons()
+    local buttons = self.getButtons()
+    if buttons == nil then return end
+
+    for _, button in ipairs(buttons) do
+        -- remove the button and pop from the table
+        self.removeButton(button.index)
+    end
+end

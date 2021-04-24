@@ -148,3 +148,80 @@ function techTypeToTrackColor(techType)
         return 'Yellow'
     end
 end
+
+function drawMultipleTechs()
+
+    while techsToDraw > 0 do
+        drawTech()
+        for i=1, 20 do coroutine.yield(0) end
+    end
+
+    startPos = 1
+    return 1
+end
+
+function drawTech()
+    techsToDraw = techsToDraw - 1
+    -- Draw and annouce each tech tile --
+    if TechBag.getQuantity() < 1 then
+        return
+    end
+
+    local t = TechBag.takeObject()
+    local type = string.sub(t.getDescription(),1,1)
+
+    printToAll(string.format("New %s", t.getName()), tColor[type])
+
+    if type == 'R' then
+        moveRareTech(t)
+        return
+    else
+        moveTech(t)
+        return
+    end
+end
+
+function moveTech(t)
+    -- Calculate offsets and place tech tiles in their spot --
+
+    local code = t.getDescription()
+    local type = string.sub(code,1,1)
+    local num = tonumber(string.sub(code,2)) - 1
+    local x,y,z = tBase[type].x, tBase[type].y, tBase[type].z
+    z = z + (offsetTech * num)
+
+    t.setRotation(vector(0,270,0))
+    t.setPositionSmooth(vector(x, y+4, z), false, false)
+end
+
+function moveRareTech(t)
+    local spot = get_next_free_rare_spot()
+    log('Spot: ['..spot..']', 'moveRareTech')
+    local pos = Rare_Technologies_board.positionToWorld(
+        Vector(Rare_Technologies_positions[spot].position) + vector(0,4,0))
+    t.setRotation(vector(0,270,0))
+    t.setPositionSmooth(pos, false, false)
+    startPos = spot+1
+end
+
+function get_next_free_rare_spot()
+    -- startPos = startPos or 1
+
+    log('StartPos: ['..startPos..']', 'get_next_free_rare_spot')
+    local free = 1
+
+    -- Find the first free space
+    for i=startPos, #Rare_Technologies_positions do
+        free = i
+        log('i: ['..i..'], #Rare_Technologies_positions: ['..#Rare_Technologies_positions..']', 'get_next_free_rare_spot')
+        pos = Rare_Technologies_board.positionToWorld(
+            Rare_Technologies_positions[i].position)
+
+        obj = castAndCheckForTag(pos, 'Tech Tile')
+        if obj == nill then break end
+    end
+
+
+    -- log('#Rare_Technologies_positions: ['..free..']', 'moveRareTech')
+    return free
+end
