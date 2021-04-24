@@ -226,6 +226,7 @@ local factions = {
         ['Box_GUID'] = 'fc4f8b',
         ['PassMarker_GUID'] = 'ab6fe5',
         ['available'] = true,
+        ['selector_button_GUID'] = '8feca2',
     },
     ['Descendants of Draco'] = {
         ['startingShip'] = 'interceptor',
@@ -236,6 +237,7 @@ local factions = {
         ['Box_GUID'] = '47a278',
         ['PassMarker_GUID'] = '92bb2c',
         ['available'] = true,
+        ['selector_button_GUID'] = '85cb7b',
     },
     ['Mechanema'] = {
         ['startingShip'] = 'interceptor',
@@ -246,6 +248,7 @@ local factions = {
         ['Box_GUID'] = '8ae1e8',
         ['PassMarker_GUID'] = 'a0df63',
         ['available'] = true,
+        ['selector_button_GUID'] = '0b0ea2',
     },
     ['Hydran Progress'] = {
         ['startingShip'] = 'interceptor',
@@ -258,9 +261,11 @@ local factions = {
         ['Box_GUID'] = '32b968',
         ['PassMarker_GUID'] = 'f29b47',
         ['available'] = true,
+        ['selector_button_GUID'] = 'f08bb7',
     },
     ['Eridani Empire'] = {
         ['startingShip'] = 'interceptor',
+        ['numStartingInfluence'] = 11,
         ['numStartingShips'] = 1,
         ['materials'] = 4,
         ['science'] = 2,
@@ -268,6 +273,7 @@ local factions = {
         ['Box_GUID'] = '8287d8',
         ['PassMarker_GUID'] = 'b73884',
         ['available'] = true,
+        ['selector_button_GUID'] = '6a67ed',
     },
     ['Orion Hegemony'] = {
         ['startingShip'] = 'cruiser',
@@ -278,6 +284,7 @@ local factions = {
         ['Box_GUID'] = 'ec15e1',
         ['PassMarker_GUID'] = '71550f',
         ['available'] = true,
+        ['selector_button_GUID'] = '181176',
     },
     ['Terran Republic'] = {
         ['startingShip'] = 'interceptor',
@@ -288,6 +295,7 @@ local factions = {
         ['Box_GUID'] = '7bf114',
         ['PassMarker_GUID'] = '4a699f',
         ['available'] = true,
+        ['selector_button_GUID'] = 'b66d80',
     },
     ['Terran Union'] = {
         ['startingShip'] = 'interceptor',
@@ -298,6 +306,7 @@ local factions = {
         ['Box_GUID'] = 'ff8243',
         ['PassMarker_GUID'] = '72e467',
         ['available'] = true,
+        ['selector_button_GUID'] = '870d43',
     },
     ['Terran Directorate'] = {
         ['startingShip'] = 'interceptor',
@@ -308,6 +317,7 @@ local factions = {
         ['Box_GUID'] = '940641',
         ['PassMarker_GUID'] = 'd31524',
         ['available'] = true,
+        ['selector_button_GUID'] = '19bf34',
     },
     ['Terran Alliance'] = {
         ['startingShip'] = 'interceptor',
@@ -318,6 +328,7 @@ local factions = {
         ['Box_GUID'] = 'a7ad78',
         ['PassMarker_GUID'] = 'f03936',
         ['available'] = true,
+        ['selector_button_GUID'] = '6072ba',
     },
     ['Terran Conglomerate'] = {
         ['startingShip'] = 'interceptor',
@@ -328,6 +339,7 @@ local factions = {
         ['Box_GUID'] = 'a998b6',
         ['PassMarker_GUID'] = '8d08e7',
         ['available'] = true,
+        ['selector_button_GUID'] = 'dc5ac7',
     },
     ['Terran Federation'] = {
         ['startingShip'] = 'interceptor',
@@ -338,6 +350,7 @@ local factions = {
         ['Box_GUID'] = '4809d2',
         ['PassMarker_GUID'] = 'c56254',
         ['available'] = true,
+        ['selector_button_GUID'] = 'd51720',
     },
     ['Rho Indi'] = {
         ['startingShip'] = 'interceptor',
@@ -348,6 +361,7 @@ local factions = {
         ['Box_GUID'] = '1bb918',
         ['PassMarker_GUID'] = 'bf12e0',
         ['available'] = true,
+        ['selector_button_GUID'] = 'ee6fda',
     },
     ['Exiles'] = {
         ['startingShip'] = 'interceptor',
@@ -358,6 +372,7 @@ local factions = {
         ['Box_GUID'] = '752778',
         ['PassMarker_GUID'] = 'e8585b',
         ['available'] = true,
+        ['selector_button_GUID'] = 'a6d2a7',
     },
     ['Wardens of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -368,6 +383,7 @@ local factions = {
         ['Box_GUID'] = 'aaf987',
         ['PassMarker_GUID'] = 'ffcf43',
         ['available'] = true,
+        ['selector_button_GUID'] = '189816',
     },
     ['Guardians of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -378,6 +394,7 @@ local factions = {
         ['Box_GUID'] = '8a6314',
         ['PassMarker_GUID'] = 'c56254',
         ['available'] = true,
+        ['selector_button_GUID'] = '15ce4a',
     },
 }
 
