@@ -428,8 +428,11 @@ local PlayerResourceMarkers = {
     }
 }
 
-local TableGUIDs = {'002b10','f7a579','69781d','4493a4',
-                    'd38d11','63752e','cafe1f'}
+local TableGUIDs = {'f7a579','69781d','4493a4',
+                    'd38d11','63752e','cafe1f',
+                    'ac4050', -- Table under the races at the end
+                    -- '002b10', -- Old end race table
+}
 
 local PassCards = { White = '891c67',
                     Yellow = 'e2c83f',
