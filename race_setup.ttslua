@@ -34,7 +34,13 @@ function select_random_race(color)
     local keyset = {}
     local human_added = false
     for k in pairs(factions) do
-        table.insert(keyset, k)
+        if not string.find(k, "Human") then
+            table.insert(keyset, k)
+
+        elseif (string.find(k, "Human") and human_added == false) then
+            human_added = true
+            table.insert(keyset, k)
+        end
     end
 
     -- now you can reliably return a random key
