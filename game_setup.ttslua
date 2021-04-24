@@ -154,14 +154,16 @@ function basicSetup2(parameters)
     -- Handle basic player setup
 
     local PlayerColor = parameters.PlayerColor
-    local Box_GUID = parameters.BoxGuid
     local FactionName = parameters.FactionName
+
+    local Box_GUID = parameters.BoxGuid or factions[FactionName].Box_GUID
+    assert(Box_GUID ~= nil)
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
     if PlayerRace[PlayerColor] ~= nil then
-            print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
-            return false
+        print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
+        return false
     end
 
     PlayerRace[PlayerColor] = FactionName .. ' '    -- A space so it can be reset in setRace
@@ -299,7 +301,9 @@ function loadOngoingGame()
             PlayerRace[color] = board.getName()
 
             -- PlayerMarkers
-            PlayerMarkers[color] = getObjectFromGUID(PassMarkers[string.gsub(PlayerRace[color], ' ', '_')])
+            PlayerMarkers[color] = getObjectFromGUID(
+                factions[PlayerRace[color]].PassMarker_GUID)
+
             if not PlayerMarkers[color] then
                 log('Player marker for '..color..' not found')
                 PlayerMarkers[color] = takePassMarker(color)
