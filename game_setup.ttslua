@@ -1,5 +1,9 @@
 function hideAndLockStuff()
     HideObjects = getObjectsWithTag('Player Part Bag')
+
+    table.insert(HideObjects, getObjectFromGUID(materialsResourceMarker_GUID))
+    table.insert(HideObjects, getObjectFromGUID(moneyResourceMarker_GUID))
+    table.insert(HideObjects, getObjectFromGUID(scienceResourceMarker_GUID))
     table.insert(HideObjects, getObjectFromGUID('8f4c6b')) -- Influence discs
     table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
     table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
@@ -146,59 +150,31 @@ function tossOuterSectors()
     ExtraS3Bag.putObject(s)
 end
 
-function drawTech()
-    -- Draw and annouce each tech tile --
-    if TechBag.getQuantity() < 1 then
-        return
-    end
-    local t = TechBag.takeObject({rotation = {0,270,0}})
-    moveTech(t)
-    local type = string.sub(t.getDescription(),1,1)
-    printToAll(string.format("New %s", t.getName()), tColor[type])
-    if type == 'R' then
-        Wait.time(drawTech, 0.2, 1)
-    end
-end
-
-function moveTech(t)
-    -- Calculate offsets and place tech tiles in their spot --
-    local code = t.getDescription()
-    local type = string.sub(code,1,1)
-    local num = tonumber(string.sub(code,2)) - 1
-    local x,y,z = tBase[type].x, tBase[type].y, tBase[type].z
-    if type == 'R' then
-        if num % 2 ~= 0 then
-            z = z + offsetRare
-            num = num - 1
-        end
-        x = x + (offsetRare * num/2)
-    else
-        z = z + (offsetTech * num)
-    end
-    t.setPositionSmooth(Vector(x, y+2, z), false, false)
-end
-
 function basicSetup2(parameters)
     -- Handle basic player setup
 
     local PlayerColor = parameters.PlayerColor
-    local Box_GUID = parameters.BoxGuid
     local FactionName = parameters.FactionName
+
+    local Box_GUID = parameters.BoxGuid or factions[FactionName].Box_GUID
+    local Box = getObjectFromGUID(Box_GUID)
+    assert(Box ~= nil)
+    assert(Box.getPosition() ~= nil)
+    assert(factions[FactionName].numStartingInfluence ~= nil)
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
     if PlayerRace[PlayerColor] ~= nil then
-            print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
-            return false
+        print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
+        return false
     end
 
     PlayerRace[PlayerColor] = FactionName .. ' '    -- A space so it can be reset in setRace
 
-    local Box = getObjectFromGUID(Box_GUID)
     local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
     PlayerPosition.y = 0.15
 
-    local SpawnPos=Box.getPosition() + Vector(0,5,0)
+    local SpawnPos=Vector(Box.getPosition()) + Vector(0,5,0)
     local InvPos = -1
 
     local takeParams = {position = SpawnPos, rotation = vector(0,0,0)}
@@ -241,7 +217,9 @@ function basicSetup2(parameters)
         triggerFunctionIfResting(board,
             function()
                 log('Setting up board for ' .. tostring(PlayerColor))
-                setupPlayerInfluence(board, PlayerColor)
+                setupPlayerInfluence(board,
+                                     PlayerColor,
+                                     factions[FactionName].numStartingInfluence)
                 getBoardInitialTechs(board)
             end)
     end
@@ -327,7 +305,9 @@ function loadOngoingGame()
             PlayerRace[color] = board.getName()
 
             -- PlayerMarkers
-            PlayerMarkers[color] = getObjectFromGUID(PassMarkers[string.gsub(PlayerRace[color], ' ', '_')])
+            PlayerMarkers[color] = getObjectFromGUID(
+                factions[PlayerRace[color]].PassMarker_GUID)
+
             if not PlayerMarkers[color] then
                 log('Player marker for '..color..' not found')
                 PlayerMarkers[color] = takePassMarker(color)
@@ -367,12 +347,19 @@ function setupTiles(players)
     end
     local d = DiscoveryBag.takeObject({rotation = {180,-45,0}})
     d.setPositionSmooth(Vector(0, 2, 0), false, false)
-    local pos = aBase
-    Wait.time(function()
-            local a = AmbassadorBag.takeObject({rotation = {0,-90,0}})
-            a.setPositionSmooth(pos, false, false)
-            pos = pos + Vector(offsetAmbassador, 0, 0)
-        end, 0.5, 4)
+
+    setup_minor_species()
+end
+
+function setup_minor_species()
+    -- Set up the minor species board
+    board = getObjectFromGUID(Minor_Species_Board_GUID)
+    for i=1,4 do
+        local a = AmbassadorBag.takeObject({rotation = {0,-90,0}})
+        pos = board.positionToWorld(
+            Minor_Species_Board_positions[i]['position']) + vector(0, 1, 0)
+        a.setPositionSmooth(pos, false, false)
+    end
 end
 
 function setupFirstRound()
@@ -391,8 +378,8 @@ function setupFirstRound()
     unflipColonyAndSkippers()
     shuffleEverything()
     setupTiles(players)
-    newTechs = (players * 2) + 8
-    Wait.time(drawTech, 0.4, newTechs)
+    techsToDraw = (players * 2) + 8
+    startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)
     moveAllPassMarkersOffBoard()
@@ -400,6 +387,7 @@ function setupFirstRound()
     getObjectFromGUID('516e93').destruct() -- Kill the text box above the button
     showNextRoundButton()
 end
+
 
 function pickRandomNPC()
         -- Pick random NPCs

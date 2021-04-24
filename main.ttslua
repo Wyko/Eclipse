@@ -1,6 +1,6 @@
 local hideStuff = true
 
-local DEBUG = true
+local DEBUG = false
 
 #include initial_variables
 #include misc_functions
@@ -12,5 +12,5 @@ local DEBUG = true
 #include next_round
 #include camera
 #include race_setup
-#include populations
+#include resource_setup
 #include console++

@@ -30,7 +30,8 @@ function nextRound()
     removeDamageCubes()
     unflipColonyAndSkippers()
     TechBag.shuffle()
-    Wait.time(drawTech, 0.4, newTechs)
+    techsToDraw = (players * 2) + 8
+    startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)
     if round > 1 then

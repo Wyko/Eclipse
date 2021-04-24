@@ -1,71 +1,3 @@
-local factions = {
-    ['Planta'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Descendants of Draco'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Mechanema'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Hydran Progress'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-        ['types'] = {'money', 'materials', 'science', 'adv_science'},
-    },
-    ['Eridani Empire'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Orion Hegemony'] = {
-        ['startingShip'] = 'cruiser',
-        ['numStartingShips'] = 1,
-    },
-    ['Terran Republic'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Terran Union'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Terran Directorate'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Terran Alliance'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Terran Conglomerate'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Terran Federation'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Rho Indi'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 2,
-    },
-    ['Exiles'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Wardens of Magellan'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-    ['Guardians of Magellan'] = {
-        ['startingShip'] = 'interceptor',
-        ['numStartingShips'] = 1,
-    },
-}
-
 function raceSetup(homeworld, color, race)
     if factions[race] == nil then
         broadcastToColor("Unfortunately, your race doesn't seem to be configured in this script yet. No setup automation is possible.", color)
@@ -73,6 +5,7 @@ function raceSetup(homeworld, color, race)
     end
     placePopulations(homeworld, color, factions[race].types)
     spawnInfluenceDisc(homeworld.getPosition()+vector(0, 1, 0), color)
+    placeStartingResources(color, race)
 end
 
 function placeHomeworld(homeworld, color)
@@ -96,6 +29,33 @@ function placeInfluenceOnHex(hex, color)
     disc.setPositionSmooth(hex.getPosition()+vector(0, 1, 0), false, true)
 end
 
-function placeStartingResources(color)
+function select_random_race(color)
+    -- iterate over whole table to get all keys
+    local keyset = {}
+    local human_added = false
+    for k in pairs(factions) do
+        if not string.find(k, "Human") then
+            table.insert(keyset, k)
 
+        elseif (string.find(k, "Human") and human_added == false) then
+            human_added = true
+            table.insert(keyset, k)
+        end
+    end
+
+    -- now you can reliably return a random key
+    math.randomseed(os.time())
+    i = math.random(1, #keyset)
+    log('i = ['..i..']', 'select_random_race')
+    random_race = keyset[i]
+
+    -- Remove the button for that race
+    getObjectFromGUID(factions[random_race].selector_button_GUID).destruct()
+
+    params = {
+      PlayerColor = color,
+      FactionName = random_race
+    }
+
+    return basicSetup2(params)
 end

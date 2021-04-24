@@ -12,7 +12,7 @@ function setupPlayerInfluence(board, PlayerColor, amountOfInfluence)
 
     board.setLock(true)
 
-    local NumberDiscs = amountOfInfluence or 12
+    local NumberDiscs = (amountOfInfluence - 1) or 12
     local lastSpawn = 14-NumberDiscs
 
     -- Eridani receive -2 influence
@@ -71,13 +71,12 @@ function spawnReturnInfluenceButton(board)
     board.createButton(data)
 end
 
-
 function returnInfluenceDiscs(board, color)
     -- Returns influence discs from the action spots on the board and the pass
     -- marker to the influence track for each player
 
     -- if DEBUG then
-    --     getNextUnusedInfluence(board)
+    --     setPlayerResource('money', ownerOfBoard(board).color , 5)
     --     return nil
     -- end
 
@@ -178,7 +177,6 @@ function getNextUnusedInfluence(boardOrColor)
     end
 end
 
-
 function getBoardInitialTechs(board)
     -- Checks the script on each player board for the initialTechs variable,
     -- then clones techs from the tech bag to fill that board with it's starting
@@ -194,7 +192,6 @@ function getBoardInitialTechs(board)
         putTechOnTrack(tech.name,tech.track,board,tech.spot, true)
     end
 end
-
 
 function discoverBoardsToSetRace(zone, obj)
     -- Discover player boards --

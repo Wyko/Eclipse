@@ -7,13 +7,14 @@ local Sector2Bag_GUID = '3ae266'
 local Sector3Bag_GUID = 'd5cb79'
 local ExtraS3Bag_GUID = '69b446'
 local OutpostBag_GUID = '54fe91'
-local AmbassadorBag_GUID = '0d6bda'
+local AmbassadorBag_GUID = '460e45'
 local nextRoundButton_GUID = '3d6d3a'
 local GuardianSpot = {41.86, 1.39, -6.50}
 local AncientSpot = {41.85, 1.39, -9.09}
 local GCDSSpot = {2.38, 1.15, -0.01}
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
+
 
 RoundMarker = nil
 local TechBag = nil
@@ -34,23 +35,384 @@ riseOfTheAncients = false
 
 local possibleColors = {'White', 'Yellow', 'Red', 'Green', 'Blue', 'Purple'}
 
-local PassMarkers = {
-    Descendants_of_Draco = '92bb2c',
-    Hydran_Progress = 'f29b47',
-    Orion_Hegemony = '71550f',
-    Eridani_Empire = 'b73884',
-    Mechanema = 'a0df63',
-    Planta = 'ab6fe5',
-    Terran_Conglomerate = '8d08e7',
-    Terran_Directorate = 'd31524',
-    Terran_Federation = 'c56254',
-    Terran_Alliance = 'f03936',
-    Terran_Republic = '4a699f',
-    Terran_Union = '72e467',
-    Rho_Indi = 'bf12e0',
-    Guardians_of_Magellan = 'c56254',
-    Wardens_of_Magellan = 'ffcf43',
+Rare_Technologies_board_GUID = 'b4d2bf'
+Rare_Technologies_board = nil
+Rare_Technologies_positions = {
+    [1] = {
+        ['position'] = {
+            ['x'] = 0.352439343929291,
+            ['y'] = 0.350000202655792,
+            ['z'] = -0.660372853279114},
+        ['rotation'] = {
+            ['x'] = -2.42426779095695E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = 7.56362908305164E-07}},
+    [2] = {
+        ['position'] = {
+            ['x'] = -0.00931848865002394,
+            ['y'] = 0.350000202655792,
+            ['z'] = -0.660481989383698},
+        ['rotation'] = {
+            ['x'] = -4.50705414323238E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = -8.71230156462843E-07}},
+    [3] = {
+        ['position'] = {
+            ['x'] = -0.361461877822876,
+            ['y'] = 0.350000202655792,
+            ['z'] = -0.662103950977325},
+        ['rotation'] = {
+            ['x'] = -4.90742138481437E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = -4.27801097657721E-07}},
+    [4] = {
+        ['position'] = {
+            ['x'] = 0.356119304895401,
+            ['y'] = 0.350000202655792,
+            ['z'] = -0.302542507648468},
+        ['rotation'] = {
+            ['x'] = -1.04731566352712E-06,
+            ['y'] = 180.000335693359,
+            ['z'] = -4.80503786093323E-07}},
+    [5] = {
+        ['position'] = {
+            ['x'] = 0.00160150974988937,
+            ['y'] = 0.350000202655792,
+            ['z'] = -0.309812754392624},
+        ['rotation'] = {
+            ['x'] = -4.38944169900424E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = -2.23682619093779E-07}},
+    [6] = {
+        ['position'] = {
+            ['x'] = -0.3600894510746,
+            ['y'] = 0.350000202655792,
+            ['z'] = -0.309885442256927},
+        ['rotation'] = {
+            ['x'] = -6.31167608844407E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = 1.85941885888496E-07}},
+    [7] = {
+        ['position'] = {
+            ['x'] = 0.355761557817459,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.0519084073603153},
+        ['rotation'] = {
+            ['x'] = -1.94965309674444E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = -4.10443163900709E-07}},
+    [8] = {
+        ['position'] = {
+            ['x'] = -0.000760651368182153,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.0496523268520832},
+        ['rotation'] = {
+            ['x'] = -3.89956682056436E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = -5.42774252210165E-08}},
+    [9] = {
+        ['position'] = {
+            ['x'] = -0.360485076904297,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.0489577203989029},
+        ['rotation'] = {
+            ['x'] = -6.31167608844407E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = 1.85941885888496E-07}},
+    [10] = {
+        ['position'] = {
+            ['x'] = 0.355453282594681,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.407270580530167},
+        ['rotation'] = {
+            ['x'] = -2.58732804070405E-08,
+            ['y'] = 180.000335693359,
+            ['z'] = -3.75178110800789E-09}},
+    [11] = {
+        ['position'] = {
+            ['x'] = 0.00328491325490177,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.409825772047043},
+        ['rotation'] = {
+            ['x'] = -4.12815182926352E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = 1.19307188128914E-07}},
+    [12] = {
+        ['position'] = {
+            ['x'] = -0.362195372581482,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.409615188837051},
+        ['rotation'] = {
+            ['x'] = -8.83816710484098E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = 3.88327180189663E-07}},
+    [13] = {
+        ['position'] = {
+            ['x'] = 0.353612869977951,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.769831240177155},
+        ['rotation'] = {
+            ['x'] = -7.26075910506552E-08,
+            ['y'] = 180.000335693359,
+            ['z'] = -5.95603211195339E-08}},
+    [14] = {
+        ['position'] = {
+            ['x'] = -0.00471933465451002,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.76947695016861},
+        ['rotation'] = {
+            ['x'] = -4.19902725923293E-08,
+            ['y'] = 180.000335693359,
+            ['z'] = 4.02755688355683E-07}},
+    [15] = {
+        ['position'] = {
+            ['x'] = -0.363471001386642,
+            ['y'] = 0.350000202655792,
+            ['z'] = 0.766444325447083},
+        ['rotation'] = {
+            ['x'] = -2.53594777177568E-07,
+            ['y'] = 180.000335693359,
+            ['z'] = 3.5033096423831E-07}},
 }
+
+local Minor_Species_Board_GUID = '9b1821'
+local Minor_Species_Board_positions = {
+    [1] = {
+        ['position'] = {
+            ['x'] = 0.000972601526882499,
+            ['y'] = 0.349985927343369,
+            ['z'] = 0.746252715587616},
+        ['rotation'] = {
+            ['x'] = 0.000115971983177587,
+            ['y'] = 180.001724243164,
+            ['z'] = 0.000587973685469478}},
+    [2] = {
+        ['position'] = {
+            ['x'] = -0.000152401713421568,
+            ['y'] = 0.349986135959625,
+            ['z'] = 0.270780026912689},
+        ['rotation'] = {
+            ['x'] = -0.00141016545239836,
+            ['y'] = 180.001693725586,
+            ['z'] = 9.80739496299066E-05}},
+    [3] = {
+        ['position'] = {
+            ['x'] = -0.00174109230283648,
+            ['y'] = 0.349980413913727,
+            ['z'] = -0.204694241285324},
+        ['rotation'] = {
+            ['x'] = -0.0030237827450037,
+            ['y'] = 180.001663208008,
+            ['z'] = 0.000286259106360376}},
+    [4] = {
+        ['position'] = {
+            ['x'] = -0.000878208607900888,
+            ['y'] = 0.349957674741745,
+            ['z'] = -0.680167019367218},
+        ['rotation'] = {
+            ['x'] = -0.0040107537060976,
+            ['y'] = 180.001602172852,
+            ['z'] = 0.00216264207847416}},
+}
+
+-- Update this any time you add another race
+local factions = {
+    ['Planta'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 2,
+        ['Box_GUID'] = 'fc4f8b',
+        ['PassMarker_GUID'] = 'ab6fe5',
+        ['available'] = true,
+        ['selector_button_GUID'] = '8feca2',
+    },
+    ['Descendants of Draco'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 3,
+        ['science'] = 4,
+        ['money'] = 2,
+        ['Box_GUID'] = '47a278',
+        ['PassMarker_GUID'] = '92bb2c',
+        ['available'] = true,
+        ['selector_button_GUID'] = '85cb7b',
+    },
+    ['Mechanema'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = '8ae1e8',
+        ['PassMarker_GUID'] = 'a0df63',
+        ['available'] = true,
+        ['selector_button_GUID'] = '0b0ea2',
+    },
+    ['Hydran Progress'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 2,
+        ['science'] = 6,
+        ['money'] = 2,
+        -- Extra type added here due to Advanced start
+        ['types'] = {'money', 'materials', 'science', 'adv_science'},
+        ['Box_GUID'] = '32b968',
+        ['PassMarker_GUID'] = 'f29b47',
+        ['available'] = true,
+        ['selector_button_GUID'] = 'f08bb7',
+    },
+    ['Eridani Empire'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingInfluence'] = 11,
+        ['numStartingShips'] = 1,
+        ['materials'] = 4,
+        ['science'] = 2,
+        ['money'] = 26,
+        ['Box_GUID'] = '8287d8',
+        ['PassMarker_GUID'] = 'b73884',
+        ['available'] = true,
+        ['selector_button_GUID'] = '6a67ed',
+    },
+    ['Orion Hegemony'] = {
+        ['startingShip'] = 'cruiser',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = 'ec15e1',
+        ['PassMarker_GUID'] = '71550f',
+        ['available'] = true,
+        ['selector_button_GUID'] = '181176',
+    },
+    ['Terran Republic'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = '7bf114',
+        ['PassMarker_GUID'] = '4a699f',
+        ['available'] = true,
+        ['selector_button_GUID'] = 'b66d80',
+    },
+    ['Terran Union'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = 'ff8243',
+        ['PassMarker_GUID'] = '72e467',
+        ['available'] = true,
+        ['selector_button_GUID'] = '870d43',
+    },
+    ['Terran Directorate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = '940641',
+        ['PassMarker_GUID'] = 'd31524',
+        ['available'] = true,
+        ['selector_button_GUID'] = '19bf34',
+    },
+    ['Terran Alliance'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = 'a7ad78',
+        ['PassMarker_GUID'] = 'f03936',
+        ['available'] = true,
+        ['selector_button_GUID'] = '6072ba',
+    },
+    ['Terran Conglomerate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = 'a998b6',
+        ['PassMarker_GUID'] = '8d08e7',
+        ['available'] = true,
+        ['selector_button_GUID'] = 'dc5ac7',
+    },
+    ['Terran Federation'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 3,
+        ['money'] = 3,
+        ['Box_GUID'] = '4809d2',
+        ['PassMarker_GUID'] = 'c56254',
+        ['available'] = true,
+        ['selector_button_GUID'] = 'd51720',
+    },
+    ['Rho Indi Syndicate'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 2,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 3,
+        ['science'] = 3,
+        ['money'] = 2,
+        ['Box_GUID'] = '1bb918',
+        ['PassMarker_GUID'] = 'bf12e0',
+        ['available'] = true,
+        ['selector_button_GUID'] = 'ee6fda',
+    },
+    ['Exiles'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 4,
+        ['science'] = 2,
+        ['money'] = 3,
+        ['Box_GUID'] = '752778',
+        ['PassMarker_GUID'] = 'e8585b',
+        ['available'] = true,
+        ['selector_button_GUID'] = 'a6d2a7',
+    },
+    ['Wardens of Magellan'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 3,
+        ['science'] = 2,
+        ['money'] = 2,
+        ['Box_GUID'] = 'aaf987',
+        ['PassMarker_GUID'] = 'ffcf43',
+        ['available'] = true,
+        ['selector_button_GUID'] = '189816',
+    },
+    ['Guardians of Magellan'] = {
+        ['startingShip'] = 'interceptor',
+        ['numStartingShips'] = 1,
+        ['numStartingInfluence'] = 13,
+        ['materials'] = 3,
+        ['science'] = 2,
+        ['money'] = 2,
+        ['Box_GUID'] = '8a6314',
+        ['PassMarker_GUID'] = 'c56254',
+        ['available'] = true,
+        ['selector_button_GUID'] = '15ce4a',
+    },
+}
+
 
 local PlayerMarkers = {
     White = nil,
@@ -61,8 +423,48 @@ local PlayerMarkers = {
     Purple = nil
 }
 
-local TableGUIDs = {'002b10','f7a579','69781d','4493a4',
-                    'd38d11','63752e','cafe1f'}
+local materialsResourceMarker_GUID = '1f8225'
+local scienceResourceMarker_GUID = 'f83ba1'
+local moneyResourceMarker_GUID = '500402'
+
+local PlayerResourceMarkers = {
+    White = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Yellow = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Red = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Green = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Blue = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Purple = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    }
+}
+
+local TableGUIDs = {'f7a579','69781d','4493a4',
+                    'd38d11','63752e','cafe1f',
+                    'ac4050', -- Table under the races at the end
+                    -- '002b10', -- Old end race table
+}
 
 local PassCards = { White = '891c67',
                     Yellow = 'e2c83f',
@@ -193,12 +595,16 @@ local turnBag = '9d696e'
 local turnTracker ='bcaf12'
 local InfluenceDiscs_GUID = '8f4c6b'
 
+techsToDraw = 0
+startPos = 1
+
 local shown = {buttons = false}
 
 local DisableGUIDs = {
   '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',
   '77e0d1', --Turn Tracker
   '2bd7cb', --Setup Board
+  'b9e58d', --Side Table
 }
 
 local HomeworldLocations = {
@@ -229,6 +635,7 @@ local HomeworldLocations = {
 }
 
 function loadObjects()
+    Rare_Technologies_board = getObjectFromGUID(Rare_Technologies_board_GUID)
     TableZone = getObjectFromGUID(TableZone)
     RoundMarker = getObjectFromGUID(RoundMarker_GUID)
     TechBag = getObjectFromGUID(TechBag_GUID)
