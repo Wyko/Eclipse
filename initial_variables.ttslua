@@ -15,6 +15,9 @@ local GCDSSpot = {2.38, 1.15, -0.01}
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
 
+local hive_sector_2_GUID = '0387a0'
+local hive_sector_3_GUID = '545ff9'
+
 
 RoundMarker = nil
 local TechBag = nil
@@ -30,7 +33,7 @@ local activeGuardianBag = nil
 local activeAncientsBag = nil
 
 useWarpTiles = false
-
+useHives = false
 riseOfTheAncients = false
 
 local possibleColors = {'White', 'Yellow', 'Red', 'Green', 'Blue', 'Purple'}
