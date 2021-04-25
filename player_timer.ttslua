@@ -1,0 +1,20 @@
+local timers = {
+    ['start_time'] = os.time(),
+    ['rounds'] = {
+        [1] = {
+            ['combat'] = nil,
+            ['players'] = {},
+        },
+        [2] = {},
+        [3] = {},
+        [4] = {},
+        [5] = {},
+        [6] = {},
+        [7] = {},
+        [8] = {},
+    }
+}
+
+function set_start_time()
+
+end
