@@ -163,6 +163,7 @@ end
 function drawTech()
     -- Draw and annouce each tech tile --
     if TechBag.getQuantity() < 1 then
+        techsToDraw = 0
         return
     end
 
