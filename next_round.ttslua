@@ -30,7 +30,7 @@ function nextRound()
     removeDamageCubes()
     unflipColonyAndSkippers()
     TechBag.shuffle()
-    techsToDraw = (players * 2) + 8
+    techsToDraw = newTechs
     startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)

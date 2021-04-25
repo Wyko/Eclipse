@@ -271,7 +271,8 @@ function setRace(playerColor, zone, obj)
             -- Only print to chat if this is the first time the player selects
             -- this race (in case they move their board, etc)
             if PlayerRace[playerColor] ~= obj.getName() then
-                printToAll(playerColor .. " has picked " .. obj.getName(), playerColor)
+                broadcastToAll(playerColor .. " has picked " .. obj.getName(),
+                               playerColor)
             end
 
             PlayerRace[playerColor] = obj.getName()

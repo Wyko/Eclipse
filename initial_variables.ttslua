@@ -15,6 +15,9 @@ local GCDSSpot = {2.38, 1.15, -0.01}
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
 
+local hive_sector_2_GUID = '0387a0'
+local hive_sector_3_GUID = '545ff9'
+
 
 RoundMarker = nil
 local TechBag = nil
@@ -30,7 +33,7 @@ local activeGuardianBag = nil
 local activeAncientsBag = nil
 
 useWarpTiles = false
-
+useHives = false
 riseOfTheAncients = false
 
 local possibleColors = {'White', 'Yellow', 'Red', 'Green', 'Blue', 'Purple'}
@@ -374,6 +377,7 @@ local factions = {
         ['PassMarker_GUID'] = 'bf12e0',
         ['available'] = true,
         ['selector_button_GUID'] = 'ee6fda',
+        ['is_rota'] = true,
     },
     ['Exiles'] = {
         ['startingShip'] = 'interceptor',
@@ -386,6 +390,7 @@ local factions = {
         ['PassMarker_GUID'] = 'e8585b',
         ['available'] = true,
         ['selector_button_GUID'] = 'a6d2a7',
+        ['is_rota'] = true,
     },
     ['Wardens of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -398,6 +403,7 @@ local factions = {
         ['PassMarker_GUID'] = 'ffcf43',
         ['available'] = true,
         ['selector_button_GUID'] = '189816',
+        ['is_rota'] = true,
     },
     ['Guardians of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -410,6 +416,7 @@ local factions = {
         ['PassMarker_GUID'] = 'c56254',
         ['available'] = true,
         ['selector_button_GUID'] = '15ce4a',
+        ['is_rota'] = true,
     },
 }
 

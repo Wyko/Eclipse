@@ -374,6 +374,8 @@ function setupFirstRound()
 
     if useWarpTiles then fillWithWarp()
     elseif useGuardians then fillWithGuardians() end
+    if useHives then addHives() end
+
 
     unflipColonyAndSkippers()
     shuffleEverything()
@@ -388,6 +390,12 @@ function setupFirstRound()
     showNextRoundButton()
 end
 
+function addHives()
+    hive_sector_2 = getObjectFromGUID(hive_sector_2_GUID)
+    hive_sector_3 = getObjectFromGUID(hive_sector_3_GUID)
+    Sector3Bag.putObject(hive_sector_3)
+    Sector2Bag.putObject(hive_sector_2)
+end
 
 function pickRandomNPC()
         -- Pick random NPCs
