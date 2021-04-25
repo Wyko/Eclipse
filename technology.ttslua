@@ -161,7 +161,6 @@ function drawMultipleTechs()
 end
 
 function drawTech()
-    techsToDraw = techsToDraw - 1
     -- Draw and annouce each tech tile --
     if TechBag.getQuantity() < 1 then
         return
@@ -176,6 +175,7 @@ function drawTech()
         moveRareTech(t)
         return
     else
+        techsToDraw = techsToDraw - 1
         moveTech(t)
         return
     end
