@@ -41,7 +41,7 @@ function spawnInfluenceDisc(pos, color)
     Wait.condition(
         function ()
             disc.setColorTint(color)
-            log(pos, 'spawnInfluenceDisc:pos')
+            -- log(pos, 'spawnInfluenceDisc:pos')
             disc.setPosition(pos)
         end,
         function ()

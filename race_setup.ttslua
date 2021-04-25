@@ -48,7 +48,7 @@ function select_random_race(color)
     i = math.random(1, #keyset)
     -- log('i = ['..i..']', 'select_random_race')
     random_race = keyset[i]
-    printToAll(color .. ' has randomly selected a race!', color)
+    printToAll(color .. ' has randomly selected '..random_race, color)
     -- Remove the button for that race
     getObjectFromGUID(factions[random_race].selector_button_GUID).destruct()
 

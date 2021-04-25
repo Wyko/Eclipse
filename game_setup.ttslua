@@ -8,6 +8,11 @@ function hideAndLockStuff()
     table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
     table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
 
+    for _, race in pairs(factions) do
+        table.insert(HideObjects, getObjectFromGUID(race.Box_GUID))
+        table.insert(DisableGUIDs, getObjectFromGUID(race.Box_GUID))
+    end
+
     -- disable interactions with tables extensions, game board, influence bag, ...
     for _,GUID in pairs(DisableGUIDs) do
         object = getObjectFromGUID(GUID)
@@ -162,6 +167,8 @@ function basicSetup2(parameters)
     assert(Box.getPosition() ~= nil)
     assert(factions[FactionName].numStartingInfluence ~= nil)
 
+    factions[FactionName].available = false
+    
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
     if PlayerRace[PlayerColor] ~= nil then
