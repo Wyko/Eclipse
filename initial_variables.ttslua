@@ -377,6 +377,7 @@ local factions = {
         ['PassMarker_GUID'] = 'bf12e0',
         ['available'] = true,
         ['selector_button_GUID'] = 'ee6fda',
+        ['is_rota'] = true,
     },
     ['Exiles'] = {
         ['startingShip'] = 'interceptor',
@@ -389,6 +390,7 @@ local factions = {
         ['PassMarker_GUID'] = 'e8585b',
         ['available'] = true,
         ['selector_button_GUID'] = 'a6d2a7',
+        ['is_rota'] = true,
     },
     ['Wardens of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -401,6 +403,7 @@ local factions = {
         ['PassMarker_GUID'] = 'ffcf43',
         ['available'] = true,
         ['selector_button_GUID'] = '189816',
+        ['is_rota'] = true,
     },
     ['Guardians of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -413,6 +416,7 @@ local factions = {
         ['PassMarker_GUID'] = 'c56254',
         ['available'] = true,
         ['selector_button_GUID'] = '15ce4a',
+        ['is_rota'] = true,
     },
 }
 
