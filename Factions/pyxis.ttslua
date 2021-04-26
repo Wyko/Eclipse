@@ -1,0 +1,6 @@
+function placePyxisResources(color)
+    board = getResourceBoard(color)
+
+    -- Remove the board and everything on it
+
+end

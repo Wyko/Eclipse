@@ -3,7 +3,6 @@ local hideStuff = true
 local DEBUG = false
 
 #include initial_variables
-#include misc_functions
 #include builtin_functions
 #include game_setup
 #include player_board
@@ -14,3 +13,10 @@ local DEBUG = false
 #include race_setup
 #include resource_setup
 #include console++
+
+-- Factions
+#include Factions\pyxis
+
+--Misc Functions
+#include Misc\cast_helpers
+#include Misc\general_helpers

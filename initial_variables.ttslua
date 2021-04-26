@@ -14,6 +14,7 @@ local AncientSpot = {41.85, 1.39, -9.09}
 local GCDSSpot = {2.38, 1.15, -0.01}
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
+local pop_cube_bag_GUID = '8b1da0'
 
 local hive_sector_2_GUID = '0387a0'
 local hive_sector_3_GUID = '545ff9'
@@ -28,6 +29,7 @@ local Sector2Bag = nil
 local Sector3Bag = nil
 local OutpostBag = nil
 local AmbassadorBag = nil
+local pop_cube_bag = nil
 
 local activeGuardianBag = nil
 local activeAncientsBag = nil
@@ -999,4 +1001,5 @@ function loadObjects()
     turnBag = getObjectFromGUID(turnBag)
     turnTracker = getObjectFromGUID(turnTracker)
     AmbassadorBag = getObjectFromGUID(AmbassadorBag_GUID)
+    pop_cube_bag = getObjectFromGUID(pop_cube_bag_GUID)
 end

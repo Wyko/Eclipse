@@ -1,0 +1,207 @@
+function setTechRotation(bag, obj)
+    -- Set tech tile rotation when they exit a bag
+    if bag.hasTag('Tech Tile') then
+        obj.setRotation(bag.getRotation())
+    end
+end
+
+function lockSideTables()
+    -- Lock all the side tables --
+    for _,id in pairs(TableGUIDs) do
+        getObjectFromGUID(id).interactable = false
+    end
+end
+
+
+function blip(obj)
+    obj.scale(24/25)
+    Wait.time(function() obj.scale(25/24) end, 0.1)
+end
+
+function rest(obj)
+    if obj ~= nil then return obj.resting end
+    return false
+end
+
+function dump(o)
+    if type(o) == 'table' then
+       local s = '{ '
+       for k,v in pairs(o) do
+          if type(k) ~= 'number' then k = '"'..k..'"' end
+          s = s .. '['..k..'] = ' .. dump(v) .. ','
+       end
+       return s .. '} '
+    else
+       return tostring(o)
+    end
+end
+
+
+ function discardRep(obj)
+     -- Put unchosen reputation tiles back into the bag --
+     if obj ~= nil then
+         if obj.getName() == "Reputation" then
+             obj.setRotation(Vector(0,270,180))
+             ReputationBag.putObject(obj)
+             Wait.time(function() ReputationBag.shuffle() end, 0.5, 1)
+         end
+     end
+ end
+
+function triggerFunctionIfResting(obj, pointerFnc, waitSeconds)
+    -- Delay execution of a function until an object is resting
+    waitSeconds = waitSeconds or 1
+    Wait.time(
+        function()
+            Wait.condition(pointerFnc, function() return obj.resting end )
+        end,
+        waitSeconds
+    )
+end
+
+function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
+   -- Search a container for all objects with matching names, then take out a random one
+   TakeParams.guid = '000000'
+   local container
+   local guids = {}
+ --   log('GUID: '..tostring(ContainerOrGUID))
+   if type(ContainerOrGUID) == 'string' then
+     container = getObjectFromGUID(ContainerOrGUID)
+   else
+     container = ContainerOrGUID
+   end
+
+   for k,v in pairs(container.getObjects()) do
+     if string.find(string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname), string.lower(ObjectName)
+     ) then
+       table.insert(guids, v.guid)
+     --   log('Found name: '..string.lower(v.name==nil and v.nickname==nil and '' or v.name or v.nickname))
+     elseif string.find(string.lower(v.description), string.lower(ObjectName)) then
+       table.insert(guids, v.guid)
+     --   log('Found description: '.. v.description)
+     end
+   end
+
+   if #guids == 0 then
+     log('Did not find '..ObjectName)
+     return false
+   end
+
+   TakeParams.guid = guids[math.random(#guids)]
+   return container.takeObject(TakeParams)
+end
+
+function SeekAndClone(ObjectName, ContainerOrGUID, pos, rot, lock)
+     rot = rot or Vector(0,0,0)
+     local obj = SeekAndTake(ObjectName, ContainerOrGUID, {})
+     local putContainer
+
+     if type(ContainerOrGUID) == 'string' then
+         putContainer = getObjectFromGUID(ContainerOrGUID)
+       else
+         putContainer = ContainerOrGUID
+     end
+     -- log('Position: ' .. tostring(pos))
+
+     if not obj then return false end
+
+     Wait.condition(
+         function ()
+             local clone = obj.clone()
+             clone.setPositionSmooth(pos, false, true)
+             clone.setRotationSmooth(rot, false, true)
+             triggerFunctionIfResting(
+                 clone,
+                 function () clone.setLock(lock or false) end
+             )
+
+             triggerFunctionIfResting(
+                 obj,
+                 function ()
+                     putContainer.putObject(obj) -- Return the object to the container it was in
+                 end
+             )
+             return clone
+         end,
+         function ()
+             return not obj.spawning
+         end,
+         10
+     )
+
+end
+
+function split (inputstr, sep)
+     -- String Split --
+     if sep == nil then
+             sep = "%s"
+     end
+     local t={}
+     for str in string.gmatch(inputstr, "([^"..sep.."]+)") do
+             table.insert(t, str)
+     end
+     return t
+end
+
+function colorInGame(color)
+     -- Returns true if a player with the given color is seated in game
+
+     for _, presentColor in pairs(getSeatedPlayers()) do
+         if color == presentColor then return true end
+     end
+     return false
+end
+
+function itemInZone(zone, obj)
+     -- Returns true if the given object is present inside the given scripting
+     -- zone
+
+     for _, tmp_obj in pairs(getObjectFromGUID(zone).getObjects()) do
+         if tmp_obj.getGUID() == obj.getGUID() then
+             return true
+         end
+     end
+     return false
+end
+
+function getRelativePosition(object, local_pos)
+    -- This was annoying to figure out. Given a vector which was first found on
+    -- on object placed at 0,0,0 with zero rotation, returns the new vector after
+    -- the object is moved and / or rotated elsewhere. Ignores scale!
+
+    if type(local_pos) == 'table' then
+        local_pos = Vector(local_pos)
+    end
+    assert(object ~= nil, "getRelativePosition: Object is nil")
+    assert(local_pos ~= nil, "getRelativePosition: local_pos is nil for "..object.getName())
+
+    local scaled_pos = vector(
+        local_pos.x / object.getScale().x,
+        local_pos.y / object.getScale().y,
+        local_pos.z / object.getScale().z)
+    return object.positionToWorld(scaled_pos)
+end
+
+function debugAssert(...)
+    -- Just a little wrapper for a common assert
+
+    local arg = {...}
+    if DEBUG then
+        assert(unpack(arg))
+    end
+end
+
+
+
+function onObjectNumberTyped(object, player_color, number)
+    if object == ReputationBag and number > 5 then
+        broadcastToColor(
+            "You may only draw a maximum of 5 reputation tiles.",
+            player_color)
+        return true
+    end
+end
+
+-- function onObjectNumberTyped(object, player_color, number)
+--     broadcastToAll(player_color .. " typed " .. number .. " whilst hovering over a " .. object.type)
+-- end
