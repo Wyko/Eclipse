@@ -1,0 +1,38 @@
+function scoreGame()
+    local hex_points = getPointsForControlledHexes()
+end
+
+function getInfluenceDiscsOnHexes()
+    return getItemsInZone{zone= TableZone, name='Influence Disc'}
+end
+
+function getPointsForControlledHexes()
+    local table_objects = getInfluenceDiscsOnHexes()
+
+    local owned_hexes = {}
+    local player_points = {}
+
+    for _, disc in ipairs(table_objects) do
+
+        -- Get the hex under the influence disc
+        local hex = castAndCheckForTag(disc.getPosition(), 'hex')
+        if hex ~= nil then
+
+            -- Get the owner of the disc from its color
+            local c = disc.getColorTint()
+            c = c:toString()
+
+            -- Score the hex
+            if player_points[c] == nil then player_points[c] = 0 end
+            local rep = hex.getVar('reputation')
+            assert(rep, 'Hex ['..hex.getDescription()..'] has no VP data.' )
+
+            -- Add the points to the owner's score
+            player_points[c] = player_points[c] + rep
+            table.insert(owned_hexes, {obj= hex, owner = c})
+        end
+    end
+
+    log(player_points)
+    return player_points
+end

@@ -25,12 +25,12 @@ end
 function castAndCheckForTag(position, tag, distance, single_result)
     -- Performs a Physics.cast and returns the first object with the given tag
 
-    local dist = distance or 3
+    local dist = distance or 5
 
     -- If true, return only one result rather than all results
     local single_result = single_result or true
 
-    results = Physics.cast({
+    local results = Physics.cast({
         origin = (Vector(position) + Vector(0,-2,0)),
         direction = {0,1,0},
         max_distance = dist,
@@ -38,16 +38,17 @@ function castAndCheckForTag(position, tag, distance, single_result)
         debug = DEBUG,
     })
 
-    local results = {}
-    -- log(results)
     for _, v in pairs(results) do
         if v['hit_object'].hasTag(tag) then
             if single_result == true then return v['hit_object'] end
             table.insert(results, v['hit_object'])
         end
     end
-
-    return results
+    if single_result then
+        return nil
+    else
+        return results
+    end
 end
 
 function objectsHitByCast(castResult, name, tag)

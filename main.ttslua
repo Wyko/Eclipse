@@ -1,6 +1,7 @@
 local hideStuff = true
 
-local DEBUG = false
+DEBUG = true
+
 
 #include initial_variables
 #include builtin_functions
@@ -13,6 +14,8 @@ local DEBUG = false
 #include race_setup
 #include resource_setup
 #include console++
+#include scoring
+#include debugging
 
 -- Factions
 #include Factions\pyxis

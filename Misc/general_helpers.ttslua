@@ -153,6 +153,28 @@ function colorInGame(color)
      return false
 end
 
+function objHasAttribute(args)
+    -- Required Args:
+    --    obj: The object to check for attributes
+    --
+    -- Optional Args (At least one is required)
+    --    name
+    --    tag (string): Checks if object has the specified tag
+    --    guid: Checks if object matches the specified GUID
+
+    -- Error checking
+    assert(args.obj ~= nil)
+
+    if (
+        args.obj.getName() == args.name or
+        (args.tag ~= nil and args.obj.hasTag(tag))
+        ) then
+        return true
+    end
+
+    return false
+end
+
 function itemInZone(zone, obj)
      -- Returns true if the given object is present inside the given scripting
      -- zone
@@ -163,6 +185,28 @@ function itemInZone(zone, obj)
          end
      end
      return false
+end
+
+function getItemsInZone(args)
+
+    -- Error checking
+    assert(args.zone ~= nil)
+    assert((args.name ~= nil or args.tag ~= nil))
+
+    -- Get the zone
+    local zone = args.zone
+    if type(zone) == 'string' then
+        local zone = getObjectFromGUID(zone)
+    end
+
+    -- Get all objects in the zone matching the given name or tag
+    local results = {}
+    for _, tmp_obj in pairs(zone.getObjects()) do
+        if objHasAttribute{obj= tmp_obj, name= args.name, tag= args.tag } then
+            table.insert(results, tmp_obj)
+        end
+    end
+    return results
 end
 
 function getRelativePosition(object, local_pos)
