@@ -160,15 +160,16 @@ function basicSetup2(parameters)
 
     local PlayerColor = parameters.PlayerColor
     local FactionName = parameters.FactionName
+    local faction = factions[FactionName]
 
-    local Box_GUID = parameters.BoxGuid or factions[FactionName].Box_GUID
+    local Box_GUID = parameters.BoxGuid or faction.Box_GUID
     local Box = getObjectFromGUID(Box_GUID)
     assert(Box ~= nil)
     assert(Box.getPosition() ~= nil)
-    assert(factions[FactionName].numStartingInfluence ~= nil)
+    assert(faction.numStartingInfluence ~= nil)
 
-    factions[FactionName].available = false
-    
+    faction.available = false
+
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
     if PlayerRace[PlayerColor] ~= nil then
@@ -226,8 +227,14 @@ function basicSetup2(parameters)
                 log('Setting up board for ' .. tostring(PlayerColor))
                 setupPlayerInfluence(board,
                                      PlayerColor,
-                                     factions[FactionName].numStartingInfluence)
+                                     faction.numStartingInfluence)
                 getBoardInitialTechs(board)
+
+                -- Check if any faction-specific functions are needed
+                local _func = faction.add_functions.basicSetupAfterBoard
+                if _func ~= nil then
+                    Global.call(_func, {color= PlayerColor, board= board})
+                end
             end)
     end
 

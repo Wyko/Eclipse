@@ -61,6 +61,7 @@ end
 
 function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
    -- Search a container for all objects with matching names, then take out a random one
+   TakeParams = TakeParams or {}
    TakeParams.guid = '000000'
    local container
    local guids = {}

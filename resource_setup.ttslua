@@ -758,7 +758,7 @@ function placeStartingResources(color, race)
     debugAssert(faction ~= nil, "placeStartingResources: Did not find faction")
 
     -- Check if a replacement function is needed
-    local replacement_func = faction.additional_functions.placeStartingResources
+    local replacement_func = faction.replacement_functions.placeStartingResources
     if replacement_func ~= nil then
         Global.call(replacement_func, {color= color, race= race})
         log('Replaced placeStartingResources with ['..replacement_func..']',
