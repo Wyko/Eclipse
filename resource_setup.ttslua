@@ -706,6 +706,7 @@ local resourceBoards_GUID = {
 function getResourceBoard(color)
     -- Returns the resource board for the given color
     local resourceBoard = getObjectFromGUID(resourceBoards_GUID[color])
+    log(resourceBoards_GUID[color], 'getResourceBoard:'..tostring(color))
     debugAssert(resourceBoard, 'No resource board found for '..tostring(color))
 
     return resourceBoard

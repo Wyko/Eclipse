@@ -1,6 +1,16 @@
-function placePyxisResources(color)
-    board = getResourceBoard(color)
+function placePyxisResources(args)
+    local board = getResourceBoard(args.color)
 
+    log('Board: ['..board.getName()..']', 'placePyxisResources')
+    log('Color: ['..tostring(args.color)..']', 'placePyxisResources')
     -- Remove the board and everything on it
+    local results = castBoxAndCheck(board, nil, 'Population')
+    log(results, 'placePyxisResources: Results')
+    if results ~= nil then
+        for _, cube in ipairs(results) do
+            if cube ~= nil then cube.destruct() end
+        end
+    end
+    board.destruct()
 
 end

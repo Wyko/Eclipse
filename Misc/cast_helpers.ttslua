@@ -6,18 +6,20 @@ function castBoxAndCheck(objToCheck, name, tag)
         obj = objToCheck
     end
     assert((name or tag), "No name or tag given")
+    local pos = Vector(obj.getPosition())
+    local bounds = obj.getBounds().size
 
     local results = Physics.cast({
-        origin       = obj.getPosition(),
-        direction    = Vector(0,1,0),
+        origin       = pos,
+        direction    = {0,1,0},
         type         = 3,
-        size         = obj.getBounds(),
-        orientation  = Vector(0,1,0),
+        size         = bounds,
+        orientation  = {0,1,0},
         max_distance = 4,
         debug        = DEBUG,
     }) -- returns {{Vector point, Vector normal, float distance, Object hit_object}, ...}
 
-    return objectsHitByCast(castResult, name, tag)
+    return objectsHitByCast(results, name, tag)
 end
 
 function castAndCheckForTag(position, tag, distance, single_result)

@@ -75,10 +75,10 @@ function returnInfluenceDiscs(board, color)
     -- Returns influence discs from the action spots on the board and the pass
     -- marker to the influence track for each player
 
-    -- if DEBUG then
-    --     setPlayerResource('money', ownerOfBoard(board).color , 5)
-    --     return nil
-    -- end
+    if DEBUG then
+        placePyxisResources{color='White'}
+        return nil
+    end
 
     local InvPos = boardInvertFactor(board)
 
