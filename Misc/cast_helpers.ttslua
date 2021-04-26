@@ -49,7 +49,8 @@ function castAndCheckForTag(position, tag, distance, single_result)
 end
 
 function objectsHitByCast(castResult, name, tag)
-    -- Returns true if an object with a given name was hit by a Physics.Cast()
+    -- Returns a table of objects with a given name or tag that were hit by a
+    -- Physics.Cast()
 
     if castResult == nil then return {} end
 
