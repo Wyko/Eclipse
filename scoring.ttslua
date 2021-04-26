@@ -25,7 +25,7 @@ function getPointsForControlledHexes()
             -- Score the hex
             if player_points[c] == nil then player_points[c] = 0 end
             local rep = hex.getVar('reputation')
-            assert(rep, 'Hex ['..hex.getDescription()..'] has no VP data.' )
+            assert(rep~=nil, 'Hex ['..hex.getDescription()..'] has no VP data.' )
 
             -- Add the points to the owner's score
             player_points[c] = player_points[c] + rep
