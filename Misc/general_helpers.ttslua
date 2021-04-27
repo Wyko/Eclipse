@@ -7,7 +7,7 @@ end
 
 function lockSideTables()
     -- Lock all the side tables --
-    for _,id in pairs(TableGUIDs) do
+    for _, id in pairs(TableGUIDs) do
         getObjectFromGUID(id).interactable = false
     end
 end

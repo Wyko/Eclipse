@@ -1,12 +1,13 @@
 function castBoxAndCheck(objToCheck, name, tag)
     local obj
-    if type(objToCheck) == string then
+    if type(objToCheck) == 'string' then
         obj = getObjectFromGUID(objToCheck)
     else
         obj = objToCheck
     end
+    assert(obj~=nil, "No object found for ["..tostring(obj).."]")
     assert((name or tag), "No name or tag given")
-    local pos = Vector(obj.getPosition())
+    local pos = Vector(obj.getPosition()) + vector(0,-2,0)
     local bounds = obj.getBounds().size
 
     local results = Physics.cast({

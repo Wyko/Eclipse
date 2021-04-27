@@ -205,7 +205,7 @@ function basicSetup2(parameters)
     -- take ambassador tiles and position them
     Object = SeekAndTake('Ambassador', Box, takeParams)
     if (Object~=false) then
-        destination = PlayerPosition + Vector(19.5*InvPos, 0, 24*InvPos)
+        destination = PlayerPosition + Vector(14*InvPos, 0, 24*InvPos)
         Object.setPositionSmooth(destination,false, true)
     end
 
@@ -215,6 +215,27 @@ function basicSetup2(parameters)
         destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
         Object.setPositionSmooth(destination,false, true)
     end
+
+    -- Deploy ships
+    dread_bag_bag.takeObject({
+        position = PlayerPosition + Vector(19*InvPos, 0, 20*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    interceptor_bag_bag.takeObject({
+        position = PlayerPosition + Vector(19*InvPos, 0, 16*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    cruiser_bag_bag.takeObject({
+        position = PlayerPosition + Vector(14*InvPos, 0, 20*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    starbase_bag_bag.takeObject({
+        position = PlayerPosition + Vector(14*InvPos, 0, 16*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     -- take player board and position it
     local board = SeekAndTake('Player Board', Box, takeParams)
@@ -258,6 +279,11 @@ function basicSetup2(parameters)
     -- place colony ships
     PlaceColonyShips(Box, takeParams, PlayerPosition)
     return true
+end
+
+function lockAndColor(obj, color)
+    obj.setLock(true)
+    obj.setColorTint(color)
 end
 
 function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)

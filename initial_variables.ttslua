@@ -16,6 +16,15 @@ local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
 local pop_cube_bag_GUID = '8b1da0'
 
+local cruiser_bag_bag_GUID = '7cd256'
+local interceptor_bag_bag_GUID = '78404b'
+local dread_bag_bag_GUID = 'f68d6c'
+local starbase_bag_bag_GUID = '5c1125'
+local cruiser_bag_bag = nil
+local interceptor_bag_bag = nil
+local dread_bag_bag = nil
+local starbase_bag_bag = nil
+
 local hive_sector_2_GUID = '0387a0'
 local hive_sector_3_GUID = '545ff9'
 
@@ -1184,10 +1193,14 @@ local PlayerResourceMarkers = {
     }
 }
 
-local TableGUIDs = {'f7a579','69781d','4493a4',
-                    'd38d11','63752e','cafe1f',
-                    'ac4050', -- Table under the races at the end
-                    -- '002b10', -- Old end race table
+local TableGUIDs = {
+    ['White'] = 'f7a579', -- White
+    ['Yellow'] = '69781d', -- Yellow
+    ['Red'] = '4493a4', -- Red
+    ['Green'] = 'd38d11', -- Green
+    ['Blue'] = '63752e', -- Blue
+    ['Purple'] = 'cafe1f', -- Purple
+    -- ['RaceTable'] = 'ac4050', -- Table under the races at the end
 }
 
 local PassCards = { White = '891c67',
@@ -1326,6 +1339,7 @@ local shown = {buttons = false}
 
 local DisableGUIDs = {
   '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',
+  'ac4050', --Race table
   '77e0d1', --Turn Tracker
   '2bd7cb', --Setup Board
   'b9e58d', --Side Table
@@ -1374,4 +1388,8 @@ function loadObjects()
     turnTracker = getObjectFromGUID(turnTracker)
     AmbassadorBag = getObjectFromGUID(AmbassadorBag_GUID)
     pop_cube_bag = getObjectFromGUID(pop_cube_bag_GUID)
+    cruiser_bag_bag = getObjectFromGUID(cruiser_bag_bag_GUID)
+    interceptor_bag_bag = getObjectFromGUID(interceptor_bag_bag_GUID)
+    dread_bag_bag = getObjectFromGUID(dread_bag_bag_GUID)
+    starbase_bag_bag = getObjectFromGUID(starbase_bag_bag_GUID)
 end
