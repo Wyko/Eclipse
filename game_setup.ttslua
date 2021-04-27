@@ -8,6 +8,11 @@ function hideAndLockStuff()
     table.insert(HideObjects, getObjectFromGUID('9d696e')) -- Turn order bag
     table.insert(HideObjects, getObjectFromGUID(nextRoundButton_GUID))
 
+    for _, race in pairs(factions) do
+        table.insert(HideObjects, getObjectFromGUID(race.Box_GUID))
+        table.insert(DisableGUIDs, getObjectFromGUID(race.Box_GUID))
+    end
+
     -- disable interactions with tables extensions, game board, influence bag, ...
     for _,GUID in pairs(DisableGUIDs) do
         object = getObjectFromGUID(GUID)
@@ -155,12 +160,15 @@ function basicSetup2(parameters)
 
     local PlayerColor = parameters.PlayerColor
     local FactionName = parameters.FactionName
+    local faction = factions[FactionName]
 
-    local Box_GUID = parameters.BoxGuid or factions[FactionName].Box_GUID
+    local Box_GUID = parameters.BoxGuid or faction.Box_GUID
     local Box = getObjectFromGUID(Box_GUID)
     assert(Box ~= nil)
     assert(Box.getPosition() ~= nil)
-    assert(factions[FactionName].numStartingInfluence ~= nil)
+    assert(faction.numStartingInfluence ~= nil)
+
+    faction.available = false
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
@@ -197,7 +205,7 @@ function basicSetup2(parameters)
     -- take ambassador tiles and position them
     Object = SeekAndTake('Ambassador', Box, takeParams)
     if (Object~=false) then
-        destination = PlayerPosition + Vector(19.5*InvPos, 0, 24*InvPos)
+        destination = PlayerPosition + Vector(14*InvPos, 0, 24*InvPos)
         Object.setPositionSmooth(destination,false, true)
     end
 
@@ -207,6 +215,27 @@ function basicSetup2(parameters)
         destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
         Object.setPositionSmooth(destination,false, true)
     end
+
+    -- Deploy ships
+    dread_bag_bag.takeObject({
+        position = PlayerPosition + Vector(19*InvPos, 0, 20*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    interceptor_bag_bag.takeObject({
+        position = PlayerPosition + Vector(19*InvPos, 0, 16*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    cruiser_bag_bag.takeObject({
+        position = PlayerPosition + Vector(14*InvPos, 0, 20*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    starbase_bag_bag.takeObject({
+        position = PlayerPosition + Vector(14*InvPos, 0, 16*InvPos),
+        rotation = takeParams.rotation*2,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     -- take player board and position it
     local board = SeekAndTake('Player Board', Box, takeParams)
@@ -219,8 +248,14 @@ function basicSetup2(parameters)
                 log('Setting up board for ' .. tostring(PlayerColor))
                 setupPlayerInfluence(board,
                                      PlayerColor,
-                                     factions[FactionName].numStartingInfluence)
+                                     faction.numStartingInfluence)
                 getBoardInitialTechs(board)
+
+                -- Check if any faction-specific functions are needed
+                local _func = faction.add_functions.basicSetupAfterBoard
+                if _func ~= nil then
+                    Global.call(_func, {color= PlayerColor, board= board})
+                end
             end)
     end
 
@@ -244,6 +279,11 @@ function basicSetup2(parameters)
     -- place colony ships
     PlaceColonyShips(Box, takeParams, PlayerPosition)
     return true
+end
+
+function lockAndColor(obj, color)
+    obj.setLock(true)
+    obj.setColorTint(color)
 end
 
 function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)

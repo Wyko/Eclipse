@@ -41,7 +41,7 @@ function spawnInfluenceDisc(pos, color)
     Wait.condition(
         function ()
             disc.setColorTint(color)
-            log(pos, 'spawnInfluenceDisc:pos')
+            -- log(pos, 'spawnInfluenceDisc:pos')
             disc.setPosition(pos)
         end,
         function ()
@@ -76,7 +76,7 @@ function returnInfluenceDiscs(board, color)
     -- marker to the influence track for each player
 
     -- if DEBUG then
-    --     setPlayerResource('money', ownerOfBoard(board).color , 5)
+    --     placePyxisResources{color='White'}
     --     return nil
     -- end
 

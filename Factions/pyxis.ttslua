@@ -1,0 +1,38 @@
+function placePyxisResources(args)
+    local board = getResourceBoard(args.color)
+
+    log('Board: ['..board.getName()..']', 'placePyxisResources')
+    log('Color: ['..tostring(args.color)..']', 'placePyxisResources')
+    -- Remove the board and everything on it
+    local results = castBoxAndCheck(board, nil, 'Population')
+    log(results, 'placePyxisResources: Results')
+    if results ~= nil then
+        for _, cube in ipairs(results) do
+            if cube ~= nil then cube.destruct() end
+        end
+    end
+    board.destruct()
+end
+
+function placePyxisPopulationCubes(args)
+    local board = getBoardBelongingToColor(args.color)
+    local track = factions['Pyxis Unity'].population_track
+
+    for i, spot in pairs(track) do
+        if i ~= 1 then
+            local pos = board.positionToWorld(Vector(spot.position))
+            pop_cube_bag.takeObject({
+                position = pos,
+                callback_function = function (obj)
+                    obj.setColorTint(args.color)
+                end
+            })
+        end
+    end
+
+    local bag = getObjectFromGUID(factions['Pyxis Unity'].Box_GUID)
+    local spot = factions['Pyxis Unity'].resource_track[9]
+    local pos = board.positionToWorld(Vector(spot.position))
+    local takeParams = {position = pos}
+    local Object = SeekAndTake('Generic Resource', bag, takeParams)
+end

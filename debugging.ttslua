@@ -1,0 +1,4 @@
+function debugButton()
+    broadcastToAll('Debug Button was pressed')
+    scoreGame()
+end

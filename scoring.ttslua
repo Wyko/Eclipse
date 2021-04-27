@@ -1,0 +1,72 @@
+function scoreGame()
+    local hex_points = getPointsForControlledHexes()
+    local discovery_points = getPointsForDiscoveryTiles()
+end
+
+function getInfluenceDiscsOnHexes()
+    return getItemsInZone{zone= TableZone, name='Influence Disc'}
+end
+
+function getControlledHexes(color)
+    local table_objects = getInfluenceDiscsOnHexes()
+    local owned_hexes = {}
+
+    for _, disc in ipairs(table_objects) do
+
+        -- Get the owner of the disc from its color
+        local c = disc.getColorTint()
+        c = c:toString()
+
+        if c == color then
+            -- Get the hex under the influence disc
+            local hex = castAndCheckForTag(disc.getPosition(), 'hex')
+            if hex ~= nil then
+                table.insert(owned_hexes, {obj= hex, owner = c})
+            end
+        end
+    end
+
+    return owned_hexes
+end
+
+function getPointsForControlledHexes()
+    local table_objects = getInfluenceDiscsOnHexes()
+
+    local player_points = {}
+
+    for _, disc in ipairs(table_objects) do
+
+        -- Get the hex under the influence disc
+        local hex = castAndCheckForTag(disc.getPosition(), 'hex')
+        if hex ~= nil then
+
+            -- Get the owner of the disc from its color
+            local c = disc.getColorTint()
+            c = c:toString()
+
+            -- Score the hex
+            if player_points[c] == nil then player_points[c] = 0 end
+            local rep = hex.getVar('reputation')
+            assert(rep~=nil, 'Hex ['..hex.getDescription()..'] has no VP data.' )
+
+            -- Add the points to the owner's score
+            player_points[c] = player_points[c] + rep
+        end
+    end
+
+    log(player_points)
+    return player_points
+end
+
+function getPointsForDiscoveryTiles()
+    for color, t in pairs(TableGUIDs) do
+        local results = castBoxAndCheck(t, nil, 'Discovery Tile')
+        for _, tile in pairs(results) do
+            if tile.is_face_down then
+                if player_points[c] == nil then player_points[c] = 0 end
+                printToAll(tile.getName() .. ' is worth 2 points')
+            end
+        end
+        log(results, 'getPointsForDiscoveryTiles:results')
+    end
+end

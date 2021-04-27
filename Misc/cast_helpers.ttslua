@@ -1,0 +1,69 @@
+function castBoxAndCheck(objToCheck, name, tag)
+    local obj
+    if type(objToCheck) == 'string' then
+        obj = getObjectFromGUID(objToCheck)
+    else
+        obj = objToCheck
+    end
+    assert(obj~=nil, "No object found for ["..tostring(obj).."]")
+    assert((name or tag), "No name or tag given")
+    local pos = Vector(obj.getPosition()) + vector(0,-2,0)
+    local bounds = obj.getBounds().size
+
+    local results = Physics.cast({
+        origin       = pos,
+        direction    = {0,1,0},
+        type         = 3,
+        size         = bounds,
+        orientation  = {0,1,0},
+        max_distance = 4,
+        debug        = DEBUG,
+    }) -- returns {{Vector point, Vector normal, float distance, Object hit_object}, ...}
+
+    return objectsHitByCast(results, name, tag)
+end
+
+function castAndCheckForTag(position, tag, distance, single_result)
+    -- Performs a Physics.cast and returns the first object with the given tag
+
+    local dist = distance or 5
+
+    -- If true, return only one result rather than all results
+    local single_result = single_result or true
+
+    local results = Physics.cast({
+        origin = (Vector(position) + Vector(0,-2,0)),
+        direction = {0,1,0},
+        max_distance = dist,
+        type = 1, -- Ray
+        debug = DEBUG,
+    })
+
+    for _, v in pairs(results) do
+        if v['hit_object'].hasTag(tag) then
+            if single_result == true then return v['hit_object'] end
+            table.insert(results, v['hit_object'])
+        end
+    end
+    if single_result then
+        return nil
+    else
+        return results
+    end
+end
+
+function objectsHitByCast(castResult, name, tag)
+    -- Returns a table of objects with a given name or tag that were hit by a
+    -- Physics.Cast()
+
+    if castResult == nil then return {} end
+
+    local objects = {}
+    for _, obj in ipairs(castResult) do
+        if (obj['hit_object'].getName() == name or
+            (tag ~= nil and obj['hit_object'].hasTag(tag))) then
+            table.insert(objects, obj['hit_object'])
+        end
+    end
+    return objects
+end
