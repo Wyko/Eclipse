@@ -62,30 +62,33 @@ end
 function getPointsForDiscoveryTiles()
     local player_points = {}
 
+    -- Search each player's table for discovery tiles and score them
     for color, t in pairs(TableGUIDs) do
         local results = castBoxAndCheck(t, nil, 'Discovery Tile')
         for _, tile in pairs(results) do
-            if tile.is_face_down and tile.hasTag('Discovery Tile') then
-                if player_points[color] == nil then player_points[color] = 0 end
-                player_points[c] = player_points[c] + 2
-                printToAll(tile.getName() .. ' is worth 2 points')
-            else
-                player_points[c] = player_points[c] + scoreDiscoveryTile(tile)
-            end
+            player_points[c] = player_points[c] + scoreDiscoveryTile(tile)
         end
     end
+
     printToAll("Points from Discoveries:")
     printToAll(dump(player_points))
     return player_points
 end
 
-function scoreDiscoveryTile(tile)
+function scoreDiscoveryTile(tile, player)
     -- Error Checking
     assert(tile.hasTag('Discovery Tile'))
 
-    local score = 0
+    -- Score unused discoveries
+    if tile.is_face_down then
+        printToAll(tile.getName() .. ' is worth 2 points')
+        return 2
+    end
 
-    -- local tileFunc =
-
-    return score
+    -- Check if the discovery tile has a custom function for points
+    if hasFunction(tile, 'score_discovery') then
+        return tile.call(score_discovery, player)
+    else
+        return 0
+    end
 end
