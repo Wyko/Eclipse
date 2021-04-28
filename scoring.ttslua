@@ -1,6 +1,33 @@
 function scoreGame()
     local hex_points = getPointsForControlledHexes()
     local discovery_points = getPointsForDiscoveryTiles()
+    local tech_points = scoreTechnology()
+
+    local total = {}
+
+    if hex_points ~= nil then
+        for c, points in pairs(hex_points) do
+            if total[c] == nil then total[c] = 0 end
+            total[c] = total[c] + points
+        end
+    end
+
+    if discovery_points ~= nil then
+        for c, points in pairs(discovery_points) do
+            if total[c] == nil then total[c] = 0 end
+            total[c] = total[c] + points
+        end
+    end
+
+    if tech_points ~= nil then
+        for c, points in pairs(tech_points) do
+            if total[c] == nil then total[c] = 0 end
+            total[c] = total[c] + points
+        end
+    end
+
+    printToAll('Total:\n'..dump(total))
+    return total
 end
 
 function getInfluenceDiscsOnHexes()
@@ -43,6 +70,7 @@ function getPointsForControlledHexes()
             -- Get the owner of the disc from its color
             local c = disc.getColorTint()
             c = c:toString()
+            assert(type(c) == 'string')
 
             -- Score the hex
             if player_points[c] == nil then player_points[c] = 0 end
@@ -63,9 +91,10 @@ function getPointsForDiscoveryTiles()
     local player_points = {}
 
     -- Search each player's table for discovery tiles and score them
-    for color, t in pairs(TableGUIDs) do
+    for c, t in pairs(TableGUIDs) do
         local results = castBoxAndCheck(t, nil, 'Discovery Tile')
         for _, tile in pairs(results) do
+            if player_points[c] == nil then player_points[c] = 0 end
             player_points[c] = player_points[c] + scoreDiscoveryTile(tile)
         end
     end
@@ -91,4 +120,25 @@ function scoreDiscoveryTile(tile, player)
     else
         return 0
     end
+end
+
+function scoreTechnology()
+    local points = {}
+    local all_boards = getAllPlayerBoards()
+    if all_boards == nil then return {} end
+
+    for c, board in pairs(all_boards) do
+        if points[c] == nil then points[c] = 0 end
+        for _, t in ipairs({"Red", "Green", "Yellow"}) do
+            local space = nextFreeTechSpace(t, board)
+            if space == nil then points[c] = points[c] + 5 end
+            if space == 8 then points[c] = points[c] + 3 end
+            if space == 7 then points[c] = points[c] + 2 end
+            if space == 6 then points[c] = points[c] + 1 end
+        end
+    end
+
+    printToAll("Points from Techs:")
+    printToAll(dump(points))
+    return points
 end
