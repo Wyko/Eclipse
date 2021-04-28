@@ -336,3 +336,23 @@ function getBoardBelongingToColor(color)
         end
     end
 end
+
+
+function getAllPlayerBoards()
+    local results = {}
+
+    -- Go through each player board zone
+    for color, zone_guid in pairs(PlayerBoardZones) do
+
+        -- Get all the objects in the zone
+        local zone = getObjectFromGUID(zone_guid)
+        for _, obj in pairs(zone.getObjects()) do
+
+            if obj.hasTag('Board') then
+                results[color] = obj
+            end
+        end
+    end
+
+    return results
+end
