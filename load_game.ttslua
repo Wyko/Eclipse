@@ -1,0 +1,43 @@
+function loadOngoingGame()
+    printToAll('Script is attempting to recover ongoing game state')
+
+    -- Pass state
+    for color,guid in pairs(PassCards) do
+        local obj = getObjectFromGUID(guid)
+        if obj then
+            printToAll(color .. " passed: " .. tostring(obj.is_face_down), color)
+            passed[color] = obj.is_face_down
+        end
+    end
+    -- After four seconds, start the "All players passed" check
+    Wait.time(setPassCheck, 4)
+
+    for color, _ in pairs(PlayerBoardZones) do
+        if hasPlayerBoard(color) then
+            local board = hasPlayerBoard(color)
+            printToAll(color .. " picked " .. board.getName(), color)
+
+            -- Return influence button
+            spawnReturnInfluenceButton(board)
+
+            -- PlayerRace
+            PlayerRace[color] = board.getName()
+
+            -- PlayerMarkers
+            PlayerMarkers[color] = getObjectFromGUID(
+                factions[PlayerRace[color]].PassMarker_GUID)
+
+            if not PlayerMarkers[color] then
+                log('Player marker for '..color..' not found')
+                PlayerMarkers[color] = takePassMarker(color)
+            else
+                log('Player marker for '..color..' found: '..tostring(PlayerMarkers[color].getName()))
+            end
+        end
+    end
+    showNextRoundButton()
+
+end
+
+
+-- TODO: Add AD board

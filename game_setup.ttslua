@@ -196,46 +196,55 @@ function basicSetup2(parameters)
     -- take fleet and position it
     Object = SeekAndTake('Fleet', Box, takeParams)
     if (Object~=false) then
-            destination = PlayerPosition + Vector(-16.5*InvPos, 0, 11*InvPos)
+            destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 11*InvPos)
             Object.setPositionSmooth(destination,false, true)
             Object.setColorTint(Color.fromString(PlayerColor))
             Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
     end
 
-    -- take ambassador tiles and position them
-    Object = SeekAndTake('Ambassador', Box, takeParams)
-    if (Object~=false) then
-        destination = PlayerPosition + Vector(14*InvPos, 0, 24*InvPos)
-        Object.setPositionSmooth(destination,false, true)
-    end
-
     -- take action card and position it
     Object = SeekAndTake('Actions', Box, takeParams)
     if (Object~=false) then
-        destination = PlayerPosition + Vector(-16.5*InvPos, 0, 20.6*InvPos)
+        destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 20.6*InvPos)
         Object.setPositionSmooth(destination,false, true)
     end
 
     -- Deploy ships
     dread_bag_bag.takeObject({
-        position = PlayerPosition + Vector(19*InvPos, 0, 20*InvPos),
-        rotation = takeParams.rotation*2,
+        position = PlayerPosition + Vector(-6*InvPos, 0.2, 28*InvPos),
+        rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     interceptor_bag_bag.takeObject({
-        position = PlayerPosition + Vector(19*InvPos, 0, 16*InvPos),
-        rotation = takeParams.rotation*2,
+        position = PlayerPosition + Vector(-2*InvPos, 0.2, 28*InvPos),
+        rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     cruiser_bag_bag.takeObject({
-        position = PlayerPosition + Vector(14*InvPos, 0, 20*InvPos),
-        rotation = takeParams.rotation*2,
+        position = PlayerPosition + Vector(2*InvPos, 0.2, 28*InvPos),
+        rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     starbase_bag_bag.takeObject({
-        position = PlayerPosition + Vector(14*InvPos, 0, 16*InvPos),
-        rotation = takeParams.rotation*2,
+        position = PlayerPosition + Vector(6*InvPos, 0.2, 28*InvPos),
+        rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    -- Take an Ambassador and Discovery Board
+    local a = a_and_disc_bag.takeObject({
+        position = PlayerPosition + Vector(16.46*InvPos, -0.14, 19*InvPos),
+        rotation = takeParams.rotation,
+        smooth = false,
+        callback_function = function (obj)
+            obj.setLock(true)
+            player_ad_board[PlayerColor] = obj
+        end
+    })
+
+    triggerFunctionIfResting(a, function ()
+        place_ambassadors(Box, takeParams, PlayerColor)
+    end)
+
 
     -- take player board and position it
     local board = SeekAndTake('Player Board', Box, takeParams)
@@ -258,6 +267,8 @@ function basicSetup2(parameters)
                 end
             end)
     end
+
+
 
     -- take home world and position it
     local homeworld = SeekAndTake('Homeworld', Box, takeParams)
@@ -319,46 +330,41 @@ function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
     end
 end
 
-function loadOngoingGame()
-    printToAll('Script is attempting to recover ongoing game state')
+function place_ambassadors(Box, takeParams, PlayerColor)
+    -- take ambassador tiles and position them
+    local tiles = SeekAndTake('Ambassador', Box, takeParams)
+    local board = player_ad_board[PlayerColor]
 
-    -- Pass state
-    for color,guid in pairs(PassCards) do
-        local obj = getObjectFromGUID(guid)
-        if obj then
-            printToAll(color .. " passed: " .. tostring(obj.is_face_down), color)
-            passed[color] = obj.is_face_down
+    local positions = board.getTable('Ambassador_positions')
+    assert(positions ~= nil)
+
+    local place = 1
+    if (tiles~=false) then
+
+        local tile
+        while tiles.getQuantity() > 1 do
+            log(tiles.getQuantity(), 'place_ambassadors:num')
+            local pos = positions[place].position
+            tiles.takeObject({
+                position          = board.positionToWorld(pos),
+                rotation          = positions[place].rotation,
+                callback_function = function (obj)
+                    obj.setTags({'Ambassador'})
+                    obj.use_grid = false
+                end
+            })
+            place = place + 1
+            if tiles.remainder != nil then tile = tiles.remainder end
         end
+
+        local pos = positions[place].position
+        tile.setPositionSmooth(board.positionToWorld(pos))
+        tile.setRotation(positions[place].rotation)
+        tile.setTags({'Ambassador'})
+        tile.use_grid = false
     end
-    -- After four seconds, start the "All players passed" check
-    Wait.time(setPassCheck, 4)
-
-    for color, _ in pairs(PlayerBoardZones) do
-        if hasPlayerBoard(color) then
-            local board = hasPlayerBoard(color)
-            printToAll(color .. " picked " .. board.getName(), color)
-
-            -- Return influence button
-            spawnReturnInfluenceButton(board)
-
-            -- PlayerRace
-            PlayerRace[color] = board.getName()
-
-            -- PlayerMarkers
-            PlayerMarkers[color] = getObjectFromGUID(
-                factions[PlayerRace[color]].PassMarker_GUID)
-
-            if not PlayerMarkers[color] then
-                log('Player marker for '..color..' not found')
-                PlayerMarkers[color] = takePassMarker(color)
-            else
-                log('Player marker for '..color..' found: '..tostring(PlayerMarkers[color].getName()))
-            end
-        end
-    end
-    showNextRoundButton()
-
 end
+
 
 function isOngoingGame()
     -- Returns true is this is an ongoing game; For instance, if the game was

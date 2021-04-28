@@ -54,19 +54,38 @@ function getPointsForControlledHexes()
         end
     end
 
-    log(player_points)
+    printToAll("Points from Hexes:")
+    printToAll(dump(player_points))
     return player_points
 end
 
 function getPointsForDiscoveryTiles()
+    local player_points = {}
+
     for color, t in pairs(TableGUIDs) do
         local results = castBoxAndCheck(t, nil, 'Discovery Tile')
         for _, tile in pairs(results) do
-            if tile.is_face_down then
-                if player_points[c] == nil then player_points[c] = 0 end
+            if tile.is_face_down and tile.hasTag('Discovery Tile') then
+                if player_points[color] == nil then player_points[color] = 0 end
+                player_points[c] = player_points[c] + 2
                 printToAll(tile.getName() .. ' is worth 2 points')
+            else
+                player_points[c] = player_points[c] + scoreDiscoveryTile(tile)
             end
         end
-        log(results, 'getPointsForDiscoveryTiles:results')
     end
+    printToAll("Points from Discoveries:")
+    printToAll(dump(player_points))
+    return player_points
+end
+
+function scoreDiscoveryTile(tile)
+    -- Error Checking
+    assert(tile.hasTag('Discovery Tile'))
+
+    local score = 0
+
+    -- local tileFunc =
+
+    return score
 end

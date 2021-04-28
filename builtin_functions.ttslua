@@ -3,6 +3,7 @@ function onLoad()
     lockSideTables()
     shuffleEverything()
     onLoad_Camera()
+    makeDebugButton()
 
     if hideStuff then hideAndLockStuff() end
     if isOngoingGame() then loadOngoingGame() end
