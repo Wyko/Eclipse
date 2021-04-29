@@ -369,7 +369,7 @@ end
 function isOngoingGame()
     -- Returns true is this is an ongoing game; For instance, if the game was
     -- loaded from a save or rewound in time.
-    local round = tonumber(RoundMarker.getDescription())
+    local round = getCurrentRound()
     if round ~= 0 then return true end
 end
 

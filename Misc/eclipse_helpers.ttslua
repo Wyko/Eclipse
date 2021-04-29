@@ -43,3 +43,8 @@ function getControlledHexes(color)
 
     return owned_hexes
 end
+
+function getCurrentRound()
+    local round = tonumber(RoundMarker.getDescription())
+    return round
+end

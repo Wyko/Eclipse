@@ -1,9 +1,5 @@
 function scoreGame()
-    local hex_points = getPointsForControlledHexes()
-    local discovery_points = getPointsForDiscoveryTiles()
-    local tech_points = scoreTechnology()
-    local monolith_points = getPointsForMonoliths()
-    local reputation_points = getPointsForReputation()
+
     local total = {}
 
     function _score(t)
@@ -14,13 +10,29 @@ function scoreGame()
         end
     end
 
+    local hex_points = getPointsForControlledHexes()
+    local discovery_points = getPointsForDiscoveryTiles()
+    local tech_points = scoreTechnology()
+    local monolith_points = getPointsForMonoliths()
+
+    if getCurrentRound() >= 0 then
+        local reputation_points = getPointsForReputation()
+        _score(reputation_points)
+    else
+        printToAll('Not scoring reputation due to hidden info.')
+    end
+
     _score(hex_points)
     _score(discovery_points)
     _score(tech_points)
     _score(monolith_points)
-    -- _score(reputation_points)
 
-    printToAll('Total:\n'..dump(total))
+    printToAll('\nTotal\n-----------')
+    for c, t in pairs(total) do
+        printToAll('   '..c..': '..tostring(t))
+    end
+    printToAll('\n-----------\n')
+
     return total
 end
 
@@ -81,10 +93,7 @@ function scoreDiscoveryTile(tile, player)
     assert(tile.hasTag('Discovery Tile'))
 
     -- Score unused discoveries
-    if tile.is_face_down then
-        printToAll(tile.getName() .. ' is worth 2 points')
-        return 2
-    end
+    if tile.is_face_down then return 2 end
 
     -- Check if the discovery tile has a custom function for points
     if hasFunction(tile, 'score_discovery') then
@@ -137,5 +146,18 @@ function getPointsForMonoliths()
 end
 
 function getPointsForReputation()
+    local points = {}
 
+    -- Search each player's table for discovery tiles and score them
+    for c, t in pairs(TableGUIDs) do
+        local results = castBoxAndCheck(t, nil, 'Rep Tile')
+        for _, tile in pairs(results) do
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + tile.getVar('reputation')
+        end
+    end
+
+    printToAll("Points from Reputation:")
+    printToAll(dump(points))
+    return points
 end
