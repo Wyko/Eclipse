@@ -12,8 +12,9 @@ function scoreGame()
 
     local hex_points = getPointsForControlledHexes()
     local discovery_points = getPointsForDiscoveryTiles()
-    local tech_points = scoreTechnology()
+    local tech_points = getPointsForTech()
     local monolith_points = getPointsForMonoliths()
+    local ambassador_points = getPointsForAmbassadors()
 
     if getCurrentRound() >= 0 then
         local reputation_points = getPointsForReputation()
@@ -26,6 +27,7 @@ function scoreGame()
     _score(discovery_points)
     _score(tech_points)
     _score(monolith_points)
+    _score(ambassador_points)
 
     printToAll('\nTotal\n-----------')
     for c, t in pairs(total) do
@@ -34,10 +36,6 @@ function scoreGame()
     printToAll('\n-----------\n')
 
     return total
-end
-
-function getInfluenceDiscsOnHexes()
-    return getItemsInZone{zone= TableZone, name='Influence Disc'}
 end
 
 function getPointsForControlledHexes()
@@ -54,7 +52,6 @@ function getPointsForControlledHexes()
             -- Get the owner of the disc from its color
             local c = disc.getColorTint()
             c = c:toString()
-            assert(type(c) == 'string')
 
             -- Score the hex
             if player_points[c] == nil then player_points[c] = 0 end
@@ -103,7 +100,7 @@ function scoreDiscoveryTile(tile, player)
     end
 end
 
-function scoreTechnology()
+function getPointsForTech()
     local points = {}
     local all_boards = getAllPlayerBoards()
     if all_boards == nil then return {} end
@@ -113,9 +110,9 @@ function scoreTechnology()
         for _, t in ipairs({"Red", "Green", "Yellow"}) do
             local space = nextFreeTechSpace(t, board)
             if space == nil then points[c] = points[c] + 5 end
-            if space == 8 then points[c] = points[c] + 3 end
-            if space == 7 then points[c] = points[c] + 2 end
-            if space == 6 then points[c] = points[c] + 1 end
+            if space == 7 then points[c] = points[c] + 3 end
+            if space == 6 then points[c] = points[c] + 2 end
+            if space == 5 then points[c] = points[c] + 1 end
         end
     end
 
@@ -160,4 +157,8 @@ function getPointsForReputation()
     printToAll("Points from Reputation:")
     printToAll(dump(points))
     return points
+end
+
+function getPointsForAmbassadors()
+
 end
