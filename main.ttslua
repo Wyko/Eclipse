@@ -1,4 +1,4 @@
-local hideStuff = true
+local hideStuff = false
 
 DEBUG = false
 
@@ -22,6 +22,11 @@ DEBUG = false
 -- Factions
 #include Factions\pyxis
 
---Misc Functions
+-- Misc Functions
 #include Misc\cast_helpers
 #include Misc\general_helpers
+#include Misc\eclipse_helpers
+
+
+-- Error Checking
+#include error_checking\hex_tests

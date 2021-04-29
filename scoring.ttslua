@@ -2,29 +2,23 @@ function scoreGame()
     local hex_points = getPointsForControlledHexes()
     local discovery_points = getPointsForDiscoveryTiles()
     local tech_points = scoreTechnology()
-
+    local monolith_points = getPointsForMonoliths()
+    local reputation_points = getPointsForReputation()
     local total = {}
 
-    if hex_points ~= nil then
-        for c, points in pairs(hex_points) do
+    function _score(t)
+        if t == nil then return end
+        for c, points in pairs(t) do
             if total[c] == nil then total[c] = 0 end
             total[c] = total[c] + points
         end
     end
 
-    if discovery_points ~= nil then
-        for c, points in pairs(discovery_points) do
-            if total[c] == nil then total[c] = 0 end
-            total[c] = total[c] + points
-        end
-    end
-
-    if tech_points ~= nil then
-        for c, points in pairs(tech_points) do
-            if total[c] == nil then total[c] = 0 end
-            total[c] = total[c] + points
-        end
-    end
+    _score(hex_points)
+    _score(discovery_points)
+    _score(tech_points)
+    _score(monolith_points)
+    -- _score(reputation_points)
 
     printToAll('Total:\n'..dump(total))
     return total
@@ -32,28 +26,6 @@ end
 
 function getInfluenceDiscsOnHexes()
     return getItemsInZone{zone= TableZone, name='Influence Disc'}
-end
-
-function getControlledHexes(color)
-    local table_objects = getInfluenceDiscsOnHexes()
-    local owned_hexes = {}
-
-    for _, disc in ipairs(table_objects) do
-
-        -- Get the owner of the disc from its color
-        local c = disc.getColorTint()
-        c = c:toString()
-
-        if c == color then
-            -- Get the hex under the influence disc
-            local hex = castAndCheckForTag(disc.getPosition(), 'hex')
-            if hex ~= nil then
-                table.insert(owned_hexes, {obj= hex, owner = c})
-            end
-        end
-    end
-
-    return owned_hexes
 end
 
 function getPointsForControlledHexes()
@@ -141,4 +113,29 @@ function scoreTechnology()
     printToAll("Points from Techs:")
     printToAll(dump(points))
     return points
+end
+
+function getPointsForMonoliths()
+    local monoliths = getItemsInZone{zone= TableZone, name='Monolith'}
+    local points = {}
+
+    for _, m in ipairs(monoliths) do
+        -- Get the hex under the monolith
+        local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
+        -- Score the monolith based on the owner of the hex
+        if hex ~= nil then
+            local c = getOwnerOfHex(hex)
+            if c ~= nil and points[c] == nil then points[c] = 0 end
+            if c ~= nil then points[c] = points[c] + 3 end
+        end
+    end
+
+    printToAll("Points from Monoliths:")
+    printToAll(dump(points))
+    return points
+end
+
+function getPointsForReputation()
+
 end

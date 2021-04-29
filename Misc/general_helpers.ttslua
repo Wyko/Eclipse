@@ -282,7 +282,6 @@ function removeAllButtons(obj)
     if buttons == nil then return end
 
     for _, button in ipairs(buttons) do
-        -- remove the button and pop from the table
-        self.removeButton(button.index)
+        obj.removeButton(button.index)
     end
 end

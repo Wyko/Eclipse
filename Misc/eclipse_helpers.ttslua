@@ -1,0 +1,45 @@
+function getOwnerOfHex(hex)
+    -- Returns the color of the owner of a given hex
+
+    -- Gets the hex if a GUID was supplied
+    hex = getObject(hex)
+
+    -- Error checking to make sure the hex is valid
+    verify_hex(hex)
+
+    local discs = castBoxAndCheck(hex, nil, 'Influence')
+
+    -- More error checking
+    if discs == nil then return nil end
+    if #discs > 1 then
+        broadcastToAll('Error getting the owner of hex ['..
+            tostring(hex.getVar('number')) .. ']\n' ..
+            'There are multiple influence discs on the hex!', Color.Yellow)
+    end
+
+    -- Get the owner of the disc from its color
+    local c = discs[1].getColorTint()
+    return c:toString()
+end
+
+function getControlledHexes(color)
+    local table_objects = getInfluenceDiscsOnHexes()
+    local owned_hexes = {}
+
+    for _, disc in ipairs(table_objects) do
+
+        -- Get the owner of the disc from its color
+        local c = disc.getColorTint()
+        c = c:toString()
+
+        if c == color then
+            -- Get the hex under the influence disc
+            local hex = castAndCheckForTag(disc.getPosition(), 'hex')
+            if hex ~= nil then
+                table.insert(owned_hexes, {obj= hex, owner = c})
+            end
+        end
+    end
+
+    return owned_hexes
+end
