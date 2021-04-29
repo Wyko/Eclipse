@@ -1,14 +1,19 @@
 function verify_hex(hex)
-    assert(hex.hasTag('Hex'), "A hex is missing the 'Hex' tag. Please ensure "..
-        "that all newly added hexes are tagged 'Hex' and have the appropriate " ..
-        "variables (VP, discovery, etc) added to their scripts. See other " ..
-        "hexes for reference.")
+    if not hex.hasTag('Hex') then
+        hex.highlightOn(Color.Red, 15)
+        error("The highlighted hex is missing the 'Hex' tag. Please ensure "..
+            "that all newly added hexes are tagged 'Hex' and have the appropriate " ..
+            "variables (VP, discovery, etc) added to their scripts. See other " ..
+            "hexes for reference.")
+    end
 
-    assert(hex.getVar('reputation')~=nil,
-        "A hex is missing scripted reputation information (and possibly other "..
-        "scripted info). Please ensure " ..
+    if hex.getVar('reputation') == nil then
+        hex.highlightOn(Color.Red, 15)
+        error(
+        "The highlighted hex is missing scripted reputation information (and " ..
+        "possibly other scripted info). Please ensure " ..
         "that all newly added hexes are tagged 'Hex' and have the appropriate " ..
         "variables (VP, discovery, etc) added to their scripts. See other " ..
         "hexes for reference.")
-        
+    end
 end

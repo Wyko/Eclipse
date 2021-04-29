@@ -27,6 +27,5 @@ DEBUG = false
 #include Misc\general_helpers
 #include Misc\eclipse_helpers
 
-
 -- Error Checking
-#include error_checking\hex_tests
+#include error_checking\tests

@@ -48,3 +48,7 @@ function getCurrentRound()
     local round = tonumber(RoundMarker.getDescription())
     return round
 end
+
+function getInfluenceDiscsOnHexes()
+    return getItemsInZone{zone= TableZone, name='Influence Disc'}
+end

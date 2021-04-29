@@ -1,0 +1,17 @@
+function verify_influence_disc(disc)
+    if not disc.hasTag('Influence') then
+        disc.highlightOn(Color.Red, 15)
+        error("The highlighted disc is missing the 'Influence' tag. Please " ..
+            "ensure that all influence discs are tagged 'Influence'. See " ..
+            "other influence discs for reference.")
+    end
+
+    local c = disc.getColorTint()
+    c = c:toString()
+    if c == nil then
+        disc.highlightOn(Color.Red, 15)
+        error("The highlighted disc is colored incorrectly. All influence " ..
+            "discs should be colored exactly their owner's color. Coloring " ..
+            "a disc any other color will affect the script.")
+    end
+end

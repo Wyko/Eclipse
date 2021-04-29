@@ -17,10 +17,10 @@ local TechTileZone_GUID = 'd22a87'
 local pop_cube_bag_GUID = '8b1da0'
 local a_and_disc_bag_GUID = '0eff17'
 
-local cruiser_bag_bag_GUID = '7cd256'
-local interceptor_bag_bag_GUID = '78404b'
-local dread_bag_bag_GUID = 'f68d6c'
-local starbase_bag_bag_GUID = '5c1125'
+local cruiser_bag_bag_GUID = '402516'
+local interceptor_bag_bag_GUID = 'dd7301'
+local dread_bag_bag_GUID = '6d8ec7'
+local starbase_bag_bag_GUID = 'bf2b77'
 local cruiser_bag_bag = nil
 local interceptor_bag_bag = nil
 local dread_bag_bag = nil

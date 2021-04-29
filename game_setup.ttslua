@@ -211,22 +211,22 @@ function basicSetup2(parameters)
 
     -- Deploy ships
     dread_bag_bag.takeObject({
-        position = PlayerPosition + Vector(-6*InvPos, 0.2, 28*InvPos),
+        position = PlayerPosition + Vector(-6*InvPos, 1.2, 28*InvPos),
         rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     interceptor_bag_bag.takeObject({
-        position = PlayerPosition + Vector(-2*InvPos, 0.2, 28*InvPos),
+        position = PlayerPosition + Vector(-2*InvPos, 1.2, 28*InvPos),
         rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     cruiser_bag_bag.takeObject({
-        position = PlayerPosition + Vector(2*InvPos, 0.2, 28*InvPos),
-        rotation = takeParams.rotation,
+        position = PlayerPosition + Vector(2*InvPos, 1.2, 28*InvPos),
+        rotation = takeParams.rotation*-1,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     starbase_bag_bag.takeObject({
-        position = PlayerPosition + Vector(6*InvPos, 0.2, 28*InvPos),
+        position = PlayerPosition + Vector(6*InvPos, 1.2, 28*InvPos),
         rotation = takeParams.rotation,
         callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
@@ -438,7 +438,9 @@ end
 
 function addHives()
     hive_sector_2 = getObjectFromGUID(hive_sector_2_GUID)
+    hive_sector_2.setLock(false)
     hive_sector_3 = getObjectFromGUID(hive_sector_3_GUID)
+    hive_sector_3.setLock(false)
     Sector3Bag.putObject(hive_sector_3)
     Sector2Bag.putObject(hive_sector_2)
 end
