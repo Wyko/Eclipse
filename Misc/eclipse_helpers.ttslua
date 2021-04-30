@@ -18,8 +18,12 @@ function getOwnerOfHex(hex)
     end
 
     -- Get the owner of the disc from its color
-    local c = discs[1].getColorTint()
-    return c:toString()
+    if verify_influence_disc(discs[1]) then
+        local c = discs[1].getColorTint()
+        return c:toString()
+    else
+        return nil
+    end
 end
 
 function getControlledHexes(color)
@@ -27,7 +31,6 @@ function getControlledHexes(color)
     local owned_hexes = {}
 
     for _, disc in ipairs(table_objects) do
-
         -- Get the owner of the disc from its color
         local c = disc.getColorTint()
         c = c:toString()
@@ -50,5 +53,32 @@ function getCurrentRound()
 end
 
 function getInfluenceDiscsOnHexes()
-    return getItemsInZone{zone= TableZone, name='Influence Disc'}
+    local discs = getItemsInZone{zone   = TableZone,
+                                 name   = 'Influence Disc',
+                                 tag    = 'Influence'}
+    local results = {}
+
+    for _, disc in ipairs(discs) do
+        if verify_influence_disc(disc) then
+            table.insert(results, disc)
+        end
+    end
+
+    return results
+end
+
+function getObjectsInRepZone(board, name, tag)
+    -- Returns  objects in the reputation zone on a player board with the gvien
+    -- name or tag
+    
+    local castResult = Physics.cast({
+        origin = board.positionToWorld(vector(-1.627953, 0.2093751, 0.3211277)),
+        direction= vector(0,0,0),
+        type = 3,
+        size = vector(2,1,9),
+        orientation  = vector(0,1,0),
+        max_distance = 3,
+        debug = DEBUG,})
+
+    return objectsHitByCast(castResult, name, tag)
 end

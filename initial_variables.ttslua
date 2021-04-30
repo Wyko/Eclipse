@@ -29,7 +29,6 @@ local starbase_bag_bag = nil
 local hive_sector_2_GUID = '0387a0'
 local hive_sector_3_GUID = '545ff9'
 
-
 RoundMarker = nil
 local TechBag = nil
 local ReputationBag = nil
@@ -1166,6 +1165,14 @@ local player_ad_board = {
     Purple = nil
 }
 
+local extra_bag_GUID = {
+    White = '86d7bb',
+    Yellow = '585779',
+    Red = '173754',
+    Green = '0868fd',
+    Blue = 'bc00b9',
+    Purple = '3a5eaa'
+}
 
 local materialsResourceMarker_GUID = '1f8225'
 local scienceResourceMarker_GUID = 'f83ba1'

@@ -1,39 +1,47 @@
-function scoreGame()
+function scoreGame(color, printOut)
+    printOut = printOut or true
 
     local total = {}
 
-    function _score(t)
+    function _score(t, source)
         if t == nil then return end
+        local printString = source .. ': '
         for c, points in pairs(t) do
             if total[c] == nil then total[c] = 0 end
+            printString = printString .. c..'['..tostring(points)..'], '
             total[c] = total[c] + points
         end
+        if printOut then printToColor(printString, color) end
     end
 
     local hex_points = getPointsForControlledHexes()
-    local discovery_points = getPointsForDiscoveryTiles()
-    local tech_points = getPointsForTech()
-    local monolith_points = getPointsForMonoliths()
-    local ambassador_points = getPointsForAmbassadors()
+    _score(hex_points, 'Hexes')
 
-    if getCurrentRound() >= 0 then
+    local discovery_points = getPointsForDiscoveryTiles()
+    _score(discovery_points, 'Discovery Tiles')
+
+    local tech_points = getPointsForTech()
+    _score(tech_points, 'Technologies')
+
+    local monolith_points = getPointsForMonoliths()
+    _score(monolith_points, 'Monoliths')
+
+    local ambassador_points = getPointsForAmbassadors()
+    _score(ambassador_points)
+
+    if getCurrentRound() >= 8 then
         local reputation_points = getPointsForReputation()
         _score(reputation_points)
     else
-        printToAll('Not scoring reputation due to hidden info.')
+        printToColor('Not scoring reputation due to hidden info.', color)
     end
 
-    _score(hex_points)
-    _score(discovery_points)
-    _score(tech_points)
-    _score(monolith_points)
-    _score(ambassador_points)
 
-    printToAll('\nTotal\n-----------')
+    local totalString = '\nTotal\n'
     for c, t in pairs(total) do
-        printToAll('   '..c..': '..tostring(t))
+        totalString = totalString .. '   '..c..': '..tostring(t)..'\n'
     end
-    printToAll('\n-----------\n')
+    if printOut then printToColor(totalString, color) end
 
     return total
 end
@@ -63,8 +71,6 @@ function getPointsForControlledHexes()
         end
     end
 
-    printToAll("Points from Hexes:")
-    printToAll(dump(player_points))
     return player_points
 end
 
@@ -80,8 +86,6 @@ function getPointsForDiscoveryTiles()
         end
     end
 
-    printToAll("Points from Discoveries:")
-    printToAll(dump(player_points))
     return player_points
 end
 
@@ -116,8 +120,6 @@ function getPointsForTech()
         end
     end
 
-    printToAll("Points from Techs:")
-    printToAll(dump(points))
     return points
 end
 
@@ -137,8 +139,6 @@ function getPointsForMonoliths()
         end
     end
 
-    printToAll("Points from Monoliths:")
-    printToAll(dump(points))
     return points
 end
 
@@ -154,11 +154,23 @@ function getPointsForReputation()
         end
     end
 
-    printToAll("Points from Reputation:")
-    printToAll(dump(points))
     return points
 end
 
 function getPointsForAmbassadors()
+    local points = {}
+    local all_boards = getAllPlayerBoards()
+    if all_boards == nil then return {} end
 
+    for c, board in pairs(all_boards) do
+        local results = getObjectsInRepZone{board= board, tag= 'Ambassador'}
+        if results ~= nil then
+            for _, a in pairs(results) do
+                if points[c] == nil then points[c] = 0 end
+                points[c] = points[c] + 1
+            end
+        end
+    end
+
+    return points
 end

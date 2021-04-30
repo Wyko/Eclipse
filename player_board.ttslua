@@ -31,8 +31,6 @@ function setupPlayerInfluence(board, PlayerColor, amountOfInfluence)
 end
 
 function spawnInfluenceDisc(pos, color)
-    assert(pos ~= nil, "spawnInfluenceDisc: pos is nil")
-    assert(type(pos)=='table', 'spawnInfluenceDisc: pos is '..type(pos))
 
     local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
     local takeParams = {guid=1}
@@ -41,8 +39,9 @@ function spawnInfluenceDisc(pos, color)
     Wait.condition(
         function ()
             disc.setColorTint(color)
+            disc.setTags({'Influence'})
             -- log(pos, 'spawnInfluenceDisc:pos')
-            disc.setPosition(pos)
+            if pos then disc.setPosition(pos) end
         end,
         function ()
             return (not disc.spawning)

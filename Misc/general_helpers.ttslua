@@ -158,7 +158,7 @@ function objHasAttribute(args)
     --    obj: The object to check for attributes
     --
     -- Optional Args (At least one is required)
-    --    name
+    --    name (string): Checks if object has the specified name
     --    tag (string): Checks if object has the specified tag
     --    guid: Checks if object matches the specified GUID
 
@@ -167,7 +167,7 @@ function objHasAttribute(args)
 
     if (
         args.obj.getName() == args.name or
-        (args.tag ~= nil and args.obj.hasTag(tag))
+        (args.tag ~= nil and args.obj.hasTag(args.tag))
         ) then
         return true
     end
@@ -235,7 +235,6 @@ function debugAssert(...)
         assert(unpack(arg))
     end
 end
-
 
 
 function onObjectNumberTyped(object, player_color, number)

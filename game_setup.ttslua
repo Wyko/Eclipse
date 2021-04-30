@@ -196,39 +196,21 @@ function basicSetup2(parameters)
     -- take fleet and position it
     Object = SeekAndTake('Fleet', Box, takeParams)
     if (Object~=false) then
-            destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 11*InvPos)
+            destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 3*InvPos)
             Object.setPositionSmooth(destination,false, true)
             Object.setColorTint(Color.fromString(PlayerColor))
             Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
     end
 
-    -- take action card and position it
-    Object = SeekAndTake('Actions', Box, takeParams)
-    if (Object~=false) then
-        destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 20.6*InvPos)
-        Object.setPositionSmooth(destination,false, true)
-    end
+    placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
 
-    -- Deploy ships
-    dread_bag_bag.takeObject({
-        position = PlayerPosition + Vector(-6*InvPos, 1.2, 28*InvPos),
-        rotation = takeParams.rotation,
-        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+    -- -- take action card and position it
+    -- Object = SeekAndTake('Actions', Box, takeParams)
+    -- if (Object~=false) then
+    --     destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 20.6*InvPos)
+    --     Object.setPositionSmooth(destination,false, true)
+    -- end
 
-    interceptor_bag_bag.takeObject({
-        position = PlayerPosition + Vector(-2*InvPos, 1.2, 28*InvPos),
-        rotation = takeParams.rotation,
-        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
-
-    cruiser_bag_bag.takeObject({
-        position = PlayerPosition + Vector(2*InvPos, 1.2, 28*InvPos),
-        rotation = takeParams.rotation*-1,
-        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
-
-    starbase_bag_bag.takeObject({
-        position = PlayerPosition + Vector(6*InvPos, 1.2, 28*InvPos),
-        rotation = takeParams.rotation,
-        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
 
     -- Take an Ambassador and Discovery Board
     local a = a_and_disc_bag.takeObject({
@@ -244,7 +226,6 @@ function basicSetup2(parameters)
     triggerFunctionIfResting(a, function ()
         place_ambassadors(Box, takeParams, PlayerColor)
     end)
-
 
     -- take player board and position it
     local board = SeekAndTake('Player Board', Box, takeParams)
@@ -268,8 +249,6 @@ function basicSetup2(parameters)
             end)
     end
 
-
-
     -- take home world and position it
     local homeworld = SeekAndTake('Homeworld', Box, takeParams)
     if (homeworld~=false) then
@@ -289,7 +268,50 @@ function basicSetup2(parameters)
 
     -- place colony ships
     PlaceColonyShips(Box, takeParams, PlayerPosition)
+
+    spawnExtraInfluence(PlayerColor, FactionName)
     return true
+end
+
+function placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
+    -- This is for easy switching of ship locations
+    local loc = 'left'
+    local shipPos = {
+        ['above'] = {
+            ['Interceptor'] = PlayerPosition + Vector(-6*InvPos, 1.0, 28*InvPos),
+            ['Cruiser'] = PlayerPosition + Vector(-2*InvPos, 1.2, 28*InvPos),
+            ['Dreadnought'] = PlayerPosition + Vector(2*InvPos, 1.2, 28*InvPos),
+            ['Starbase'] = PlayerPosition + Vector(6*InvPos, 1.2, 28*InvPos),
+        },
+        ['left'] =  {
+            ['Interceptor'] = PlayerPosition + Vector(-19*InvPos, 0, 10*InvPos),
+            ['Cruiser'] = PlayerPosition + Vector(-14*InvPos, 0, 10*InvPos),
+            ['Dreadnought'] = PlayerPosition + Vector(-19*InvPos, -0.48, 6*InvPos),
+            ['Starbase'] = PlayerPosition + Vector(-14*InvPos, 0.2, 6*InvPos),
+        }
+    }
+
+    -- Deploy ships
+    dread_bag_bag.takeObject({
+        position = shipPos[loc].Dreadnought,
+        rotation = takeParams.rotation + vector(0,180,0),
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    interceptor_bag_bag.takeObject({
+        position = shipPos[loc].Interceptor,
+        rotation = takeParams.rotation + vector(0,180,0),
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    cruiser_bag_bag.takeObject({
+        position = shipPos[loc].Cruiser,
+        rotation = takeParams.rotation,
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
+    starbase_bag_bag.takeObject({
+        position = shipPos[loc].Starbase,
+        rotation = takeParams.rotation + vector(0,180,0),
+        callback_function = function (obj) lockAndColor(obj, PlayerColor) end})
+
 end
 
 function lockAndColor(obj, color)
@@ -318,7 +340,7 @@ function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
   if PlayerPosition.z < 0 then Inv=1 end
   local StartPosition = PlayerPosition + Vector(-22.4*Inv, 0, 15*Inv)
   if #guids ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
-  if #guids > 3 then StartPosition = StartPosition + Vector(0, 0, 1*Inv) end
+  if #guids > 3 then StartPosition = StartPosition + Vector(0, 0, 0) end
 
   for k,id in pairs(guids) do
       TakeParams.guid = guids[id]
@@ -484,5 +506,19 @@ function removeUnusedAreas()
                 PlayerMarkers[color] = nil
             end
         end
+    end
+end
+
+function spawnExtraInfluence(color, race)
+    -- Spawns the extra influence discs
+    local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
+    local extra = getObjectFromGUID(extra_bag_GUID[color])
+
+    local num = 3
+    if race == 'Pyxis Unity' then num = 2 end
+    for _ = 1, num do
+        local disc = spawnInfluenceDisc(nil, color)
+        Wait.condition(function () extra.putObject(disc) end,
+                       function () return not disc.spawning end)
     end
 end
