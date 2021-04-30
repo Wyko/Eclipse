@@ -72169,4 +72169,27 @@
               "DragSelectable": true,
               "Autoraise": true,
               "Sticky": true,
- 
+              "Tooltip": true,
+              "GridProjection": false,
+              "HideWhenFaceDown": false,
+              "Hands": false,
+              "CustomMesh": {
+                "MeshURL": "http://pastebin.com/raw.php?i=eZz7K6q1",
+                "DiffuseURL": "",
+                "NormalURL": "",
+                "ColliderURL": "http://pastebin.com/raw.php?i=eZz7K6q1",
+                "Convex": true,
+                "MaterialIndex": 2,
+                "TypeIndex": 5,
+                "CastShadows": true
+              },
+              "LuaScript": "",
+              "LuaScriptState": "",
+              "XmlUI": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
