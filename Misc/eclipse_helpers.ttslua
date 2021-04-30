@@ -39,7 +39,7 @@ function getControlledHexes(color)
             -- Get the hex under the influence disc
             local hex = castAndCheckForTag(disc.getPosition(), 'hex')
             if hex ~= nil then
-                table.insert(owned_hexes, {obj= hex, owner = c})
+                owned_hexes[hex] = true
             end
         end
     end

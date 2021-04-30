@@ -8,7 +8,7 @@ function scoreGame(color, printOut)
         local printString = source .. ': '
         for c, points in pairs(t) do
             if total[c] == nil then total[c] = 0 end
-            printString = printString .. c..'['..tostring(points)..'], '
+            printString = printString .. c..': '..tostring(points)..', '
             total[c] = total[c] + points
         end
         if printOut then printToColor(printString, color) end
@@ -20,7 +20,7 @@ function scoreGame(color, printOut)
     _score(getPointsForMonoliths(), 'Monoliths')
     _score(getPointsForAmbassadors(), 'Ambassadors')
 
-    if getCurrentRound() >= 8 then
+    if getCurrentRound() >= 0 then
         _score(getPointsForReputation(), 'Reputation Tiles')
     else
         printToColor('Not scoring reputation due to hidden info.', color)
@@ -37,61 +37,77 @@ function scoreGame(color, printOut)
 end
 
 function getPointsForControlledHexes()
-    local table_objects = getInfluenceDiscsOnHexes()
+    local discs = getInfluenceDiscsOnHexes()
 
-    local player_points = {}
+    local points = {}
+    local scored_hexes = {}
 
-    for _, disc in ipairs(table_objects) do
+    for _, disc in ipairs(discs) do
 
         -- Get the hex under the influence disc
         local hex = castAndCheckForTag(disc.getPosition(), 'hex')
-        if hex ~= nil then
+        if hex ~= nil and scored_hexes[hex] == nil then
+
+            -- Stop from duplicating hex scoring
+            scored_hexes[hex] = true
 
             -- Get the owner of the disc from its color
             local c = disc.getColorTint()
             c = c:toString()
 
             -- Score the hex
-            if player_points[c] == nil then player_points[c] = 0 end
+            if points[c] == nil then points[c] = 0 end
             local rep = hex.getVar('reputation')
             assert(rep~=nil, 'Hex ['..hex.getDescription()..'] has no VP data.' )
 
+            -- Score Planta
+            if PlayerRace[c] == 'Planta' then points[c] = points[c] + 1 end
+
             -- Add the points to the owner's score
-            player_points[c] = player_points[c] + rep
+            points[c] = points[c] + rep
         end
     end
 
-    return player_points
+    return points
 end
 
 function getPointsForDiscoveryTiles()
-    local player_points = {}
+    local points = {}
 
     -- Search each player's table for discovery tiles and score them
     for c, t in pairs(TableGUIDs) do
         local results = castBoxAndCheck(t, nil, 'Discovery Tile')
         for _, tile in pairs(results) do
-            if player_points[c] == nil then player_points[c] = 0 end
-            player_points[c] = player_points[c] + scoreDiscoveryTile(tile)
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + scoreDiscoveryTile(tile, c)
         end
     end
 
-    return player_points
+    return points
 end
 
-function scoreDiscoveryTile(tile, player)
+function scoreDiscoveryTile(tile, color)
     -- Error Checking
     assert(tile.hasTag('Discovery Tile'))
 
+    local score = 0
+
     -- Score unused discoveries
-    if tile.is_face_down then return 2 end
+    if tile.is_face_down then
+        return 2
+
+    -- Score Magellan
+    elseif PlayerRace[color] ~= nil and
+           string.find(PlayerRace[color], 'Magellan') then
+        score = score + 1
+    end
 
     -- Check if the discovery tile has a custom function for points
-    if hasFunction(tile, 'score_discovery') then
-        return tile.call(score_discovery, player)
-    else
-        return 0
+    if hasFunction(tile, 'reputation_func') then
+        score = score + tile.call('reputation_func', color)
     end
+
+    return score
 end
 
 function getPointsForTech()
@@ -137,14 +153,22 @@ function getPointsForReputation()
     local points = {}
 
     -- Search each player's table for discovery tiles and score them
-    for c, t in pairs(TableGUIDs) do
-        local results = castBoxAndCheck(t, nil, 'Rep Tile')
-        for _, tile in pairs(results) do
-            if points[c] == nil then points[c] = 0 end
-            points[c] = points[c] + tile.getVar('reputation')
-        end
+    for c, _ in pairs(TableGUIDs) do
+        local rep = scoreReputation(c)
+        if rep > 0 then points[c] = rep end
     end
 
+    return points
+end
+
+function scoreReputation(color)
+    local t = TableGUIDs[color]
+    local points = 0
+    local results = castBoxAndCheck(t, nil, 'Rep Tile')
+
+    for _, tile in pairs(results) do
+        points = points + tile.getVar('reputation')
+    end
     return points
 end
 

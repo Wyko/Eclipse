@@ -272,6 +272,7 @@ function hasFunction(obj, funcName)
 
     local func = obj.getVar(funcName)
     if type(func) ~= 'function' then return false end
+    return true
 end
 
 function removeAllButtons(obj)
