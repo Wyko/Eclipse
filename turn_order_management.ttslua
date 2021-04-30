@@ -59,9 +59,22 @@ function updateTurnOrder()
     Turns.order = new_turns
     Turns.turn_color = Turns.order[1]
 
+    local msg = '\n'
+    if getCurrentRound() == 2 then
+        msg = msg .. 'The turn order has been updated.\n'..
+        '['..Color.Orange:toHex()..']Please note:[-] Due ' ..
+        'to a TTS bug, the player order in the top right corner may not ' ..
+        'reflect the real order, even though turns will go to the '..
+        'correct next player when you pass your turn.\n'
+    end
+    msg = msg .. 'The new turn order is as follows:\n'
+
+    for _, t in ipairs(new_turns) do
+        msg = msg .. '    ['..Color.fromString(t):toHex()..']'.. tostring(t) ..'[-]\n'
+    end
+    printToAll(msg)
     log(Turns.order, 'Turn Order: New')
 end
-
 
 function ownerOfMarker(marker)
     -- Returns the Player owner of a particular marker
