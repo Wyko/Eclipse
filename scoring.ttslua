@@ -14,24 +14,14 @@ function scoreGame(color, printOut)
         if printOut then printToColor(printString, color) end
     end
 
-    local hex_points = getPointsForControlledHexes()
-    _score(hex_points, 'Hexes')
-
-    local discovery_points = getPointsForDiscoveryTiles()
-    _score(discovery_points, 'Discovery Tiles')
-
-    local tech_points = getPointsForTech()
-    _score(tech_points, 'Technologies')
-
-    local monolith_points = getPointsForMonoliths()
-    _score(monolith_points, 'Monoliths')
-
-    local ambassador_points = getPointsForAmbassadors()
-    _score(ambassador_points)
+    _score(getPointsForControlledHexes(), 'Hexes')
+    _score(getPointsForDiscoveryTiles(), 'Discovery Tiles')
+    _score(getPointsForTech(), 'Technologies')
+    _score(getPointsForMonoliths(), 'Monoliths')
+    _score(getPointsForAmbassadors(), 'Ambassadors')
 
     if getCurrentRound() >= 8 then
-        local reputation_points = getPointsForReputation()
-        _score(reputation_points)
+        _score(getPointsForReputation(), 'Reputation Tiles')
     else
         printToColor('Not scoring reputation due to hidden info.', color)
     end
@@ -113,10 +103,11 @@ function getPointsForTech()
         if points[c] == nil then points[c] = 0 end
         for _, t in ipairs({"Red", "Green", "Yellow"}) do
             local space = nextFreeTechSpace(t, board)
-            if space == nil then points[c] = points[c] + 5 end
-            if space == 7 then points[c] = points[c] + 3 end
-            if space == 6 then points[c] = points[c] + 2 end
-            if space == 5 then points[c] = points[c] + 1 end
+            if     space == nil then points[c] = points[c] + 5
+            elseif space == 7 then points[c] = points[c] + 3
+            elseif space == 6 then points[c] = points[c] + 2
+            elseif space == 5 then points[c] = points[c] + 1
+            end
         end
     end
 
@@ -163,7 +154,7 @@ function getPointsForAmbassadors()
     if all_boards == nil then return {} end
 
     for c, board in pairs(all_boards) do
-        local results = getObjectsInRepZone{board= board, tag= 'Ambassador'}
+        local results = getObjectsInRepZone(board, nil, 'Ambassador')
         if results ~= nil then
             for _, a in pairs(results) do
                 if points[c] == nil then points[c] = 0 end

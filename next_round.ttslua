@@ -31,14 +31,14 @@ function nextRound()
     unflipColonyAndSkippers()
     TechBag.shuffle()
     techsToDraw = newTechs
-    startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)
+    startLuaCoroutine(Global, 'drawMultipleTechs')
     if round > 1 then
         Wait.time(function ()
             updateTurnOrder()
             moveAllPassMarkersOffBoard()
-        end, 2)
+        end, 4)
     end
 end
 

@@ -70,14 +70,14 @@ end
 function getObjectsInRepZone(board, name, tag)
     -- Returns  objects in the reputation zone on a player board with the gvien
     -- name or tag
-    
+
     local castResult = Physics.cast({
-        origin = board.positionToWorld(vector(-1.627953, 0.2093751, 0.3211277)),
-        direction= vector(0,0,0),
+        origin = board.positionToWorld(vector(-1.627953, 0.2093751, 0.3211277)) + vector(0,-2,0),
+        direction= vector(0,1,0),
         type = 3,
         size = vector(2,1,9),
         orientation  = vector(0,1,0),
-        max_distance = 3,
+        max_distance = 4,
         debug = DEBUG,})
 
     return objectsHitByCast(castResult, name, tag)
