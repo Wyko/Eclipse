@@ -11,11 +11,7 @@ function getOwnerOfHex(hex)
 
     -- More error checking
     if discs == nil then return nil end
-    if #discs > 1 then
-        broadcastToAll('Error getting the owner of hex ['..
-            tostring(hex.getVar('number')) .. ']\n' ..
-            'There are multiple influence discs on the hex!', Color.Yellow)
-    end
+    verify_number_of_influence_on_hex(hex, discs)
 
     -- Get the owner of the disc from its color
     if verify_influence_disc(discs[1]) then

@@ -14,11 +14,23 @@ function scoreGame(color, printOut)
         if printOut then printToColor(printString, color) end
     end
 
+    for color, race in pairs(PlayerRace) do
+        if race == 'Descendants of Draco' then
+            printToColor("["..Color.Orange:toHex()..']Note for Draco:[-] ' ..
+            'The scoring script only scores ancient ship models, not ' ..
+            'ancient blueprint tiles. Please use the models in order to ' ..
+            'score points for Draco correctly.', color)
+        end
+    end
+
+
     _score(getPointsForControlledHexes(), 'Hexes')
     _score(getPointsForDiscoveryTiles(), 'Discovery Tiles')
     _score(getPointsForTech(), 'Technologies')
     _score(getPointsForMonoliths(), 'Monoliths')
     _score(getPointsForAmbassadors(), 'Ambassadors')
+    _score(getPointsForWarpTokens(), 'Warp Tokens')
+    _score(getPointsForAncients(), 'Draco Ancients')
 
     if getCurrentRound() >= 0 then
         _score(getPointsForReputation(), 'Reputation Tiles')
@@ -184,6 +196,60 @@ function getPointsForAmbassadors()
                 if points[c] == nil then points[c] = 0 end
                 points[c] = points[c] + 1
             end
+        end
+    end
+
+    return points
+end
+
+function getPointsForWarpTokens()
+
+    local warps = {
+        ['warpDiscovery'] = {['obj'] = getObjectFromGUID('75a159'), ['points'] = 2},
+        ['warpTech']      = {['obj'] = getObjectFromGUID('0ed41c'), ['points'] = 1}
+    }
+
+    local points = {}
+
+    for _, tile in pairs(warps) do
+        if tile.obj ~= nil then
+            -- Get the hex under the token
+            local hex = castAndCheckForTag(tile.obj.getPosition(), 'hex')
+
+            -- Score the token based on the owner of the hex
+            if hex ~= nil then
+                local c = getOwnerOfHex(hex)
+                if c ~= nil and points[c] == nil then points[c] = 0 end
+                if c ~= nil then points[c] = points[c] + tile.points end
+            end
+        end
+    end
+
+    return points
+end
+
+function getPointsForAncients()
+    -- Only score if Draco is present
+    local c = nil
+    for color, race in pairs(PlayerRace) do
+        if race == 'Descendants of Draco' then
+            c = color
+            break
+        end
+    end
+    if c == nil then return {} end
+
+    local ancients = getItemsInZone{zone= TableZone, tag='Ancient'}
+    local points = {}
+
+    for _, m in ipairs(ancients) do
+        -- Get the hex under the ancient
+        local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
+        -- Score the ancient
+        if hex ~= nil then
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + 1
         end
     end
 

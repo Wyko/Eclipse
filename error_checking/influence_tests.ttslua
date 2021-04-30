@@ -20,3 +20,14 @@ function verify_influence_disc(disc)
 
     return true
 end
+
+function verify_number_of_influence_on_hex(hex, discs)
+    if #discs > 1 then
+        broadcastToAll('Error getting the owner of hex ('..
+            tostring(hex.getVar('number')) .. ')\n' ..
+            'There are multiple influence discs on the hex!', Color.Yellow)
+        hex.highlightOn(Color.Orange, 15)
+        return false
+    end
+    return true
+end
