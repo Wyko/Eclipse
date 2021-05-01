@@ -353,6 +353,8 @@ function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
 end
 
 function place_ambassadors(Box, takeParams, PlayerColor)
+    if #getSeatedPlayers() <= 3 then return false end
+
     -- take ambassador tiles and position them
     local tiles = SeekAndTake('Ambassador', Box, takeParams)
     local board = player_ad_board[PlayerColor]

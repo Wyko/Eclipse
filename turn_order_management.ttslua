@@ -194,6 +194,7 @@ function setPassCheck()
         handlePassCards)
 end
 
+
 function handlePassCards()
     local check = true
     for _,color in pairs(getSeatedPlayers()) do

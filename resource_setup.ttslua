@@ -766,7 +766,6 @@ function placeStartingResources(color, race)
         return
     end
 
-
     for _, resource in ipairs{"money", "materials", "science"} do
         local marker = spawnResourceMarker(resource, color)
         setPlayerResource(resource, color, faction[resource])

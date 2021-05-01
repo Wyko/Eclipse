@@ -63,12 +63,12 @@ function getInfluenceDiscsOnHexes()
     return results
 end
 
-function getObjectsInRepZone(board, name, tag)
+function getObjectsInRepZone(args)
     -- Returns  objects in the reputation zone on a player board with the gvien
     -- name or tag
 
     local castResult = Physics.cast({
-        origin = board.positionToWorld(vector(-1.627953, 0.2093751, 0.3211277)) + vector(0,-2,0),
+        origin = args.board.positionToWorld(vector(-1.627953, 0.2093751, 0.3211277)) + vector(0,-2,0),
         direction= vector(0,1,0),
         type = 3,
         size = vector(2,1,9),
@@ -76,5 +76,14 @@ function getObjectsInRepZone(board, name, tag)
         max_distance = 4,
         debug = DEBUG,})
 
-    return objectsHitByCast(castResult, name, tag)
+    return objectsHitByCast(castResult, args.name, args.tag)
+end
+
+function ownerOfRace(race)
+    for color, r in pairs(PlayerRace) do
+        if r == race then
+            return color
+        end
+    end
+    return nil
 end

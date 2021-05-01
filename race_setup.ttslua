@@ -6,6 +6,22 @@ function raceSetup(homeworld, color, race)
     placePopulations(homeworld, color, factions[race].types)
     spawnInfluenceDisc(homeworld.getPosition()+vector(0, 1, 0), color)
     placeStartingResources(color, race)
+    placeOrbital(homeworld)
+end
+
+function placeOrbital(hex)
+    -- Mainly for Exiles. Place an orbital
+    
+    local pos = hex.getTable('orbital')
+    if pos == nil then return end
+
+    orbitals_bag.takeObject({
+        position          = hex.positionToWorld(pos),
+        smooth            = true,
+        callback_function = function (obj)
+            triggerFunctionIfResting(obj, function () obj.setLock(true) end)
+        end
+    })
 end
 
 function placeHomeworld(homeworld, color)

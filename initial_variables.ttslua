@@ -16,6 +16,7 @@ local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
 local pop_cube_bag_GUID = '8b1da0'
 local a_and_disc_bag_GUID = '0eff17'
+local orbitals_bag_GUID = 'f04483'
 
 local cruiser_bag_bag_GUID = '402516'
 local interceptor_bag_bag_GUID = 'dd7301'
@@ -1411,4 +1412,5 @@ function loadObjects()
     dread_bag_bag = getObjectFromGUID(dread_bag_bag_GUID)
     starbase_bag_bag = getObjectFromGUID(starbase_bag_bag_GUID)
     a_and_disc_bag = getObjectFromGUID(a_and_disc_bag_GUID)
+    orbitals_bag = getObjectFromGUID(orbitals_bag_GUID)
 end

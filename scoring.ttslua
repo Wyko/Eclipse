@@ -1,6 +1,6 @@
 function scoreGame(color, printOut)
     printOut = printOut or true
-
+    local fullString = ''
     local total = {}
 
     function _score(t, source)
@@ -12,6 +12,7 @@ function scoreGame(color, printOut)
             total[c] = total[c] + points
         end
         if printOut then printToColor(printString, color) end
+        fullString = fullString .. '\n' .. printString
     end
 
     for color, race in pairs(PlayerRace) do
@@ -29,21 +30,28 @@ function scoreGame(color, printOut)
     _score(getPointsForTech(), 'Technologies')
     _score(getPointsForMonoliths(), 'Monoliths')
     _score(getPointsForAmbassadors(), 'Ambassadors')
+    _score(getPointsForMinorSpecies(), 'Minor Species')
     _score(getPointsForWarpTokens(), 'Warp Tokens')
     _score(getPointsForAncients(), 'Draco Ancients')
+    _score(getPointsForExileOrbitals(), 'Exiles Orbitals')
 
-    if getCurrentRound() >= 0 then
+    if getCurrentRound() >= 8 then
         _score(getPointsForReputation(), 'Reputation Tiles')
     else
         printToColor('Not scoring reputation due to hidden info.', color)
     end
 
 
-    local totalString = '\nTotal\n'
+    local totalString = '\nTotal Points:\n'
     for c, t in pairs(total) do
-        totalString = totalString .. '   '..c..': '..tostring(t)..'\n'
+        totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
+            ' ('..Player[c].steam_name..', '..PlayerRace[c]..'): '..tostring(t)..'\n'
     end
     if printOut then printToColor(totalString, color) end
+
+    if allPlayersPassed() and (getCurrentRound() >= 8) then
+        Notes.setNotes(totalString .. '\n' .. fullString)
+    end
 
     return total
 end
@@ -190,7 +198,7 @@ function getPointsForAmbassadors()
     if all_boards == nil then return {} end
 
     for c, board in pairs(all_boards) do
-        local results = getObjectsInRepZone(board, nil, 'Ambassador')
+        local results = getObjectsInRepZone{board= board, tag= 'Ambassador'}
         if results ~= nil then
             for _, a in pairs(results) do
                 if points[c] == nil then points[c] = 0 end
@@ -248,6 +256,57 @@ function getPointsForAncients()
 
         -- Score the ancient
         if hex ~= nil then
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + 1
+        end
+    end
+
+    return points
+end
+
+function getPointsForMinorSpecies()
+    local points = {}
+    local all_boards = getAllPlayerBoards()
+    if all_boards == nil then return {} end
+
+    for c, board in pairs(all_boards) do
+        local results = getObjectsInRepZone{board= board, tag= 'Minor Species'}
+        if results ~= nil then
+            for _, tile in pairs(results) do
+                if points[c] == nil then points[c] = 0 end
+
+                -- Get a special function if it has one
+                if hasFunction(tile, 'reputation_func') then
+                    local _p = tile.call('reputation_func', {color= c, board= board})
+                    if _p ~= nil then points[c] = points[c] + _p end
+                end
+
+                -- Get any saved reputation
+                local rep = tile.getVar('reputation')
+                if rep ~= nil then points[c] = points[c] + rep end
+            end
+        end
+    end
+
+    return points
+end
+
+function getPointsForExileOrbitals()
+    -- Only score if Exiles are present
+    local c = ownerOfRace('Exiles')
+    if c == nil then return {} end
+
+    local orbitals = getItemsInZone{zone= TableZone, tag='Orbital'}
+    local points = {}
+
+    for _, m in ipairs(orbitals) do
+        -- Get the hex under the orbital
+        local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
+        -- Check if Exiles own the hex
+        if hex ~= nil and getOwnerOfHex(hex) == c then
+
+            -- Score the orbital
             if points[c] == nil then points[c] = 0 end
             points[c] = points[c] + 1
         end
