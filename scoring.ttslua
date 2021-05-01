@@ -338,7 +338,7 @@ function getPointsForPyxisStarbases()
 
                 -- Score the starbase
                 if points[c] == nil then points[c] = 0 end
-                points[c] = points[c] + 1
+                points[c] = points[c] + 4
             end
         end
 
