@@ -2806,7 +2806,6 @@
       },
       "LuaScript": "number = 001\r\nreputation = 4\r\nartifact = true\r\nancients = 0\r\ndiscovery = true\r\nguardian = false\r\nwarp = false\r\nmoney = {{-1.45435329048515, 0.35000017285347, 1.93669083614505},{-0.561419391625634, 0.350000113248825, 1.93548796889463},}\r\nmaterials = {{2.09167522833235, 0.349999785423279, 0.504112503466487},}\r\nscience = {{-1.33921069214907, 0.350000232458115, -1.8360174614121},}\r\nadv_money = {}\r\nadv_materials = {{2.10233095604451, 0.350000023841858, -0.400472502944178},}\r\nadv_science = {{-0.452227709926934, 0.350000143051147, -1.83084242085422},}\r\nneutral = {}\r\nadv_neutral = {}",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -21388,7 +21387,6 @@
       },
       "LuaScript": "----#include Eclipse\\pass_card\nlocal button_Pass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Pass for the rest of the round.\",\r\n    alignment = 3}\r\n\r\nlocal button_UnPass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Un-Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    rotation = {0,0,180},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Takes your marker off the turn tracker and tells everyone you didn't pass.\\n\\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.\",\r\n    alignment = 3}\r\n\r\nfunction onLoad()\r\n    setButton()\r\nend\r\n\r\nfunction onRotate(spin, flip, player_color, old_spin, old_flip)\r\n    removeAllButtons()\r\n    Wait.condition(\r\n        function ()\r\n            setButton()\r\n        end,\r\n        function ()\r\n            return self.resting\r\n        end)\r\nend\r\n\r\nfunction setButton()\r\n    if not self.is_face_down then\r\n        createPassButton()\r\n    else\r\n        createUnPassButton()\r\n    end\r\nend\r\n\r\nfunction flipThis()\r\n    if not self.is_face_down then\r\n        Turns.turn_color = Turns.getNextTurnColor()\r\n    end\r\n    self.setLock(false)\r\n    self.flip()\r\nend\r\n\r\nfunction createPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_Pass)\r\nend\r\n\r\nfunction createUnPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_UnPass)\r\nend\r\n\r\nfunction removeAllButtons()\r\n    local buttons = self.getButtons()\r\n    if buttons == nil then return end\r\n\r\n    for _, button in ipairs(buttons) do\r\n        -- remove the button and pop from the table\r\n        self.removeButton(button.index)\r\n    end\r\nend\r\n\n----#include Eclipse\\pass_card",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -21475,7 +21473,6 @@
       },
       "LuaScript": "----#include Eclipse\\pass_card\nlocal button_Pass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Pass for the rest of the round.\",\r\n    alignment = 3}\r\n\r\nlocal button_UnPass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Un-Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    rotation = {0,0,180},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Takes your marker off the turn tracker and tells everyone you didn't pass.\\n\\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.\",\r\n    alignment = 3}\r\n\r\nfunction onLoad()\r\n    setButton()\r\nend\r\n\r\nfunction onRotate(spin, flip, player_color, old_spin, old_flip)\r\n    removeAllButtons()\r\n    Wait.condition(\r\n        function ()\r\n            setButton()\r\n        end,\r\n        function ()\r\n            return self.resting\r\n        end)\r\nend\r\n\r\nfunction setButton()\r\n    if not self.is_face_down then\r\n        createPassButton()\r\n    else\r\n        createUnPassButton()\r\n    end\r\nend\r\n\r\nfunction flipThis()\r\n    if not self.is_face_down then\r\n        Turns.turn_color = Turns.getNextTurnColor()\r\n    end\r\n    self.setLock(false)\r\n    self.flip()\r\nend\r\n\r\nfunction createPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_Pass)\r\nend\r\n\r\nfunction createUnPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_UnPass)\r\nend\r\n\r\nfunction removeAllButtons()\r\n    local buttons = self.getButtons()\r\n    if buttons == nil then return end\r\n\r\n    for _, button in ipairs(buttons) do\r\n        -- remove the button and pop from the table\r\n        self.removeButton(button.index)\r\n    end\r\nend\r\n\n----#include Eclipse\\pass_card",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -21553,7 +21550,6 @@
       },
       "LuaScript": "----#include Eclipse\\pass_card\nlocal button_Pass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Pass for the rest of the round.\",\r\n    alignment = 3}\r\n\r\nlocal button_UnPass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Un-Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    rotation = {0,0,180},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Takes your marker off the turn tracker and tells everyone you didn't pass.\\n\\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.\",\r\n    alignment = 3}\r\n\r\nfunction onLoad()\r\n    setButton()\r\nend\r\n\r\nfunction onRotate(spin, flip, player_color, old_spin, old_flip)\r\n    removeAllButtons()\r\n    Wait.condition(\r\n        function ()\r\n            setButton()\r\n        end,\r\n        function ()\r\n            return self.resting\r\n        end)\r\nend\r\n\r\nfunction setButton()\r\n    if not self.is_face_down then\r\n        createPassButton()\r\n    else\r\n        createUnPassButton()\r\n    end\r\nend\r\n\r\nfunction flipThis()\r\n    if not self.is_face_down then\r\n        Turns.turn_color = Turns.getNextTurnColor()\r\n    end\r\n    self.setLock(false)\r\n    self.flip()\r\nend\r\n\r\nfunction createPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_Pass)\r\nend\r\n\r\nfunction createUnPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_UnPass)\r\nend\r\n\r\nfunction removeAllButtons()\r\n    local buttons = self.getButtons()\r\n    if buttons == nil then return end\r\n\r\n    for _, button in ipairs(buttons) do\r\n        -- remove the button and pop from the table\r\n        self.removeButton(button.index)\r\n    end\r\nend\r\n\n----#include Eclipse\\pass_card",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -24229,7 +24225,6 @@
       },
       "LuaScript": "function onCollisionEnter()\n    self.shuffle()\nend\n\n\nfunction filterObjectEnter(obj)\n    if string.find(obj.getName(), \"Tech %-\") ~= nil then\n        return true\n    end\n    return false\nend\n\nfunction onObjectLeaveContainer(bag, obj)\n    if bag.getGUID() == self.getGUID() then\n        obj.setRotation(Vector(0.00, 270, 0.00))\n    end\nend",
       "LuaScriptState": "",
-      "XmlUI": "",
       "ContainedObjects": [
         {
           "GUID": "3f64a9",
@@ -33635,7 +33630,6 @@
       },
       "LuaScript": "function filterObjectEnter(obj)\n    if obj.getName() == \"Sector 2\" then\n        return true\n    end\n    return false\nend\n\nfunction onObjectLeaveContainer(container, obj)\n    if container == self then\n        obj.setRotation(vector(0, 90, 180))\n    end\nend",
       "LuaScriptState": "",
-      "XmlUI": "",
       "ContainedObjects": [
         {
           "GUID": "a8cd6f",
@@ -34836,7 +34830,6 @@
       },
       "LuaScript": "function filterObjectEnter(obj)\n    if obj.getName() == \"Sector 1\" then\n        return true\n    end\n    return false\nend\n\nfunction onObjectLeaveContainer(container, obj)\n    if container == self then\n        obj.setRotation(vector(0, 90, 180))\n    end\nend",
       "LuaScriptState": "",
-      "XmlUI": "",
       "ContainedObjects": [
         {
           "GUID": "debe93",
@@ -35845,7 +35838,6 @@
       },
       "LuaScript": "function filterObjectEnter(obj)\n    if obj.getName() == \"Sector 3\" then\n        return true\n    end\n    return false\nend\n\nfunction onObjectLeaveContainer(container, obj)\n    if container == self then\n        obj.setRotation(vector(0, 90, 180))\n    end\nend",
       "LuaScriptState": "",
-      "XmlUI": "",
       "ContainedObjects": [
         {
           "GUID": "9bc93b",
@@ -37590,7 +37582,6 @@
       },
       "LuaScript": "function onCollisionEnter()\r\n    self.shuffle()\r\nend\n\n\nfunction filterObjectEnter(obj)\n    if obj.getName() == \"Reputation\" then\n        obj.setHiddenFrom()\n        return true\n    end\n    return false\nend",
       "LuaScriptState": "",
-      "XmlUI": "",
       "ContainedObjects": [
         {
           "GUID": "69d50d",
@@ -39396,7 +39387,6 @@
       },
       "LuaScript": "function filterObjectEnter(obj)\n    if obj.getName() == \"Discovery\" then\n        return true\n    end\n    return false\nend\n\nfunction onObjectLeaveContainer(container, obj)\n    if container == self then\n        obj.setRotation(vector(0, 225, 180))\n    end\nend",
       "LuaScriptState": "",
-      "XmlUI": "",
       "ContainedObjects": [
         {
           "GUID": "e55a55",
@@ -44013,8 +44003,7 @@
         }
       },
       "LuaScript": "\nfunction onload ()\n    self.createButton({\n        click_function = 'onClick',\n        label = 'Next Round',\n        tooltip = 'Next Round',\n        function_owner = self,\n        position = {0, -0.05, 0},\n        rotation = {0, 0, 0},\n        width = 3600,\n        height = 850,\n        font_size = 400\n    })\n\n    -- initial_button = self.createButton({\n    --     click_function = \"onInitialClick\",\n    --     function_owner = self,\n    --     label = \"Deal Initial Technologies\",\n    --     position = {0, 0.3, 0},\n    --     scale = {0.5, 0.5, 0.5},\n    --     width = 7500,\n    --     height = 2000,\n    --     font_size = 700,\n    --     color = {0.2692, 0.6029, 0.9843, 1}\n    -- })\nend\n\n-- function onInitialClick(obj, color, alt_click)\n--     Global.call('setupFirstRound')\n--     initial_button.destruct()\n-- end\n\n-- Prevent accidental double-clicks on button --\nlocal lockout = false\nlocal warning = false\n\nfunction onClick(obj, color, alt_click)\n\n    local round = tonumber(Global.getVar('RoundMarker').getDescription()) + 1\n    log(\"Round: \" .. round)\n\n    if round > 1 and not Global.call('allPlayersPassed') and not warning then\n        broadcastToAll(\"Warning: Not all players have passed yet\", Color.red)\n        printToAll(\"A player attempted to click Next Round, but not all players\"\n            .. \" have passed yet.\\nPlayers pending:\")\n        for _, player in pairs(Global.call(\"playersNotPassed\"), \"\\n\") do\n            printToAll(player, Color.fromString(player))\n        end\n        printToAll(\"You may choose to click the Next Round button anyway in five\"\n            .. \" seconds.\")\n        lockout = true\n        warning = true\n        Wait.time(function() lockout = false end, 5)\n        return\n    end\n\n    if lockout == false and alt_click == false then\n        lockout = true\n        warning = false\n        Global.call('nextRound')\n        Wait.time(function() lockout = false end, 5)\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "17d661",
@@ -44065,8 +44054,7 @@
         }
       },
       "LuaScript": "local RepZone_GUID = '773f39'\nlocal RepZone = nil\n\nlocal discard_queue = {}\n\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Discard Reputation',\n        tooltip = 'Discard Reputation',\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 0},\r\n        width = 3600,\r\n        height = 850,\r\n        font_size = 400\r\n    })\n    RepZone = getObjectFromGUID(RepZone_GUID)\r\nend\n\n\nfunction onClick(d, color, alt_click)\n    if alt_click == false then\n        discards = Player[color].getHandObjects()\n        zone = RepZone.getObjects()\n        for _,obj in pairs(zone) do\n            if obj.getName() == \"Reputation\" then\n                table.insert(discards, obj)\n            end\n        end\r\n        for x,obj in pairs(discards) do\n            local guid = obj.getGUID()\n            if discard_queue[guid] ~= true then\n                discard_queue[guid] = true\n                Wait.time(function() discardRep(obj) end, 0.2*x, 1)\n            end\n        end\n    end\nend\n\nfunction discardRep(obj)\n    -- Put unchosen reputation tiles back into the bag --\n\n    local ReputationBag = getObjectFromGUID('3c5d08')\n\n    if obj ~= nil then\n        if obj.getName() == \"Reputation\" then\n            local obj_guid = obj.getGUID()\n            obj.setRotation(Vector(0,270,180))\n            ReputationBag.putObject(obj)\n            Wait.time(function () discard_queue[obj_guid] = nil end, 2)\n            Wait.time(function() ReputationBag.shuffle() end, 0.5, 1)\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "8e38a1",
@@ -44449,8 +44437,7 @@
         "LoopingEffectIndex": 0
       },
       "LuaScript": "local turnSkipPlayer = nil\n\nfunction onLoad()\n    turnSkipPlayer = getColor()\n    -- log(self.getName() .. \" assigned to \" .. turnSkipPlayer)\n    self.setColorTint(turnSkipPlayer)\nend\n\n-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn\nfunction onPlayerTurn(plr)\n    -- log(\"plr.color: \" .. plr.color)\n    -- log(\"Player[turnSkipPlayer]: \".. tostring(Player[turnSkipPlayer].color))\n    if (plr.color == Player[turnSkipPlayer].color\n        and self.is_face_down\n        and not allSkippersFlipped()\n        ) then\n        broadcastToAll(\"Skipping \" .. plr.steam_name .. \"'s turn.\", plr.color)\n        Wait.frames(skipTurn, 2)\n    end\nend\n\nfunction skipTurn()\n    Turns.turn_color = Turns.getNextTurnColor()\nend\n\nfunction allSkippersFlipped()\n    for _, skipper in pairs(getObjectsWithTag(\"Turn Skipper\")) do\n        if not skipper.is_face_down then\n            return false\n        end\n    end\n    printToAll('All turn skippers are flipped.')\n    return true\nend\n\nfunction getColor()\n    for _, color in pairs(Color.list) do\n        if self.hasTag(color) then\n            return color\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "fcb072",
@@ -50000,8 +49987,7 @@
         "LoopingEffectIndex": 0
       },
       "LuaScript": "local turnSkipPlayer = nil\n\nfunction onLoad()\n    turnSkipPlayer = getColor()\n    -- log(self.getName() .. \" assigned to \" .. turnSkipPlayer)\n    self.setColorTint(turnSkipPlayer)\nend\n\n-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn\nfunction onPlayerTurn(plr)\n    -- log(\"plr.color: \" .. plr.color)\n    -- log(\"Player[turnSkipPlayer]: \".. tostring(Player[turnSkipPlayer].color))\n    if (plr.color == Player[turnSkipPlayer].color\n        and self.is_face_down\n        and not allSkippersFlipped()\n        ) then\n        broadcastToAll(\"Skipping \" .. plr.steam_name .. \"'s turn.\", plr.color)\n        Wait.frames(skipTurn, 2)\n    end\nend\n\nfunction skipTurn()\n    Turns.turn_color = Turns.getNextTurnColor()\nend\n\nfunction allSkippersFlipped()\n    for _, skipper in pairs(getObjectsWithTag(\"Turn Skipper\")) do\n        if not skipper.is_face_down then\n            return false\n        end\n    end\n    printToAll('All turn skippers are flipped.')\n    return true\nend\n\nfunction getColor()\n    for _, color in pairs(Color.list) do\n        if self.hasTag(color) then\n            return color\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "8bcb8d",
@@ -50051,8 +50037,7 @@
         "LoopingEffectIndex": 0
       },
       "LuaScript": "local turnSkipPlayer = nil\n\nfunction onLoad()\n    turnSkipPlayer = getColor()\n    -- log(self.getName() .. \" assigned to \" .. turnSkipPlayer)\n    self.setColorTint(turnSkipPlayer)\nend\n\n-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn\nfunction onPlayerTurn(plr)\n    -- log(\"plr.color: \" .. plr.color)\n    -- log(\"Player[turnSkipPlayer]: \".. tostring(Player[turnSkipPlayer].color))\n    if (plr.color == Player[turnSkipPlayer].color\n        and self.is_face_down\n        and not allSkippersFlipped()\n        ) then\n        broadcastToAll(\"Skipping \" .. plr.steam_name .. \"'s turn.\", plr.color)\n        Wait.frames(skipTurn, 2)\n    end\nend\n\nfunction skipTurn()\n    Turns.turn_color = Turns.getNextTurnColor()\nend\n\nfunction allSkippersFlipped()\n    for _, skipper in pairs(getObjectsWithTag(\"Turn Skipper\")) do\n        if not skipper.is_face_down then\n            return false\n        end\n    end\n    printToAll('All turn skippers are flipped.')\n    return true\nend\n\nfunction getColor()\n    for _, color in pairs(Color.list) do\n        if self.hasTag(color) then\n            return color\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "c3cc14",
@@ -51424,8 +51409,7 @@
         "LoopingEffectIndex": 0
       },
       "LuaScript": "local turnSkipPlayer = nil\n\nfunction onLoad()\n    turnSkipPlayer = getColor()\n    -- log(self.getName() .. \" assigned to \" .. turnSkipPlayer)\n    self.setColorTint(turnSkipPlayer)\nend\n\n-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn\nfunction onPlayerTurn(plr)\n    -- log(\"plr.color: \" .. plr.color)\n    -- log(\"Player[turnSkipPlayer]: \".. tostring(Player[turnSkipPlayer].color))\n    if (plr.color == Player[turnSkipPlayer].color\n        and self.is_face_down\n        and not allSkippersFlipped()\n        ) then\n        broadcastToAll(\"Skipping \" .. plr.steam_name .. \"'s turn.\", plr.color)\n        Wait.frames(skipTurn, 2)\n    end\nend\n\nfunction skipTurn()\n    Turns.turn_color = Turns.getNextTurnColor()\nend\n\nfunction allSkippersFlipped()\n    for _, skipper in pairs(getObjectsWithTag(\"Turn Skipper\")) do\n        if not skipper.is_face_down then\n            return false\n        end\n    end\n    printToAll('All turn skippers are flipped.')\n    return true\nend\n\nfunction getColor()\n    for _, color in pairs(Color.list) do\n        if self.hasTag(color) then\n            return color\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "7aabf3",
@@ -51535,7 +51519,6 @@
       },
       "LuaScript": "----#include Eclipse\\pass_card\nlocal button_Pass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Pass for the rest of the round.\",\r\n    alignment = 3}\r\n\r\nlocal button_UnPass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Un-Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    rotation = {0,0,180},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Takes your marker off the turn tracker and tells everyone you didn't pass.\\n\\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.\",\r\n    alignment = 3}\r\n\r\nfunction onLoad()\r\n    setButton()\r\nend\r\n\r\nfunction onRotate(spin, flip, player_color, old_spin, old_flip)\r\n    removeAllButtons()\r\n    Wait.condition(\r\n        function ()\r\n            setButton()\r\n        end,\r\n        function ()\r\n            return self.resting\r\n        end)\r\nend\r\n\r\nfunction setButton()\r\n    if not self.is_face_down then\r\n        createPassButton()\r\n    else\r\n        createUnPassButton()\r\n    end\r\nend\r\n\r\nfunction flipThis()\r\n    if not self.is_face_down then\r\n        Turns.turn_color = Turns.getNextTurnColor()\r\n    end\r\n    self.setLock(false)\r\n    self.flip()\r\nend\r\n\r\nfunction createPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_Pass)\r\nend\r\n\r\nfunction createUnPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_UnPass)\r\nend\r\n\r\nfunction removeAllButtons()\r\n    local buttons = self.getButtons()\r\n    if buttons == nil then return end\r\n\r\n    for _, button in ipairs(buttons) do\r\n        -- remove the button and pop from the table\r\n        self.removeButton(button.index)\r\n    end\r\nend\r\n\n----#include Eclipse\\pass_card",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -54108,8 +54091,7 @@
         "LoopingEffectIndex": 0
       },
       "LuaScript": "local turnSkipPlayer = nil\n\nfunction onLoad()\n    turnSkipPlayer = getColor()\n    -- log(self.getName() .. \" assigned to \" .. turnSkipPlayer)\n    self.setColorTint(turnSkipPlayer)\nend\n\n-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn\nfunction onPlayerTurn(plr)\n    -- log(\"plr.color: \" .. plr.color)\n    -- log(\"Player[turnSkipPlayer]: \".. tostring(Player[turnSkipPlayer].color))\n    if (plr.color == Player[turnSkipPlayer].color\n        and self.is_face_down\n        and not allSkippersFlipped()\n        ) then\n        broadcastToAll(\"Skipping \" .. plr.steam_name .. \"'s turn.\", plr.color)\n        Wait.frames(skipTurn, 2)\n    end\nend\n\nfunction skipTurn()\n    Turns.turn_color = Turns.getNextTurnColor()\nend\n\nfunction allSkippersFlipped()\n    for _, skipper in pairs(getObjectsWithTag(\"Turn Skipper\")) do\n        if not skipper.is_face_down then\n            return false\n        end\n    end\n    printToAll('All turn skippers are flipped.')\n    return true\nend\n\nfunction getColor()\n    for _, color in pairs(Color.list) do\n        if self.hasTag(color) then\n            return color\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "4a5104",
@@ -54219,7 +54201,6 @@
       },
       "LuaScript": "----#include Eclipse\\pass_card\nlocal button_Pass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Pass for the rest of the round.\",\r\n    alignment = 3}\r\n\r\nlocal button_UnPass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Un-Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    rotation = {0,0,180},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Takes your marker off the turn tracker and tells everyone you didn't pass.\\n\\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.\",\r\n    alignment = 3}\r\n\r\nfunction onLoad()\r\n    setButton()\r\nend\r\n\r\nfunction onRotate(spin, flip, player_color, old_spin, old_flip)\r\n    removeAllButtons()\r\n    Wait.condition(\r\n        function ()\r\n            setButton()\r\n        end,\r\n        function ()\r\n            return self.resting\r\n        end)\r\nend\r\n\r\nfunction setButton()\r\n    if not self.is_face_down then\r\n        createPassButton()\r\n    else\r\n        createUnPassButton()\r\n    end\r\nend\r\n\r\nfunction flipThis()\r\n    if not self.is_face_down then\r\n        Turns.turn_color = Turns.getNextTurnColor()\r\n    end\r\n    self.setLock(false)\r\n    self.flip()\r\nend\r\n\r\nfunction createPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_Pass)\r\nend\r\n\r\nfunction createUnPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_UnPass)\r\nend\r\n\r\nfunction removeAllButtons()\r\n    local buttons = self.getButtons()\r\n    if buttons == nil then return end\r\n\r\n    for _, button in ipairs(buttons) do\r\n        -- remove the button and pop from the table\r\n        self.removeButton(button.index)\r\n    end\r\nend\r\n\n----#include Eclipse\\pass_card",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -56836,8 +56817,7 @@
         "LoopingEffectIndex": 0
       },
       "LuaScript": "local turnSkipPlayer = nil\n\nfunction onLoad()\n    turnSkipPlayer = getColor()\n    -- log(self.getName() .. \" assigned to \" .. turnSkipPlayer)\n    self.setColorTint(turnSkipPlayer)\nend\n\n-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn\nfunction onPlayerTurn(plr)\n    -- log(\"plr.color: \" .. plr.color)\n    -- log(\"Player[turnSkipPlayer]: \".. tostring(Player[turnSkipPlayer].color))\n    if (plr.color == Player[turnSkipPlayer].color\n        and self.is_face_down\n        and not allSkippersFlipped()\n        ) then\n        broadcastToAll(\"Skipping \" .. plr.steam_name .. \"'s turn.\", plr.color)\n        Wait.frames(skipTurn, 2)\n    end\nend\n\nfunction skipTurn()\n    Turns.turn_color = Turns.getNextTurnColor()\nend\n\nfunction allSkippersFlipped()\n    for _, skipper in pairs(getObjectsWithTag(\"Turn Skipper\")) do\n        if not skipper.is_face_down then\n            return false\n        end\n    end\n    printToAll('All turn skippers are flipped.')\n    return true\nend\n\nfunction getColor()\n    for _, color in pairs(Color.list) do\n        if self.hasTag(color) then\n            return color\n        end\n    end\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "471cf3",
@@ -56947,7 +56927,6 @@
       },
       "LuaScript": "----#include Eclipse\\pass_card\nlocal button_Pass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Pass for the rest of the round.\",\r\n    alignment = 3}\r\n\r\nlocal button_UnPass = {\r\n    click_function = \"flipThis\",\r\n    function_owner = self,\r\n    label = \"Un-Pass\",\r\n    position = {0, 0.0, 1.4},\r\n    rotation = {0,0,180},\r\n    scale = {0.5, 0.5, 0.5},\r\n    width = 1400,\r\n    height = 400,\r\n    font_size = 300,\r\n    tooltip = \"Takes your marker off the turn tracker and tells everyone you didn't pass.\\n\\nOnly do this if you made a mistake when passing. You may have to manually correct the positions of the markers on the turn tracker after doing this.\",\r\n    alignment = 3}\r\n\r\nfunction onLoad()\r\n    setButton()\r\nend\r\n\r\nfunction onRotate(spin, flip, player_color, old_spin, old_flip)\r\n    removeAllButtons()\r\n    Wait.condition(\r\n        function ()\r\n            setButton()\r\n        end,\r\n        function ()\r\n            return self.resting\r\n        end)\r\nend\r\n\r\nfunction setButton()\r\n    if not self.is_face_down then\r\n        createPassButton()\r\n    else\r\n        createUnPassButton()\r\n    end\r\nend\r\n\r\nfunction flipThis()\r\n    if not self.is_face_down then\r\n        Turns.turn_color = Turns.getNextTurnColor()\r\n    end\r\n    self.setLock(false)\r\n    self.flip()\r\nend\r\n\r\nfunction createPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_Pass)\r\nend\r\n\r\nfunction createUnPassButton()\r\n    removeAllButtons()\r\n    self.createButton(button_UnPass)\r\nend\r\n\r\nfunction removeAllButtons()\r\n    local buttons = self.getButtons()\r\n    if buttons == nil then return end\r\n\r\n    for _, button in ipairs(buttons) do\r\n        -- remove the button and pop from the table\r\n        self.removeButton(button.index)\r\n    end\r\nend\r\n\n----#include Eclipse\\pass_card",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -62485,8 +62464,7 @@
         "CastShadows": true
       },
       "LuaScript": "local TerranRedBox_GUID = '940641'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Terran Directorate',\r\n        tooltip = 'Select Terran Directorate',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = TerranRedBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Terran Directorate',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "6a67ed",
@@ -62535,8 +62513,7 @@
         "CastShadows": true
       },
       "LuaScript": "local EridaniBox_GUID = '8287d8'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Eridani Empire',\r\n        tooltip = 'Select Eridani Empire',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = EridaniBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Eridani Empire',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "8feca2",
@@ -62585,8 +62562,7 @@
         "CastShadows": true
       },
       "LuaScript": "local PlantaBox_GUID = 'fc4f8b'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Planta',\r\n        tooltip = 'Select Planta',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = PlantaBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Planta',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "870d43",
@@ -62635,8 +62611,7 @@
         "CastShadows": true
       },
       "LuaScript": "local TerranGreenBox_GUID = 'ff8243'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Terran Union',\r\n        tooltip = 'Select Terran Union',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = TerranGreenBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Terran Union',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "d51720",
@@ -62685,8 +62660,7 @@
         "CastShadows": true
       },
       "LuaScript": "local TerranBlueBox_GUID = '4809d2'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Terran Federation',\r\n        tooltip = 'Select Terran Federation',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = TerranBlueBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Terran Federation',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "f08bb7",
@@ -62735,8 +62709,7 @@
         "CastShadows": true
       },
       "LuaScript": "local HydranBox_GUID = '32b968'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Hydran Progress',\r\n        tooltip = 'Select Hydran Progress',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = HydranBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Hydran Progress',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "85cb7b",
@@ -62785,8 +62758,7 @@
         "CastShadows": true
       },
       "LuaScript": "local DescendantsBox_GUID = '47a278'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Descendants of Draco',\r\n        tooltip = 'Select Descendants of Draco',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = DescendantsBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Descendants of Draco',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "b66d80",
@@ -62835,8 +62807,7 @@
         "CastShadows": true
       },
       "LuaScript": "local TerranYellowBox_GUID ='7bf114'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Terran Republic',\r\n        tooltip = 'Select Terran Republic',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = TerranYellowBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Terran Republic',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "dc5ac7",
@@ -62885,8 +62856,7 @@
         "CastShadows": true
       },
       "LuaScript": "local TerranWhiteBox_GUID ='a998b6'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Terran Conglomerate',\r\n        tooltip = 'Select Terran Conglomerate',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = TerranWhiteBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Terran Conglomerate',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "0b0ea2",
@@ -62935,8 +62905,7 @@
         "CastShadows": true
       },
       "LuaScript": "local MechanemaBox_GUID = '8ae1e8'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Mechanema',\r\n        tooltip = 'Select Mechanema',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = MechanemaBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Mechanema',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "181176",
@@ -62985,8 +62954,7 @@
         "CastShadows": true
       },
       "LuaScript": "local OrionBox_GUID = 'ec15e1'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Orion Hegemony',\r\n        tooltip = 'Select Orion Hegemony',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = OrionBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Orion Hegemony',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "6072ba",
@@ -63035,8 +63003,7 @@
         "CastShadows": true
       },
       "LuaScript": "local TerranBlackBox_GUID = 'a7ad78'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Terran Alliance',\r\n        tooltip = 'Select Terran Alliance',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = TerranBlackBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Terran Alliance',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "15ce4a",
@@ -63085,8 +63052,7 @@
         "CastShadows": true
       },
       "LuaScript": "local MagellanGuardianBox_GUID ='8a6314'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Guardians of Magellan',\r\n        tooltip = 'Select Guardians of Magellan',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = MagellanGuardianBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Guardians of Magellan',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "189816",
@@ -63135,8 +63101,7 @@
         "CastShadows": true
       },
       "LuaScript": "local MagellanWardenBox_GUID ='aaf987'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Wardens of Magellan',\r\n        tooltip = 'Select Wardens of Magellan',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = MagellanWardenBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Wardens of Magellan',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "ee6fda",
@@ -63185,8 +63150,7 @@
         "CastShadows": true
       },
       "LuaScript": "local RhoIndiBox_GUID = '1bb918'\r\n\r\nfunction onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Select Rho Indi Syndicate',\r\n        tooltip = 'Select Rho Indi Syndicate',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    params = {\r\n      BoxGuid = RhoIndiBox_GUID,\r\n      PlayerColor = color,\r\n      FactionName = 'Rho Indi Syndicate',\r\n    }\r\n\r\n    if Global.call('basicSetup2', params) then\r\n      self.removeButton(0)\r\n      self.destruct()\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "8f4c6b",
@@ -63375,8 +63339,7 @@
         }
       },
       "LuaScript": "local toggleColors = {\r\n    [true] = Color.Green,\r\n    [false] = Color.Red\r\n}\r\n\r\nlocal rotaLabel = \"Rise of the Ancients\\nRaces\"\r\nlocal warpLabel = \"Fill empty space with\\nWarp Tiles\"\r\nlocal guardianLabel = \"Fill empty space with\\nGuardians\"\r\nlocal hybridLabel = \"Set Up for \\n2-Player Hybrid\"\r\nlocal hivesLabel = \"Include\\nAncient Hives\"\r\nlocal pyxisLabel = \"Include Pyxis Unity\"\r\nlocal lyraLabel = \"Include Lyra\"\r\n\r\nlocal switches = {\r\n    [rotaLabel] = true,\r\n    [hivesLabel] = false,\r\n    [warpLabel] = false,\r\n    [guardianLabel] = false,\r\n    [hybridLabel] = false,\r\n    [pyxisLabel] = true,\r\n    [lyraLabel] = false,\r\n}\r\n\r\nlocal toggleGroup_Fill = {warpLabel, guardianLabel, hybridLabel}\r\n\r\nlocal setupButton = {click_function = \"setupButtonFunc\", function_owner = self, label = \"Set Up Game\", position = {0, 0.300000011920929, 1.3}, scale = {0.1, 0.1, 0.1}, width = 7200, height = 1900, font_size = 800, color = {0.2692, 0.6029, 0.9843, 1}, tooltip = \"Set Up Game\"}\r\nlocal rotaButton = {click_function = \"rotaButtonFunc\", function_owner = self, label = rotaLabel, position = {-1.3, 0.3, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[rotaLabel]], tooltip = \"Make the first edition Rise of the Ancients races available to choose.\"}\r\n\r\nlocal warpButton = {click_function = \"warpButtonFunc\", function_owner = self, label = warpLabel, position = {-1.3, 0.3, -0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[warpLabel]], tooltip = \"Sets up the board with warp tiles connecting players.\"}\r\nlocal guardianButton = {click_function = \"guardianButtonFunc\", function_owner = self, label = guardianLabel, position = {-1.3, 0.3, -0.2}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[guardianLabel]], tooltip = \"Sets up the board with guardian tiles in spaces where there are no players.\"}\r\nlocal hybridButton = {click_function = \"hybridButtonFunc\", function_owner = self, label = hybridLabel, position = {-1.3, 0.300000011920929, 0.2}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[hybridLabel]], tooltip = \"Set Up for 2-Player Hybrid\"}\r\n\r\nlocal hivesButton = {click_function = \"hivesButtonFunc\", function_owner = self, label = hivesLabel, position = {1.3, 0.300000011920929, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[hivesLabel]], tooltip = \"Include Ancient Hives\"}\r\nlocal lyraButton = {click_function = \"lyraButtonFunc\", function_owner = self, label = lyraLabel, position = {0, 0.300000011920929, -0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[lyraLabel]], tooltip = \"Include Lyra\"}\r\nlocal pyxisButton = {click_function = \"pyxisButtonFunc\", function_owner = self, label = pyxisLabel, position = {0, 0.300000011920929, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[pyxisLabel]], tooltip = \"Include Pyxis Unity\"}\r\n\r\n\r\nfunction onload()\r\n    self.createButton(setupButton)\r\n    self.createButton(rotaButton)\r\n    self.createButton(warpButton)\r\n    self.createButton(guardianButton)\r\n    self.createButton(hivesButton)\r\n    -- self.createButton(hybridButton)\r\n    -- self.createButton(lyraButton)\r\n    self.createButton(pyxisButton)\r\nend\r\n\r\nfunction setupButtonFunc(obj, color, alt_click)\r\n    Global.setVar('useWarpTiles', switches[warpLabel])\r\n    log(Global.getVar('useWarpTiles'))\r\n    Global.setVar('useGuardians', switches[guardianLabel])\r\n    Global.setVar('useHives', switches[hivesLabel])\r\n\r\n    Global.call('setupFirstRound')\r\n    self.destruct()\r\nend\r\n\r\nfunction rotaButtonFunc(obj, color, alt_click)\r\n    local rotaObjects = {\r\n        '4fa947', '3c8a8f', 'c010ea', '15ce4a', '189816', 'ee6fda', '43f8f0',\r\n        'a6d2a7'\r\n    }\r\n    updateInterface(rotaLabel)\r\n    Global.call('set_rota_availability', switches[rotaLabel])\r\n    for _, obj in ipairs(rotaObjects) do\r\n        toggleHide(getObjectFromGUID(obj), switches[rotaLabel])\r\n    end\r\nend\r\n\r\nfunction hivesButtonFunc()\r\n    updateInterface(hivesLabel)\r\nend\r\n\r\nfunction lyraButtonFunc()\r\n    updateInterface(lyraLabel)\r\nend\r\n\r\nfunction pyxisButtonFunc()\r\n    updateInterface(pyxisLabel)\r\n    local factions = Global.getTable('factions')\r\n\r\n    for _, obj in ipairs({\r\n        factions['Pyxis Unity'].selector_button_GUID,\r\n        factions['Pyxis Unity'].race_board_GUID,\r\n    }) do\r\n        toggleHide(getObjectFromGUID(obj), switches[pyxisLabel])\r\n    end\r\nend\r\n\r\nfunction hybridButtonFunc()\r\n    broadcastToAll(\"Not implemented yet\")\r\n    toggleGroupMember(hybridLabel, toggleGroup_Fill)\r\nend\r\n\r\nfunction warpButtonFunc()\r\n    toggleGroupMember(warpLabel, toggleGroup_Fill)\r\nend\r\n\r\nfunction guardianButtonFunc()\r\n    toggleGroupMember(guardianLabel, toggleGroup_Fill)\r\nend\r\n\r\nfunction toggleGroupMember(label, group)\r\n    for _, button in ipairs(group) do\r\n        if button ~= label then updateInterface(button, false) end\r\n    end\r\n    updateInterface(label)\r\nend\r\n\r\nfunction updateInterface(label, pressed)\r\n    local btns = self.getButtons()\r\n\r\n    if pressed ~= nil then\r\n        switches[label] = pressed\r\n    else\r\n        switches[label] = not switches[label]\r\n    end\r\n\r\n    for i, btn in pairs(btns) do\r\n        if btn.label == label then\r\n            self.editButton({\r\n                index = btn.index,\r\n                color = toggleColors[switches[label]]\r\n            })\r\n        end\r\n    end\r\n\r\nend\r\n\r\nfunction toggleHide(obj, show)\r\n    if obj == nil then return end\r\n    if not show then\r\n        -- obj.setInvisibleTo(getColors())\r\n        obj.setInvisibleTo({\"Blue\", \"White\", \"Red\", \"Yellow\", \"Green\", 'Purple'})\r\n    else\r\n        obj.setInvisibleTo({})\r\n    end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "a6d2a7",
@@ -67051,8 +67014,7 @@
         "CastShadows": true
       },
       "LuaScript": "function onload ()\r\n    self.createButton({\r\n        click_function = 'onClick',\r\n        label = 'Random Race',\r\n        tooltip = 'Selects a random race from among the vailable choices. Humans will only be considered once.',\r\n        function_owner = self,\r\n        position = {0, -0.05, 0},\r\n        rotation = {0, 0, 180},\r\n        width = 1100,\r\n        height = 1100,\r\n        font_size = 40,\r\n        color = {0.7573, 0.7573, 0.7573, 0},\r\n    })\r\n\r\n    self.createButton({\r\n        click_function = \"onClick\",\r\n        function_owner = self,\r\n        label = \"Random Race\",\r\n        tooltip = 'Selects a random race from among the vailable choices. Humans will only be considered once.',\r\n        position = {0, -0.1, 4.1},\r\n        rotation = {0, 90, 180},\r\n        scale = {0.5, 0.5, 0.5},\r\n        width = 5300, height = 1200,\r\n        font_size = 1100,\r\n        color = {0.8345, 0.8345, 0.8345, 1},\r\n        alignment = 2\r\n    })\r\nend\r\n\r\n\r\nfunction onClick(obj, color, alt_click)\r\n    if alt_click == true then return true end\r\n\r\n    -- params = {PlayerColor = color}\r\n    Global.call('select_random_race', color)\r\n    -- if Global.call('select_random_race', color) then\r\n      -- self.destruct()\r\n    -- end\r\nend",
-      "LuaScriptState": "",
-      "XmlUI": ""
+      "LuaScriptState": ""
     },
     {
       "GUID": "ac4050",
@@ -67159,7 +67121,6 @@
       },
       "LuaScript": "number = 212\r\nreputation = 2\r\nartifact = false\r\nancients = 3\r\ndiscovery = true\r\nguardian = false\r\nwarp = false\r\nmoney = {}\r\nmaterials = {{0.493323638465483, 0.349860340356827, 1.74992764825043},}\r\nscience = {{-1.26072121402905, 0.349703073501587, -2.11040762239463},}\r\nadv_money = {{1.21516125269227, 0.349217683076859, -1.70555098517508},}\r\nadv_materials = {{1.38757269785569, 0.34935861825943, 1.76286793184147},}\r\nadv_science = {}\r\nneutral = {}\r\nadv_neutral = {}",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {
@@ -67271,7 +67232,6 @@
       },
       "LuaScript": "number = 319\r\nreputation = 2\r\nartifact = false\r\nancients = 3\r\ndiscovery = true\r\nguardian = false\r\nwarp = false\r\nmoney = {}\r\nmaterials = {{0.586306440309116, 0.350068211555481, -1.7958745183916},}\r\nscience = {{-1.18624835359061, 0.349577575922012, 1.29308775074017},}\r\nadv_money = {{1.20400266065394, 0.349200844764709, 1.97036687468622},}\r\nadv_materials = {{1.48624139155316, 0.350008726119995, -1.78973200818535},}\r\nadv_science = {}\r\nneutral = {}\r\nadv_neutral = {}",
       "LuaScriptState": "",
-      "XmlUI": "",
       "AttachedSnapPoints": [
         {
           "Position": {

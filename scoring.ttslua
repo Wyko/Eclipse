@@ -318,7 +318,6 @@ function getPointsForExileOrbitals()
     return points
 end
 
--- TODO: Add starbase tag to ships
 function getPointsForPyxisStarbases()
     -- Only score if Pyxis is present
     local c = ownerOfRace('Pyxis Unity')
