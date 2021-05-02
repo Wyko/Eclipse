@@ -33,7 +33,7 @@ function scoreGame(color, printOut)
     _score(getPointsForExileOrbitals(), 'Exiles Orbitals')
     _score(getPointsForPyxisStarbases(), 'Pyxis Starbases')
 
-    if getCurrentRound() >= 8 then
+    if getCurrentRound() >= 8 and allPlayersPassed() then
         _score(getPointsForReputation(), 'Reputation Tiles')
     else
         printToColor('Not scoring reputation due to hidden info.', color)
