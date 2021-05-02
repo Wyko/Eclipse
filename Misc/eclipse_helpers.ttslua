@@ -1,0 +1,89 @@
+function getOwnerOfHex(hex)
+    -- Returns the color of the owner of a given hex
+
+    -- Gets the hex if a GUID was supplied
+    hex = getObject(hex)
+
+    -- Error checking to make sure the hex is valid
+    verify_hex(hex)
+
+    local discs = castBoxAndCheck(hex, nil, 'Influence')
+
+    -- More error checking
+    if discs == nil or next(discs) == nil then return nil end
+    verify_number_of_influence_on_hex(hex, discs)
+
+    -- Get the owner of the disc from its color
+    if verify_influence_disc(discs[1]) then
+        local c = discs[1].getColorTint()
+        return c:toString()
+    else
+        return nil
+    end
+end
+
+function getControlledHexes(color)
+    local table_objects = getInfluenceDiscsOnHexes()
+    local owned_hexes = {}
+
+    for _, disc in ipairs(table_objects) do
+        -- Get the owner of the disc from its color
+        local c = disc.getColorTint()
+        c = c:toString()
+
+        if c == color then
+            -- Get the hex under the influence disc
+            local hex = castAndCheckForTag(disc.getPosition(), 'hex')
+            if hex ~= nil then
+                owned_hexes[hex] = true
+            end
+        end
+    end
+
+    return owned_hexes
+end
+
+function getCurrentRound()
+    local round = tonumber(RoundMarker.getDescription())
+    return round
+end
+
+function getInfluenceDiscsOnHexes()
+    local discs = getItemsInZone{zone   = TableZone,
+                                 name   = 'Influence Disc',
+                                 tag    = 'Influence'}
+    local results = {}
+
+    for _, disc in ipairs(discs) do
+        if verify_influence_disc(disc) then
+            table.insert(results, disc)
+        end
+    end
+
+    return results
+end
+
+function getObjectsInRepZone(args)
+    -- Returns  objects in the reputation zone on a player board with the gvien
+    -- name or tag
+
+    local castResult = Physics.cast({
+        origin = args.board.positionToWorld(vector(-1.627953, 0.2093751, 0.3211277)) + vector(0,-2,0),
+        direction= vector(0,1,0),
+        type = 3,
+        size = vector(2,1,9),
+        orientation  = vector(0,1,0),
+        max_distance = 4,
+        debug = DEBUG,})
+
+    return objectsHitByCast(castResult, args.name, args.tag)
+end
+
+function ownerOfRace(race)
+    for color, r in pairs(PlayerRace) do
+        if r == race then
+            return color
+        end
+    end
+    return nil
+end

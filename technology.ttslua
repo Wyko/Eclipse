@@ -104,15 +104,8 @@ function removeButtonFromTechTile(zone, tile)
     if (not tile.hasTag('Tech Tile') or zone.getGUID() ~= TechTileZone_GUID) then
       return false
     end
-    local techType = string.sub(tile.getDescription(),1,1)
-    if techType == 'R' then
-        return false
-    end
 
-    -- if not obj.getButtons() then return false end
-    for _, button in pairs(tile.getButtons()) do
-        tile.removeButton(button.index)
-    end
+    removeAllButtons(tile)
 end
 
 function acquireTech(tile, color)

@@ -158,7 +158,7 @@ function objHasAttribute(args)
     --    obj: The object to check for attributes
     --
     -- Optional Args (At least one is required)
-    --    name
+    --    name (string): Checks if object has the specified name
     --    tag (string): Checks if object has the specified tag
     --    guid: Checks if object matches the specified GUID
 
@@ -167,7 +167,7 @@ function objHasAttribute(args)
 
     if (
         args.obj.getName() == args.name or
-        (args.tag ~= nil and args.obj.hasTag(tag))
+        (args.tag ~= nil and args.obj.hasTag(args.tag))
         ) then
         return true
     end
@@ -237,7 +237,6 @@ function debugAssert(...)
 end
 
 
-
 function onObjectNumberTyped(object, player_color, number)
     if object == ReputationBag and number > 5 then
         broadcastToColor(
@@ -247,6 +246,42 @@ function onObjectNumberTyped(object, player_color, number)
     end
 end
 
--- function onObjectNumberTyped(object, player_color, number)
---     broadcastToAll(player_color .. " typed " .. number .. " whilst hovering over a " .. object.type)
--- end
+function getObject(objOrGUID)
+    -- Given either an object or a GUID, return an object or return nil
+
+    if type(objOrGUID) == 'string' then
+        -- Get the object if a GUID was supplied
+        return getObjectFromGUID(objOrGUID)
+
+    elseif type(objOrGUID) == 'userdata' then
+        -- Return the object if one was supplied
+        return objOrGUID
+
+    else
+        log('Error: Invalid object: '..tostring(objOrGUID), 'getObject')
+        return nil
+    end
+end
+
+function hasFunction(obj, funcName)
+    -- Verifies whether a given object contains a function with the given name
+
+    obj = getObject(obj)
+    assert(type(funcName) == 'string')
+    assert(obj ~= nil)
+
+    local func = obj.getVar(funcName)
+    if type(func) ~= 'function' then return false end
+    return true
+end
+
+function removeAllButtons(obj)
+    -- Removes all buttons on an object
+
+    local buttons = obj.getButtons()
+    if buttons == nil then return end
+
+    for _, button in ipairs(buttons) do
+        obj.removeButton(button.index)
+    end
+end

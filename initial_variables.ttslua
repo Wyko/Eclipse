@@ -15,11 +15,13 @@ local GCDSSpot = {2.38, 1.15, -0.01}
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
 local pop_cube_bag_GUID = '8b1da0'
+local a_and_disc_bag_GUID = '0eff17'
+local orbitals_bag_GUID = 'f04483'
 
-local cruiser_bag_bag_GUID = '7cd256'
-local interceptor_bag_bag_GUID = '78404b'
-local dread_bag_bag_GUID = 'f68d6c'
-local starbase_bag_bag_GUID = '5c1125'
+local cruiser_bag_bag_GUID = '402516'
+local interceptor_bag_bag_GUID = 'dd7301'
+local dread_bag_bag_GUID = '6d8ec7'
+local starbase_bag_bag_GUID = 'bf2b77'
 local cruiser_bag_bag = nil
 local interceptor_bag_bag = nil
 local dread_bag_bag = nil
@@ -27,7 +29,6 @@ local starbase_bag_bag = nil
 
 local hive_sector_2_GUID = '0387a0'
 local hive_sector_3_GUID = '545ff9'
-
 
 RoundMarker = nil
 local TechBag = nil
@@ -1156,6 +1157,24 @@ local PlayerMarkers = {
     Purple = nil
 }
 
+local player_ad_board = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local extra_bag_GUID = {
+    White = '86d7bb',
+    Yellow = '585779',
+    Red = '173754',
+    Green = '0868fd',
+    Blue = 'bc00b9',
+    Purple = '3a5eaa'
+}
+
 local materialsResourceMarker_GUID = '1f8225'
 local scienceResourceMarker_GUID = 'f83ba1'
 local moneyResourceMarker_GUID = '500402'
@@ -1392,4 +1411,6 @@ function loadObjects()
     interceptor_bag_bag = getObjectFromGUID(interceptor_bag_bag_GUID)
     dread_bag_bag = getObjectFromGUID(dread_bag_bag_GUID)
     starbase_bag_bag = getObjectFromGUID(starbase_bag_bag_GUID)
+    a_and_disc_bag = getObjectFromGUID(a_and_disc_bag_GUID)
+    orbitals_bag = getObjectFromGUID(orbitals_bag_GUID)
 end

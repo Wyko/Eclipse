@@ -1,72 +1,351 @@
-function scoreGame()
-    local hex_points = getPointsForControlledHexes()
-    local discovery_points = getPointsForDiscoveryTiles()
-end
+function scoreGame(color, printOut)
+    printOut = printOut or true
+    local fullString = ''
+    local total = {}
 
-function getInfluenceDiscsOnHexes()
-    return getItemsInZone{zone= TableZone, name='Influence Disc'}
-end
-
-function getControlledHexes(color)
-    local table_objects = getInfluenceDiscsOnHexes()
-    local owned_hexes = {}
-
-    for _, disc in ipairs(table_objects) do
-
-        -- Get the owner of the disc from its color
-        local c = disc.getColorTint()
-        c = c:toString()
-
-        if c == color then
-            -- Get the hex under the influence disc
-            local hex = castAndCheckForTag(disc.getPosition(), 'hex')
-            if hex ~= nil then
-                table.insert(owned_hexes, {obj= hex, owner = c})
-            end
+    function _score(t, source)
+        if t == nil or next(t) == nil then return end
+        local printString = source .. ': '
+        for c, points in pairs(t) do
+            if total[c] == nil then total[c] = 0 end
+            printString = printString .. c..': '..tostring(points)..', '
+            total[c] = total[c] + points
         end
+        if printOut then printToColor(printString, color) end
+        fullString = fullString .. '\n' .. printString
     end
 
-    return owned_hexes
+    if ownerOfRace('Descendants of Draco') ~= nil then
+        printToColor(ojText('Note for Draco: ') ..
+        'The scoring script scores ancient ship models AND tiles. In order ' ..
+        'to not score double points for Draco, please use only one type of '..
+        'object (ship model or tile) on each hex with ancients on it.', color)
+    end
+
+    _score(getPointsForControlledHexes(), 'Hexes')
+    _score(getPointsForDiscoveryTiles(), 'Discovery Tiles')
+    _score(getPointsForTech(), 'Technologies')
+    _score(getPointsForMonoliths(), 'Monoliths')
+    _score(getPointsForAmbassadors(), 'Ambassadors')
+    _score(getPointsForMinorSpecies(), 'Minor Species')
+    _score(getPointsForWarpTokens(), 'Warp Tokens')
+    _score(getPointsForAncients(), 'Draco Ancients')
+    _score(getPointsForExileOrbitals(), 'Exiles Orbitals')
+    _score(getPointsForPyxisStarbases(), 'Pyxis Starbases')
+
+    if getCurrentRound() >= 8 and allPlayersPassed() then
+        _score(getPointsForReputation(), 'Reputation Tiles')
+    else
+        printToColor('Not scoring reputation due to hidden info.', color)
+    end
+
+
+    local totalString = '\nTotal Points:\n'
+
+    for c, t in pairs(total) do
+        local name = ''
+        if Player[c].seated then name = Player[c].steam_name .. ', ' end
+        totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
+            ' ('.. name ..PlayerRace[c]..'): '..tostring(t)..'\n'
+    end
+    if printOut then printToColor(totalString, color) end
+
+    if allPlayersPassed() and (getCurrentRound() >= 8) then
+        Notes.setNotes(totalString .. '\n' .. fullString)
+    end
+
+    return total
 end
 
 function getPointsForControlledHexes()
-    local table_objects = getInfluenceDiscsOnHexes()
+    local discs = getInfluenceDiscsOnHexes()
 
-    local player_points = {}
+    local points = {}
+    local scored_hexes = {}
 
-    for _, disc in ipairs(table_objects) do
+    for _, disc in ipairs(discs) do
 
         -- Get the hex under the influence disc
         local hex = castAndCheckForTag(disc.getPosition(), 'hex')
-        if hex ~= nil then
+        if hex ~= nil and scored_hexes[hex] == nil then
+
+            -- Stop from duplicating hex scoring
+            scored_hexes[hex] = true
 
             -- Get the owner of the disc from its color
             local c = disc.getColorTint()
             c = c:toString()
 
             -- Score the hex
-            if player_points[c] == nil then player_points[c] = 0 end
+            if points[c] == nil then points[c] = 0 end
             local rep = hex.getVar('reputation')
             assert(rep~=nil, 'Hex ['..hex.getDescription()..'] has no VP data.' )
 
+            -- Score Planta
+            if PlayerRace[c] == 'Planta' then points[c] = points[c] + 1 end
+
             -- Add the points to the owner's score
-            player_points[c] = player_points[c] + rep
+            points[c] = points[c] + rep
         end
     end
 
-    log(player_points)
-    return player_points
+    return points
 end
 
 function getPointsForDiscoveryTiles()
-    for color, t in pairs(TableGUIDs) do
+    local points = {}
+
+    -- Search each player's table for discovery tiles and score them
+    for c, t in pairs(TableGUIDs) do
         local results = castBoxAndCheck(t, nil, 'Discovery Tile')
         for _, tile in pairs(results) do
-            if tile.is_face_down then
-                if player_points[c] == nil then player_points[c] = 0 end
-                printToAll(tile.getName() .. ' is worth 2 points')
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + scoreDiscoveryTile(tile, c)
+        end
+    end
+
+    return points
+end
+
+function scoreDiscoveryTile(tile, color)
+    -- Error Checking
+    assert(tile.hasTag('Discovery Tile'))
+
+    local score = 0
+
+    -- Score unused discoveries
+    if tile.is_face_down then
+        return 2
+
+    -- Score Magellan
+    elseif PlayerRace[color] ~= nil and
+           string.find(PlayerRace[color], 'Magellan') then
+        score = score + 1
+    end
+
+    -- Check if the discovery tile has a custom function for points
+    if hasFunction(tile, 'reputation_func') then
+        score = score + tile.call('reputation_func', color)
+    end
+
+    return score
+end
+
+function getPointsForTech()
+    local points = {}
+    local all_boards = getAllPlayerBoards()
+    if all_boards == nil then return {} end
+
+    for c, board in pairs(all_boards) do
+        for _, t in ipairs({"Red", "Green", "Yellow"}) do
+            local space = nextFreeTechSpace(t, board)
+
+            -- Initialize the table
+            if space == nil or space >= 5 then
+                if points[c] == nil then points[c] = 0 end
+            end
+
+            if     space == nil then points[c] = points[c] + 5
+            elseif space == 7 then points[c] = points[c] + 3
+            elseif space == 6 then points[c] = points[c] + 2
+            elseif space == 5 then points[c] = points[c] + 1
             end
         end
-        log(results, 'getPointsForDiscoveryTiles:results')
     end
+
+    return points
+end
+
+function getPointsForMonoliths()
+    local monoliths = getItemsInZone{zone= TableZone, name='Monolith'}
+    local points = {}
+
+    for _, m in ipairs(monoliths) do
+        -- Get the hex under the monolith
+        local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
+        -- Score the monolith based on the owner of the hex
+        if hex ~= nil then
+            local c = getOwnerOfHex(hex)
+            if c ~= nil and points[c] == nil then points[c] = 0 end
+            if c ~= nil then points[c] = points[c] + 3 end
+        end
+    end
+
+    return points
+end
+
+function getPointsForReputation()
+    local points = {}
+
+    -- Search each player's table for discovery tiles and score them
+    for c, _ in pairs(TableGUIDs) do
+        local rep = scoreReputation(c)
+        if rep > 0 then points[c] = rep end
+    end
+
+    return points
+end
+
+function scoreReputation(color)
+    local t = TableGUIDs[color]
+    local points = 0
+    local results = castBoxAndCheck(t, nil, 'Rep Tile')
+
+    for _, tile in pairs(results) do
+        points = points + tile.getVar('reputation')
+    end
+    return points
+end
+
+function getPointsForAmbassadors()
+    local points = {}
+    local all_boards = getAllPlayerBoards()
+    if all_boards == nil then return {} end
+
+    for c, board in pairs(all_boards) do
+        local results = getObjectsInRepZone{board= board, tag= 'Ambassador'}
+        if results ~= nil then
+            for _, a in pairs(results) do
+                if points[c] == nil then points[c] = 0 end
+                points[c] = points[c] + 1
+            end
+        end
+    end
+
+    return points
+end
+
+function getPointsForWarpTokens()
+
+    local warps = {
+        ['warpDiscovery'] = {['obj'] = getObjectFromGUID('75a159'), ['points'] = 2},
+        ['warpTech']      = {['obj'] = getObjectFromGUID('0ed41c'), ['points'] = 1}
+    }
+
+    local points = {}
+
+    for _, tile in pairs(warps) do
+        if tile.obj ~= nil then
+            -- Get the hex under the token
+            local hex = castAndCheckForTag(tile.obj.getPosition(), 'hex')
+
+            -- Score the token based on the owner of the hex
+            if hex ~= nil then
+                local c = getOwnerOfHex(hex)
+                if c ~= nil and points[c] == nil then points[c] = 0 end
+                if c ~= nil then points[c] = points[c] + tile.points end
+            end
+        end
+    end
+
+    return points
+end
+
+function getPointsForAncients()
+    -- Only score if Draco is present
+    local c = nil
+    for color, race in pairs(PlayerRace) do
+        if race == 'Descendants of Draco' then
+            c = color
+            break
+        end
+    end
+    if c == nil then return {} end
+
+    local ancients = getItemsInZone{zone= TableZone, tag='Ancient'}
+    local points = {}
+
+    for _, m in ipairs(ancients) do
+        -- Get the hex under the ancient
+        local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
+        -- Score the ancient
+        if hex ~= nil then
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + 1
+        end
+    end
+
+    return points
+end
+
+function getPointsForMinorSpecies()
+    local points = {}
+    local all_boards = getAllPlayerBoards()
+    if all_boards == nil then return {} end
+
+    for c, board in pairs(all_boards) do
+        local results = getObjectsInRepZone{board= board, tag= 'Minor Species'}
+        if results ~= nil then
+            for _, tile in pairs(results) do
+                if points[c] == nil then points[c] = 0 end
+
+                -- Get a special function if it has one
+                if hasFunction(tile, 'reputation_func') then
+                    local _p = tile.call('reputation_func', {color= c, board= board})
+                    if _p ~= nil then points[c] = points[c] + _p end
+                end
+
+                -- Get any saved reputation
+                local rep = tile.getVar('reputation')
+                if rep ~= nil then points[c] = points[c] + rep end
+            end
+        end
+    end
+
+    return points
+end
+
+function getPointsForExileOrbitals()
+    -- Only score if Exiles are present
+    local c = ownerOfRace('Exiles')
+    if c == nil then return {} end
+
+    local orbitals = getItemsInZone{zone= TableZone, tag='Orbital'}
+    local points = {}
+
+    for _, m in ipairs(orbitals) do
+        -- Get the hex under the orbital
+        local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
+
+        -- Check if Exiles own the hex
+        if hex ~= nil and getOwnerOfHex(hex) == c then
+
+            -- Score the orbital
+            if points[c] == nil then points[c] = 0 end
+            points[c] = points[c] + 1
+        end
+    end
+
+    return points
+end
+
+function getPointsForPyxisStarbases()
+    -- Only score if Pyxis is present
+    local c = ownerOfRace('Pyxis Unity')
+    if c == nil then return {} end
+
+    local starbases = getItemsInZone{zone= TableZone, tag='Starbase'}
+    local points = {}
+
+    for _, m in ipairs(starbases) do
+
+        -- Check if Pyxis owns the ship
+        local ownerColor = m.getColorTint():toString()
+        if ownerColor == c then
+            -- Only score it if it's deployed onto a hex
+            local hex = castAndCheckForTag(m.getPosition(), 'hex')
+            if hex ~= nil then
+
+                -- Score the starbase
+                if points[c] == nil then points[c] = 0 end
+                points[c] = points[c] + 4
+            end
+        end
+
+    end
+
+    return points
 end

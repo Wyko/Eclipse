@@ -50,6 +50,7 @@ function flipThis()
     if not self.is_face_down then
         Turns.turn_color = Turns.getNextTurnColor()
     end
+    self.setLock(false)
     self.flip()
 end
 

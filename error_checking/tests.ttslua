@@ -1,0 +1,8 @@
+#include hex_tests
+#include influence_tests
+
+function alert(msg, objToHighlight)
+    objToHighlight.highlightOn(Color.Orange, 15)
+    if DEBUG then error(msg)
+    else broadcastToAll(msg, Color.Orange) end
+end

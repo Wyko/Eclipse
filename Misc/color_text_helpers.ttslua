@@ -1,0 +1,3 @@
+function ojText(txt)
+    return "[" .. Color.Orange:toHex() .. ']' .. txt .. '[-]'
+end

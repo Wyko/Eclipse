@@ -16,10 +16,17 @@ DEBUG = false
 #include console++
 #include scoring
 #include debugging
+#include initial_draft
+#include load_game
 
 -- Factions
 #include Factions\pyxis
 
---Misc Functions
+-- Misc Functions
 #include Misc\cast_helpers
 #include Misc\general_helpers
+#include Misc\eclipse_helpers
+#include Misc\color_text_helpers
+
+-- Error Checking
+#include error_checking\tests

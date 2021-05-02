@@ -28,20 +28,33 @@ function nextRound()
 
     end
     removeDamageCubes()
+    lockHexesOrbitalsMonoliths()
     unflipColonyAndSkippers()
     TechBag.shuffle()
     techsToDraw = newTechs
-    startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)
+    startLuaCoroutine(Global, 'drawMultipleTechs')
     if round > 1 then
         Wait.time(function ()
             updateTurnOrder()
             moveAllPassMarkersOffBoard()
-        end, 2)
+        end, 4)
     end
 end
 
+-- TODO: Specify which hexes to lock
+function lockHexesOrbitalsMonoliths()
+    local objects = getObjectsWithAnyTags{
+        'Monolith',
+        'Orbital',
+        'Hex'
+    }
+
+    for _, obj in ipairs(objects) do
+        obj.setLock(true)
+    end
+end
 
 function advanceRoundMarker(round)
     -- Move the round token and annouce --
