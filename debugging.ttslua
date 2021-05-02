@@ -1,6 +1,6 @@
 function makeDebugButton()
-    local tooltip= "This is a debug button. You really shouldn't be seeing this."
-    local data = {click_function = "debugButton", function_owner = self, label = "Score", position = {3.5, 0.2, 3.6}, scale = {0.5, 0.5, 0.5}, width = 2000, height = 400, font_size = 400}
+    local tooltip= "Score the game and print the results to chat. Reputation will only be scored at the end of the game."
+    local data = {click_function = "debugButton", tooltip=tooltip, function_owner = self, label = "Score", position = {3.5, 0.2, 3.6}, scale = {0.5, 0.5, 0.5}, width = 2000, height = 600, font_size = 400}
     local board = getObjectFromGUID('48e151')
     assert(board ~= nil)
     board.createButton(data)
