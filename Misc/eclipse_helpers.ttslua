@@ -10,7 +10,7 @@ function getOwnerOfHex(hex)
     local discs = castBoxAndCheck(hex, nil, 'Influence')
 
     -- More error checking
-    if discs == nil then return nil end
+    if discs == nil or next(discs) == nil then return nil end
     verify_number_of_influence_on_hex(hex, discs)
 
     -- Get the owner of the disc from its color

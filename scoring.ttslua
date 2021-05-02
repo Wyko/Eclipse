@@ -41,9 +41,12 @@ function scoreGame(color, printOut)
 
 
     local totalString = '\nTotal Points:\n'
+
     for c, t in pairs(total) do
+        local name = ''
+        if Player[c].seated then name = Player[c].steam_name .. ', ' end
         totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
-            ' ('..Player[c].steam_name..', '..PlayerRace[c]..'): '..tostring(t)..'\n'
+            ' ('.. name ..PlayerRace[c]..'): '..tostring(t)..'\n'
     end
     if printOut then printToColor(totalString, color) end
 
@@ -305,6 +308,7 @@ function getPointsForExileOrbitals()
     for _, m in ipairs(orbitals) do
         -- Get the hex under the orbital
         local hex = castAndCheckForTag(m.getPosition(), 'hex')
+
 
         -- Check if Exiles own the hex
         if hex ~= nil and getOwnerOfHex(hex) == c then

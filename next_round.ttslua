@@ -28,6 +28,7 @@ function nextRound()
 
     end
     removeDamageCubes()
+    lockHexesOrbitalsMonoliths()
     unflipColonyAndSkippers()
     TechBag.shuffle()
     techsToDraw = newTechs
@@ -42,6 +43,18 @@ function nextRound()
     end
 end
 
+-- TODO: Specify which hexes to lock
+function lockHexesOrbitalsMonoliths()
+    local objects = getObjectsWithAnyTags{
+        'Monolith',
+        'Orbital',
+        'Hex'
+    }
+
+    for _, obj in ipairs(objects) do
+        obj.setLock(true)
+    end
+end
 
 function advanceRoundMarker(round)
     -- Move the round token and annouce --
