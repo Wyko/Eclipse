@@ -168,7 +168,7 @@ function basicSetup2(parameters)
     assert(Box.getPosition() ~= nil)
     assert(faction.numStartingInfluence ~= nil)
 
-    faction.available = false
+    factions[FactionName].available = false
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
