@@ -19,7 +19,6 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
     -- If no spot is specified, the next available spot is used.
     -- tech can be a techName (to be searched from the bag) or an Object
 
-
     spot = spot or nextFreeTechSpace(trackColor, board)
     if not spot then
         broadcastToColor(
@@ -37,7 +36,9 @@ function putTechOnTrack(tech, trackColor, board, spot, lock)
     log(type(tech), 'putTechOnTrack:type(tech)')
     if type(tech) == 'string' then
         log('Preparing clone', 'putTechOnTrack')
-        SeekAndClone(tech, TechBag_GUID, finalPos, board.getRotation(), lock)
+
+        -- Draw the techs from the extra tech bag
+        SeekAndClone(tech, scriptTechBag_GUID, finalPos, board.getRotation(), lock)
 
     elseif tech.tag == "Chip" and tech.getQuantity() > 1 then
         -- If we're supplied an actual object, then just move it

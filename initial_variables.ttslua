@@ -30,6 +30,9 @@ local starbase_bag_bag = nil
 local hive_sector_2_GUID = '0387a0'
 local hive_sector_3_GUID = '545ff9'
 
+local scriptTechBag_GUID = '1bac99'
+local scriptTechBag = nil
+
 RoundMarker = nil
 local TechBag = nil
 local ReputationBag = nil
@@ -1498,4 +1501,5 @@ function loadObjects()
     discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
     warpBag = getObjectFromGUID('257134')
     colonyShipBag = getObjectFromGUID(colonyShipBag_GUID)
+    scriptTechBag = getObjectFromGUID(scriptTechBag_GUID)
 end
