@@ -11,7 +11,7 @@ function nextRound()
 
     -- Get the number of thechs from the player boards rather than seated
     -- players, in case someone leaves or it's a play-by-mail game
-    local players = #getAllPlayerBoards()
+    local players = tableLen(getAllPlayerBoards())
     local newTechs = players + 3
 
     local round = tonumber(RoundMarker.getDescription()) + 1

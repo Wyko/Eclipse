@@ -339,7 +339,7 @@ end
 
 function getAllPlayerBoards()
     -- Returns a table of all player boards in the form of {color = object}
-    
+
     local results = {}
 
     -- Go through each player board zone
