@@ -52,7 +52,6 @@ function fillWithWarp()
             rotation = Vector(359.82, 0.01, 359.68),
         },
     }
-    local warpBag = getObjectFromGUID('257134')
 
     for _, color in ipairs(possibleColors) do
         local found = false
@@ -62,16 +61,18 @@ function fillWithWarp()
             end
         end
 
-        if not found then
-            warpBag.takeObject({
-                position = warpSpots[color].position,
-                rotation = warpSpots[color].rotation,
-                callback_function = function (obj)
-                    obj.setLock(true)
-                end
-            })
-        end
+        if not found then placeWarpTile(warpSpots[color]) end
     end
+end
+
+function placeWarpTile(spot)
+    warpBag.takeObject({
+        position = spot.position,
+        rotation = spot.rotation,
+        callback_function = function (obj)
+            obj.setLock(true)
+        end
+    })
 end
 
 function fillWithGuardians()
@@ -118,6 +119,12 @@ function fillWithGuardians()
         if not found then placeGuardianTile(GuardiansSpots[color]) end
     end
 end
+
+
+
+-- function setupHybridTwoPlayer()
+--
+-- end
 
 function placeGuardianTile(spot)
     guardianBag.takeObject({

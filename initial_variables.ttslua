@@ -1394,6 +1394,7 @@ local HomeworldLocations = {
 local guardianBag = nil
 local guardianModelBag = nil
 local discoveryBag = nil
+local warpBag = nil
 
 function loadObjects()
     Rare_Technologies_board = getObjectFromGUID(Rare_Technologies_board_GUID)
@@ -1420,4 +1421,5 @@ function loadObjects()
     guardianBag = getObjectFromGUID('54fe91')
     guardianModelBag = getObjectFromGUID('19e48c')
     discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
+    warpBag = getObjectFromGUID('257134')
 end
