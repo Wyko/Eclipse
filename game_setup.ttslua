@@ -73,6 +73,9 @@ function setupHybridTwoPlayer()
     end
 
     placeWarpTile(warpSpots['Purple'])
+    placeWarpTile(warpSpots['Red'])
+    placeGuardianTile(guardianSpots['White'])
+    placeGuardianTile(guardianSpots['Green'])
 end
 
 function placeGuardianTile(spot)
@@ -397,7 +400,8 @@ function setupFirstRound()
     pickRandomNPC()
 
     if useWarpTiles then fillWithWarp()
-    elseif useGuardians then fillWithGuardians() end
+    elseif useGuardians then fillWithGuardians()
+    elseif useHybrid then setupHybridTwoPlayer() end
     if useHives then addHives() end
 
 
