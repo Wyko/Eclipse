@@ -66,10 +66,32 @@ function fillWithGuardians()
     end
 end
 
+function movePlayersToColors(targetColors)
+    -- Given a table of colors {['Red'] = true, ...} iterate through all
+    -- seated players and move the first one not in the table to the color
+
+    local players = getSeatedPlayers()
+    local i, plrToMove = next(players, nil)
+    while i do
+        -- Check if the seated player is not already seated at a color we need
+        if targetColors[plrToMove] == nil then
+            -- Move the player to a color in 'colors' that isn't already seated
+            for c, _ in pairs(targetColors) do
+                if not Player[c].seated then
+                    Player[plrToMove].changeColor(c)
+                end
+            end
+        end
+        i, plrToMove = next(players, i)
+    end
+end
+
 function setupHybridTwoPlayer()
-    if not Player['Red'].seated and Player['Yellow'].seated then
+    if not Player['Blue'].seated or Player['Yellow'].seated then
         broadcastToAll('For a two-player hybrid setup, players will need to ' ..
-        'be seated at Yellow and Blue.')
+        'be seated across from one another at Yellow and Blue.')
+
+        movePlayersToColors({Yellow = true, Blue = true})
     end
 
     placeWarpTile(warpSpots['Purple'])
