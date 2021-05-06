@@ -1391,6 +1391,60 @@ local HomeworldLocations = {
     },
 }
 
+local guardianSpots = {
+    Purple = {
+        position = Vector(10.32, 0.96, 5.95),
+        rotation = Vector(0.00, 60.01, 0.00),
+    },
+    White = {
+        position = Vector(10.32, 0.96, -5.96),
+        rotation = Vector(0.00, 120.00, 0.00),
+    },
+    Yellow = {
+        position = Vector(0.00, 0.96, -11.92),
+        rotation = Vector(0.00, 180.86, 0.00),
+    },
+    Red = {
+        position = Vector(-10.32, 0.96, -5.96),
+        rotation = Vector(0.00, 240.00, 0.00),
+    },
+    Green = {
+        position = Vector(-10.32, 0.96, 5.96),
+        rotation = Vector(0.00, 300.01, 0.00),
+    },
+    Blue = {
+        position = Vector(0.00, 0.96, 11.92),
+        rotation = Vector(0.00, 359.32, 0.00),
+    },
+}
+
+local warpSpots = {
+    Purple = {
+        position = Vector(9.12, 1.01, 8.14),
+        rotation = Vector(0.00, 59.64, 0.00)
+    },
+    White = {
+        position = Vector(11.60, 1.01, -3.72),
+        rotation = Vector(0.00, 119.99, 0.00),
+    },
+    Yellow = {
+        position = Vector(2.58, 1.01, -11.93),
+        rotation = Vector(0.00, 179.99, 0.00),
+    },
+    Red = {
+        position = Vector(-9.03, 1.01, -8.19),
+        rotation = Vector(0.00, 240.01, 0.00),
+    },
+    Green = {
+        position = Vector(-11.64, 1.01, 3.77),
+        rotation = Vector(0.00, 300.11, 0.00),
+    },
+    Blue = {
+        position = Vector(-2.58, 1.06, 11.93),
+        rotation = Vector(359.82, 0.01, 359.68),
+    },
+}
+
 local guardianBag = nil
 local guardianModelBag = nil
 local discoveryBag = nil
