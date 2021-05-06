@@ -1391,6 +1391,10 @@ local HomeworldLocations = {
     },
 }
 
+local guardianBag = nil
+local guardianModelBag = nil
+local discoveryBag = nil
+
 function loadObjects()
     Rare_Technologies_board = getObjectFromGUID(Rare_Technologies_board_GUID)
     TableZone = getObjectFromGUID(TableZone)
@@ -1413,4 +1417,7 @@ function loadObjects()
     starbase_bag_bag = getObjectFromGUID(starbase_bag_bag_GUID)
     a_and_disc_bag = getObjectFromGUID(a_and_disc_bag_GUID)
     orbitals_bag = getObjectFromGUID(orbitals_bag_GUID)
+    guardianBag = getObjectFromGUID('54fe91')
+    guardianModelBag = getObjectFromGUID('19e48c')
+    discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
 end

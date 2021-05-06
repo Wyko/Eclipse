@@ -102,10 +102,6 @@ function fillWithGuardians()
         },
     }
 
-    local guardianBag = getObjectFromGUID('54fe91')
-    local guardianModelBag = getObjectFromGUID('19e48c')
-    local discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
-
     if #getSeatedPlayers() < 2 then
         printToAll('Must have at least two players to fill with guardians.')
         return false
@@ -119,29 +115,31 @@ function fillWithGuardians()
             end
         end
 
-        if not found then
-            guardianBag.takeObject({
-                position = GuardiansSpots[color].position,
-                rotation = GuardiansSpots[color].rotation,
-                callback_function = function (obj)
-                    obj.setLock(true)
-                end
-            })
-            discoveryBag.takeObject({
-                position = GuardiansSpots[color].position+Vector(0,1,0),
-                rotation = GuardiansSpots[color].rotation+Vector(0, -45, 180),
-            })
-
-            activeGuardianBag.takeObject({
-                position = GuardiansSpots[color].position+Vector(0,2,0),
-                rotation = GuardiansSpots[color].rotation
-            })
-            guardianModelBag.takeObject({
-                position = GuardiansSpots[color].position+Vector(0,3,0),
-                rotation = GuardiansSpots[color].rotation
-            })
-        end
+        if not found then placeGuardianTile(GuardiansSpots[color]) end
     end
+end
+
+function placeGuardianTile(spot)
+    guardianBag.takeObject({
+        position = spot.position,
+        rotation = spot.rotation,
+        callback_function = function (obj)
+            obj.setLock(true)
+        end
+    })
+    discoveryBag.takeObject({
+        position = spot.position+Vector(0,1,0),
+        rotation = spot.rotation+Vector(0, -45, 180),
+    })
+
+    activeGuardianBag.takeObject({
+        position = spot.position+Vector(0,2,0),
+        rotation = spot.rotation
+    })
+    guardianModelBag.takeObject({
+        position = spot.position+Vector(0,3,0),
+        rotation = spot.rotation
+    })
 end
 
 function showNextRoundButton()
