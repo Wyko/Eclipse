@@ -1,4 +1,4 @@
-local hideStuff = true
+local hideStuff = false
 
 
 DEBUG = false

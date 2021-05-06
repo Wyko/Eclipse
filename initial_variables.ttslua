@@ -245,6 +245,7 @@ factions = {
         ['selector_button_GUID'] = '8feca2',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 4,
     },
     ['Descendants of Draco'] = {
         ['startingShip'] = 'interceptor',
@@ -259,6 +260,7 @@ factions = {
         ['selector_button_GUID'] = '85cb7b',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Mechanema'] = {
         ['startingShip'] = 'interceptor',
@@ -273,6 +275,7 @@ factions = {
         ['selector_button_GUID'] = '0b0ea2',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Hydran Progress'] = {
         ['startingShip'] = 'interceptor',
@@ -289,6 +292,7 @@ factions = {
         ['selector_button_GUID'] = 'f08bb7',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Eridani Empire'] = {
         ['startingShip'] = 'interceptor',
@@ -303,6 +307,7 @@ factions = {
         ['selector_button_GUID'] = '6a67ed',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Orion Hegemony'] = {
         ['startingShip'] = 'cruiser',
@@ -317,6 +322,7 @@ factions = {
         ['selector_button_GUID'] = '181176',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Terran Republic'] = {
         ['startingShip'] = 'interceptor',
@@ -331,6 +337,7 @@ factions = {
         ['selector_button_GUID'] = 'b66d80',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Terran Union'] = {
         ['startingShip'] = 'interceptor',
@@ -345,6 +352,7 @@ factions = {
         ['selector_button_GUID'] = '870d43',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Terran Directorate'] = {
         ['startingShip'] = 'interceptor',
@@ -359,6 +367,7 @@ factions = {
         ['selector_button_GUID'] = '19bf34',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Terran Alliance'] = {
         ['startingShip'] = 'interceptor',
@@ -373,6 +382,7 @@ factions = {
         ['selector_button_GUID'] = '6072ba',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Terran Conglomerate'] = {
         ['startingShip'] = 'interceptor',
@@ -387,6 +397,7 @@ factions = {
         ['selector_button_GUID'] = 'dc5ac7',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Terran Federation'] = {
         ['startingShip'] = 'interceptor',
@@ -401,6 +412,7 @@ factions = {
         ['selector_button_GUID'] = 'd51720',
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Rho Indi Syndicate'] = {
         ['startingShip'] = 'interceptor',
@@ -416,6 +428,7 @@ factions = {
         ['is_rota'] = true,
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 2,
     },
     ['Exiles'] = {
         ['startingShip'] = 'interceptor',
@@ -431,6 +444,7 @@ factions = {
         ['is_rota'] = true,
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Wardens of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -446,6 +460,7 @@ factions = {
         ['is_rota'] = true,
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Guardians of Magellan'] = {
         ['startingShip'] = 'interceptor',
@@ -461,6 +476,7 @@ factions = {
         ['is_rota'] = true,
         ['replacement_functions'] = {},
         ['add_functions'] = {},
+        ['colonyShips'] = 3,
     },
     ['Pyxis Unity'] = {
         ['startingShip'] = 'interceptor',
@@ -1142,7 +1158,8 @@ factions = {
                     ['x'] = -1.73692242242396E-05,
                     ['y'] = 179.996185302734,
                     ['z'] = 2.0588090592355E-06}},
-        }
+        },
+        ['colonyShips'] = 2,
 
     },
 }
@@ -1450,6 +1467,10 @@ local guardianModelBag = nil
 local discoveryBag = nil
 local warpBag = nil
 
+local colonyShipBag = nil
+local colonyShipBag_GUID = '904d0e'
+
+
 function loadObjects()
     Rare_Technologies_board = getObjectFromGUID(Rare_Technologies_board_GUID)
     TableZone = getObjectFromGUID(TableZone)
@@ -1476,4 +1497,5 @@ function loadObjects()
     guardianModelBag = getObjectFromGUID('19e48c')
     discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
     warpBag = getObjectFromGUID('257134')
+    colonyShipBag = getObjectFromGUID(colonyShipBag_GUID)
 end

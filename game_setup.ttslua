@@ -246,7 +246,7 @@ function basicSetup2(parameters)
     end
 
     -- place colony ships
-    PlaceColonyShips(Box, takeParams, PlayerPosition)
+    PlaceColonyShips(PlayerColor, FactionName)
 
     spawnExtraInfluence(PlayerColor, FactionName)
     return true
@@ -298,36 +298,30 @@ function lockAndColor(obj, color)
     obj.setColorTint(color)
 end
 
-function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
+function PlaceColonyShips(PlayerColor, faction)
   -- Search a container for all colony ships and place them in front of the player
-  TakeParams.guid = '000000'
-  local container
-  local guids = {}
-  local Object
   local offset
-  container = ContainerOrGUID
-
-  for k,v in pairs(container.getObjects()) do
-    if string.find(string.lower(v.name or v.nickname), string.lower('Colony Ship')) then
-      table.insert(guids, v.guid)
-    end
+  local takeParams = {}
+  local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
+  local Inv = -1
+  PlayerPosition.y = 0.15
+  if PlayerPosition.z < 0 then
+      Inv = 1
+      takeParams.rotation = vector(0,180,0)
   end
 
-  if #guids == 0 then return false end
+  local numShips = factions[faction].colonyShips
 
-  local Inv = -1;
-  if PlayerPosition.z < 0 then Inv=1 end
   local StartPosition = PlayerPosition + Vector(-22.4*Inv, 0, 15*Inv)
-  if #guids ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
-  if #guids > 3 then StartPosition = StartPosition + Vector(0, 0, 0) end
+  if numShips ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
+  if numShips > 3 then StartPosition = StartPosition + Vector(0, 0, 0) end
 
-  for k,id in pairs(guids) do
-      TakeParams.guid = guids[id]
-      Object = container.takeObject(TakeParams)
+  for k = 1, numShips do
+      local shipTile = colonyShipBag.takeObject(takeParams)
 
-      if k>2 and #guids>3 then offset = Vector((k-2)*2.9*Inv, 0, -2*Inv)
+      if k>2 and numShips>3 then offset = Vector((k-2)*2.9*Inv, 0, -2*Inv)
       else offset = Vector(k*2.9*Inv, 0, 0) end
-      Object.setPositionSmooth(StartPosition + offset, false, true)
+      shipTile.setPositionSmooth(StartPosition + offset, false, true)
     end
 end
 
