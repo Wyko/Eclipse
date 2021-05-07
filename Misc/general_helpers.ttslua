@@ -188,6 +188,7 @@ function itemInZone(zone, obj)
 end
 
 function getItemsInZone(args)
+    -- Returns a numerically indexed table of objects in the given zone
 
     -- Error checking
     assert(args.zone ~= nil)
