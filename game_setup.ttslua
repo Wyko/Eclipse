@@ -183,27 +183,20 @@ function basicSetup2(parameters)
 
     placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
 
-    -- -- take action card and position it
-    -- Object = SeekAndTake('Actions', Box, takeParams)
-    -- if (Object~=false) then
-    --     destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 20.6*InvPos)
-    --     Object.setPositionSmooth(destination,false, true)
-    -- end
-
-
     -- Take an Ambassador and Discovery Board
     local a = a_and_disc_bag.takeObject({
-        position = PlayerPosition + Vector(16.46*InvPos, -0.14, 19*InvPos),
+        position = PlayerPosition + Vector(16.66*InvPos, -0.14, 13.9*InvPos),
         rotation = takeParams.rotation,
         smooth = false,
         callback_function = function (obj)
             obj.setLock(true)
-            player_ad_board[PlayerColor] = obj
         end
     })
+    player_ad_board[PlayerColor] = a
 
     triggerFunctionIfResting(a, function ()
         place_ambassadors(Box, takeParams, PlayerColor)
+        spawnExtraInfluence(PlayerColor, FactionName)
     end)
 
     -- take player board and position it
@@ -248,7 +241,7 @@ function basicSetup2(parameters)
     -- place colony ships
     PlaceColonyShips(PlayerColor, FactionName)
 
-    spawnExtraInfluence(PlayerColor, FactionName)
+
     return true
 end
 
@@ -326,7 +319,7 @@ function PlaceColonyShips(PlayerColor, faction)
 end
 
 function place_ambassadors(Box, takeParams, PlayerColor)
-    if #getSeatedPlayers() <= 3 then return false end
+    -- if #getSeatedPlayers() <= 3 then return false end
 
     -- take ambassador tiles and position them
     local tiles = SeekAndTake('Ambassador', Box, takeParams)
@@ -342,9 +335,10 @@ function place_ambassadors(Box, takeParams, PlayerColor)
         while tiles.getQuantity() > 1 do
             log(tiles.getQuantity(), 'place_ambassadors:num')
             local pos = positions[place].position
+            local rot = positions[place].rotation
             tiles.takeObject({
                 position          = board.positionToWorld(pos),
-                rotation          = positions[place].rotation,
+                rotation          = board.positionToWorld(rot),
                 callback_function = function (obj)
                     obj.setTags({'Ambassador'})
                     obj.use_grid = false
@@ -492,9 +486,12 @@ function spawnExtraInfluence(color, race)
 
     local num = 3
     if race == 'Pyxis Unity' then num = 2 end
-    for _ = 1, num do
-        local disc = spawnInfluenceDisc(nil, color)
-        Wait.condition(function () extra.putObject(disc) end,
-                       function () return not disc.spawning end)
+
+    local board = player_ad_board[color]
+    local positions = board.getTable('Influence_positions')
+
+    for i = 1, num do
+        local pos = board.positionToWorld(positions[i].position)
+        local disc = spawnInfluenceDisc(pos, color)
     end
 end
