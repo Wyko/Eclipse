@@ -26,34 +26,6 @@ function hideAndLockStuff()
 end
 
 function fillWithWarp()
-    local warpSpots = {
-        Purple = {
-            position = Vector(9.12, 1.01, 8.14),
-            rotation = Vector(0.00, 59.64, 0.00)
-        },
-        White = {
-            position = Vector(11.60, 1.01, -3.72),
-            rotation = Vector(0.00, 119.99, 0.00),
-        },
-        Yellow = {
-            position = Vector(2.58, 1.01, -11.93),
-            rotation = Vector(0.00, 179.99, 0.00),
-        },
-        Red = {
-            position = Vector(-9.03, 1.01, -8.19),
-            rotation = Vector(0.00, 240.01, 0.00),
-        },
-        Green = {
-            position = Vector(-11.64, 1.01, 3.77),
-            rotation = Vector(0.00, 300.11, 0.00),
-        },
-        Blue = {
-            position = Vector(-2.58, 1.06, 11.93),
-            rotation = Vector(359.82, 0.01, 359.68),
-        },
-    }
-    local warpBag = getObjectFromGUID('257134')
-
     for _, color in ipairs(possibleColors) do
         local found = false
         for _, seatedColor in ipairs(getSeatedPlayers()) do
@@ -62,54 +34,25 @@ function fillWithWarp()
             end
         end
 
-        if not found then
-            warpBag.takeObject({
-                position = warpSpots[color].position,
-                rotation = warpSpots[color].rotation,
-                callback_function = function (obj)
-                    obj.setLock(true)
-                end
-            })
-        end
+        if not found then placeWarpTile(warpSpots[color]) end
     end
 end
 
+function placeWarpTile(spot)
+    warpBag.takeObject({
+        position = spot.position,
+        rotation = spot.rotation,
+        callback_function = function (obj)
+            obj.setLock(true)
+        end
+    })
+end
+
 function fillWithGuardians()
-    local GuardiansSpots = {
-        Purple = {
-            position = Vector(10.32, 0.96, 5.95),
-            rotation = Vector(0.00, 60.01, 0.00),
-        },
-        White = {
-            position = Vector(10.32, 0.96, -5.96),
-            rotation = Vector(0.00, 120.00, 0.00),
-        },
-        Yellow = {
-            position = Vector(0.00, 0.96, -11.92),
-            rotation = Vector(0.00, 180.86, 0.00),
-        },
-        Red = {
-            position = Vector(-10.32, 0.96, -5.96),
-            rotation = Vector(0.00, 240.00, 0.00),
-        },
-        Green = {
-            position = Vector(-10.32, 0.96, 5.96),
-            rotation = Vector(0.00, 300.01, 0.00),
-        },
-        Blue = {
-            position = Vector(0.00, 0.96, 11.92),
-            rotation = Vector(0.00, 359.32, 0.00),
-        },
-    }
-
-    local guardianBag = getObjectFromGUID('54fe91')
-    local guardianModelBag = getObjectFromGUID('19e48c')
-    local discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
-
-    if #getSeatedPlayers() < 2 then
-        printToAll('Must have at least two players to fill with guardians.')
-        return false
-    end
+    -- if #getSeatedPlayers() < 2 then
+    --     printToAll('Must have at least two players to fill with guardians.')
+    --     return false
+    -- end
 
     for _, color in ipairs(possibleColors) do
         local found = false
@@ -119,29 +62,65 @@ function fillWithGuardians()
             end
         end
 
-        if not found then
-            guardianBag.takeObject({
-                position = GuardiansSpots[color].position,
-                rotation = GuardiansSpots[color].rotation,
-                callback_function = function (obj)
-                    obj.setLock(true)
-                end
-            })
-            discoveryBag.takeObject({
-                position = GuardiansSpots[color].position+Vector(0,1,0),
-                rotation = GuardiansSpots[color].rotation+Vector(0, -45, 180),
-            })
-
-            activeGuardianBag.takeObject({
-                position = GuardiansSpots[color].position+Vector(0,2,0),
-                rotation = GuardiansSpots[color].rotation
-            })
-            guardianModelBag.takeObject({
-                position = GuardiansSpots[color].position+Vector(0,3,0),
-                rotation = GuardiansSpots[color].rotation
-            })
-        end
+        if not found then placeGuardianTile(guardianSpots[color]) end
     end
+end
+
+function movePlayersToColors(targetColors)
+    -- Given a table of colors {['Red'] = true, ...} iterate through all
+    -- seated players and move the first one not in the table to the color
+
+    local players = getSeatedPlayers()
+    local i, plrToMove = next(players, nil)
+    while i do
+        -- Check if the seated player is not already seated at a color we need
+        if targetColors[plrToMove] == nil then
+            -- Move the player to a color in 'colors' that isn't already seated
+            for c, _ in pairs(targetColors) do
+                if not Player[c].seated then
+                    Player[plrToMove].changeColor(c)
+                end
+            end
+        end
+        i, plrToMove = next(players, i)
+    end
+end
+
+function setupHybridTwoPlayer()
+    if not Player['Blue'].seated or Player['Yellow'].seated then
+        broadcastToAll('For a two-player hybrid setup, players will need to ' ..
+        'be seated across from one another at Yellow and Blue.')
+
+        movePlayersToColors({Yellow = true, Blue = true})
+    end
+
+    placeWarpTile(warpSpots['Purple'])
+    placeWarpTile(warpSpots['Red'])
+    placeGuardianTile(guardianSpots['White'])
+    placeGuardianTile(guardianSpots['Green'])
+end
+
+function placeGuardianTile(spot)
+    guardianBag.takeObject({
+        position = spot.position,
+        rotation = spot.rotation,
+        callback_function = function (obj)
+            obj.setLock(true)
+        end
+    })
+    discoveryBag.takeObject({
+        position = spot.position+Vector(0,1,0),
+        rotation = spot.rotation+Vector(0, -45, 180),
+    })
+
+    activeGuardianBag.takeObject({
+        position = spot.position+Vector(0,2,0),
+        rotation = spot.rotation
+    })
+    guardianModelBag.takeObject({
+        position = spot.position+Vector(0,3,0),
+        rotation = spot.rotation
+    })
 end
 
 function showNextRoundButton()
@@ -168,7 +147,7 @@ function basicSetup2(parameters)
     assert(Box.getPosition() ~= nil)
     assert(faction.numStartingInfluence ~= nil)
 
-    faction.available = false
+    factions[FactionName].available = false
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
@@ -204,27 +183,20 @@ function basicSetup2(parameters)
 
     placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
 
-    -- -- take action card and position it
-    -- Object = SeekAndTake('Actions', Box, takeParams)
-    -- if (Object~=false) then
-    --     destination = PlayerPosition + Vector(-16.5*InvPos, -0.14, 20.6*InvPos)
-    --     Object.setPositionSmooth(destination,false, true)
-    -- end
-
-
     -- Take an Ambassador and Discovery Board
     local a = a_and_disc_bag.takeObject({
-        position = PlayerPosition + Vector(16.46*InvPos, -0.14, 19*InvPos),
+        position = PlayerPosition + Vector(16.66*InvPos, -0.14, 13.9*InvPos),
         rotation = takeParams.rotation,
         smooth = false,
         callback_function = function (obj)
             obj.setLock(true)
-            player_ad_board[PlayerColor] = obj
         end
     })
+    player_ad_board[PlayerColor] = a
 
     triggerFunctionIfResting(a, function ()
         place_ambassadors(Box, takeParams, PlayerColor)
+        spawnExtraInfluence(PlayerColor, FactionName)
     end)
 
     -- take player board and position it
@@ -267,9 +239,9 @@ function basicSetup2(parameters)
     end
 
     -- place colony ships
-    PlaceColonyShips(Box, takeParams, PlayerPosition)
+    PlaceColonyShips(PlayerColor, FactionName)
 
-    spawnExtraInfluence(PlayerColor, FactionName)
+
     return true
 end
 
@@ -319,41 +291,35 @@ function lockAndColor(obj, color)
     obj.setColorTint(color)
 end
 
-function PlaceColonyShips(ContainerOrGUID, TakeParams, PlayerPosition)
+function PlaceColonyShips(PlayerColor, faction)
   -- Search a container for all colony ships and place them in front of the player
-  TakeParams.guid = '000000'
-  local container
-  local guids = {}
-  local Object
   local offset
-  container = ContainerOrGUID
-
-  for k,v in pairs(container.getObjects()) do
-    if string.find(string.lower(v.name or v.nickname), string.lower('Colony Ship')) then
-      table.insert(guids, v.guid)
-    end
+  local takeParams = {}
+  local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
+  local Inv = -1
+  PlayerPosition.y = 0.15
+  if PlayerPosition.z < 0 then
+      Inv = 1
+      takeParams.rotation = vector(0,180,0)
   end
 
-  if #guids == 0 then return false end
+  local numShips = factions[faction].colonyShips
 
-  local Inv = -1;
-  if PlayerPosition.z < 0 then Inv=1 end
   local StartPosition = PlayerPosition + Vector(-22.4*Inv, 0, 15*Inv)
-  if #guids ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
-  if #guids > 3 then StartPosition = StartPosition + Vector(0, 0, 0) end
+  if numShips ~= 3 then StartPosition = StartPosition + Vector(1.45*Inv, 0, 0) end
+  if numShips > 3 then StartPosition = StartPosition + Vector(0, 0, 0) end
 
-  for k,id in pairs(guids) do
-      TakeParams.guid = guids[id]
-      Object = container.takeObject(TakeParams)
+  for k = 1, numShips do
+      local shipTile = colonyShipBag.takeObject(takeParams)
 
-      if k>2 and #guids>3 then offset = Vector((k-2)*2.9*Inv, 0, -2*Inv)
+      if k>2 and numShips>3 then offset = Vector((k-2)*2.9*Inv, 0, -2*Inv)
       else offset = Vector(k*2.9*Inv, 0, 0) end
-      Object.setPositionSmooth(StartPosition + offset, false, true)
+      shipTile.setPositionSmooth(StartPosition + offset, false, true)
     end
 end
 
 function place_ambassadors(Box, takeParams, PlayerColor)
-    if #getSeatedPlayers() <= 3 then return false end
+    -- if #getSeatedPlayers() <= 3 then return false end
 
     -- take ambassador tiles and position them
     local tiles = SeekAndTake('Ambassador', Box, takeParams)
@@ -369,9 +335,10 @@ function place_ambassadors(Box, takeParams, PlayerColor)
         while tiles.getQuantity() > 1 do
             log(tiles.getQuantity(), 'place_ambassadors:num')
             local pos = positions[place].position
+            local rot = positions[place].rotation
             tiles.takeObject({
                 position          = board.positionToWorld(pos),
-                rotation          = positions[place].rotation,
+                rotation          = board.positionToWorld(rot),
                 callback_function = function (obj)
                     obj.setTags({'Ambassador'})
                     obj.use_grid = false
@@ -443,7 +410,8 @@ function setupFirstRound()
     pickRandomNPC()
 
     if useWarpTiles then fillWithWarp()
-    elseif useGuardians then fillWithGuardians() end
+    elseif useGuardians then fillWithGuardians()
+    elseif useHybrid then setupHybridTwoPlayer() end
     if useHives then addHives() end
 
 
@@ -518,9 +486,12 @@ function spawnExtraInfluence(color, race)
 
     local num = 3
     if race == 'Pyxis Unity' then num = 2 end
-    for _ = 1, num do
-        local disc = spawnInfluenceDisc(nil, color)
-        Wait.condition(function () extra.putObject(disc) end,
-                       function () return not disc.spawning end)
+
+    local board = player_ad_board[color]
+    local positions = board.getTable('Influence_positions')
+
+    for i = 1, num do
+        local pos = board.positionToWorld(positions[i].position)
+        local disc = spawnInfluenceDisc(pos, color)
     end
 end

@@ -1,0 +1,138 @@
+local toggleColors = {
+    [true] = Color.Green,
+    [false] = Color.Red
+}
+
+local rotaLabel = "Rise of the Ancients\nRaces"
+local warpLabel = "Fill empty space with\nWarp Tiles"
+local guardianLabel = "Fill empty space with\nGuardians"
+local hybridLabel = "Set Up for \n2-Player Hybrid"
+local hivesLabel = "Include\nAncient Hives"
+local pyxisLabel = "Include Pyxis Unity"
+local lyraLabel = "Include Lyra"
+
+local switches = {
+    [rotaLabel] = true,
+    [hivesLabel] = false,
+    [warpLabel] = false,
+    [guardianLabel] = false,
+    [hybridLabel] = false,
+    [pyxisLabel] = true,
+    [lyraLabel] = false,
+}
+
+local toggleGroup_Fill = {warpLabel, guardianLabel, hybridLabel}
+
+local setupButton = {click_function = "setupButtonFunc", function_owner = self, label = "Set Up Game", position = {0, 0.300000011920929, 1.3}, scale = {0.1, 0.1, 0.1}, width = 7200, height = 1900, font_size = 800, color = {0.2692, 0.6029, 0.9843, 1}, tooltip = "Set Up Game"}
+local rotaButton = {click_function = "rotaButtonFunc", function_owner = self, label = rotaLabel, position = {-1.3, 0.3, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[rotaLabel]], tooltip = "Make the first edition Rise of the Ancients races available to choose."}
+
+local warpButton = {click_function = "warpButtonFunc", function_owner = self, label = warpLabel, position = {-1.3, 0.3, -0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[warpLabel]], tooltip = "Sets up the board with warp tiles connecting players."}
+local guardianButton = {click_function = "guardianButtonFunc", function_owner = self, label = guardianLabel, position = {-1.3, 0.3, -0.2}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[guardianLabel]], tooltip = "Sets up the board with guardian tiles in spaces where there are no players."}
+local hybridButton = {click_function = "hybridButtonFunc", function_owner = self, label = hybridLabel, position = {-1.3, 0.300000011920929, 0.2}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[hybridLabel]], tooltip = "Set Up for 2-Player Hybrid"}
+
+local hivesButton = {click_function = "hivesButtonFunc", function_owner = self, label = hivesLabel, position = {1.3, 0.300000011920929, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[hivesLabel]], tooltip = "Include Ancient Hives"}
+local lyraButton = {click_function = "lyraButtonFunc", function_owner = self, label = lyraLabel, position = {0, 0.300000011920929, -0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[lyraLabel]], tooltip = "Include Lyra"}
+local pyxisButton = {click_function = "pyxisButtonFunc", function_owner = self, label = pyxisLabel, position = {0, 0.300000011920929, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[pyxisLabel]], tooltip = "Include Pyxis Unity"}
+
+
+function onload()
+    self.createButton(setupButton)
+    self.createButton(rotaButton)
+    self.createButton(warpButton)
+    self.createButton(guardianButton)
+    self.createButton(hivesButton)
+    self.createButton(hybridButton)
+    -- self.createButton(lyraButton)
+    self.createButton(pyxisButton)
+end
+
+function setupButtonFunc(obj, color, alt_click)
+    Global.setVar('useWarpTiles', switches[warpLabel])
+    Global.setVar('useGuardians', switches[guardianLabel])
+    Global.setVar('useHives', switches[hivesLabel])
+    Global.setVar('useHybrid', switches[hybridLabel])
+
+    Global.call('setupFirstRound')
+    self.destruct()
+end
+
+function rotaButtonFunc(obj, color, alt_click)
+    local rotaObjects = {
+        '4fa947', '3c8a8f', 'c010ea', '15ce4a', '189816', 'ee6fda', '43f8f0',
+        'a6d2a7'
+    }
+    updateInterface(rotaLabel)
+    Global.call('set_rota_availability', switches[rotaLabel])
+    for _, obj in ipairs(rotaObjects) do
+        toggleHide(getObjectFromGUID(obj), switches[rotaLabel])
+    end
+end
+
+function hivesButtonFunc()
+    updateInterface(hivesLabel)
+end
+
+function lyraButtonFunc()
+    updateInterface(lyraLabel)
+end
+
+function pyxisButtonFunc()
+    updateInterface(pyxisLabel)
+    local factions = Global.getTable('factions')
+
+    for _, obj in ipairs({
+        factions['Pyxis Unity'].selector_button_GUID,
+        factions['Pyxis Unity'].race_board_GUID,
+    }) do
+        toggleHide(getObjectFromGUID(obj), switches[pyxisLabel])
+    end
+end
+
+function hybridButtonFunc()
+    toggleGroupMember(hybridLabel, toggleGroup_Fill)
+end
+
+function warpButtonFunc()
+    toggleGroupMember(warpLabel, toggleGroup_Fill)
+end
+
+function guardianButtonFunc()
+    toggleGroupMember(guardianLabel, toggleGroup_Fill)
+end
+
+function toggleGroupMember(label, group)
+    for _, button in ipairs(group) do
+        if button ~= label then updateInterface(button, false) end
+    end
+    updateInterface(label)
+end
+
+function updateInterface(label, pressed)
+    local btns = self.getButtons()
+
+    if pressed ~= nil then
+        switches[label] = pressed
+    else
+        switches[label] = not switches[label]
+    end
+
+    for i, btn in pairs(btns) do
+        if btn.label == label then
+            self.editButton({
+                index = btn.index,
+                color = toggleColors[switches[label]]
+            })
+        end
+    end
+
+end
+
+function toggleHide(obj, show)
+    if obj == nil then return end
+    if not show then
+        -- obj.setInvisibleTo(getColors())
+        obj.setInvisibleTo({"Blue", "White", "Red", "Yellow", "Green", 'Purple'})
+    else
+        obj.setInvisibleTo({})
+    end
+end

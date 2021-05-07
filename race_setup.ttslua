@@ -11,7 +11,7 @@ end
 
 function placeOrbital(hex)
     -- Mainly for Exiles. Place an orbital
-    
+
     local pos = hex.getTable('orbital')
     if pos == nil then return end
 
@@ -49,19 +49,21 @@ function select_random_race(color)
     -- iterate over whole table to get all keys
     local keyset = {}
     local human_added = false
-    for k in pairs(factions) do
-        if not string.find(k, "Human") then
-            table.insert(keyset, k)
+    for name, fac in pairs(factions) do
+        if fac.available == true then
+            if not string.find(name, "Terran") then
+                table.insert(keyset, name)
 
-        elseif (string.find(k, "Human") and human_added == false) then
-            human_added = true
-            table.insert(keyset, k)
+            elseif (string.find(name, "Terran") and human_added == false) then
+                human_added = true
+                table.insert(keyset, name)
+            end
         end
     end
 
     -- now you can reliably return a random key
     math.randomseed(os.time())
-    i = math.random(1, #keyset)
+    i = math.random(tableLength(keyset))
     -- log('i = ['..i..']', 'select_random_race')
     random_race = keyset[i]
     printToAll(color .. ' has randomly selected '..random_race, color)
