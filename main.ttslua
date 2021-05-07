@@ -1,5 +1,4 @@
-local hideStuff = true
-
+local hideStuff = false
 
 DEBUG = false
 
@@ -19,6 +18,7 @@ DEBUG = false
 #include debugging
 #include initial_draft
 #include load_game
+-- #include combat
 
 -- Factions
 #include Factions\pyxis

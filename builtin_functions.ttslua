@@ -3,6 +3,7 @@ function onLoad()
     lockSideTables()
     shuffleEverything()
     onLoad_Camera()
+    makeScoreButton()
     makeDebugButton()
 
     if hideStuff then hideAndLockStuff() end

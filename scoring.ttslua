@@ -1,3 +1,15 @@
+function makeScoreButton()
+    local tooltip= "Score the game and print the results to chat. Reputation will only be scored at the end of the game."
+    local data = {click_function = "scoreButton", tooltip=tooltip, function_owner = self, label = "Score", position = {3.5, 0.2, 3.6}, scale = {0.5, 0.5, 0.5}, width = 2000, height = 600, font_size = 400}
+    local board = getObjectFromGUID('48e151')
+    assert(board ~= nil)
+    board.createButton(data)
+end
+
+function scoreButton(obj, color, alt_click)
+    scoreGame(color, true)
+end
+
 function scoreGame(color, printOut)
     printOut = printOut or true
     local fullString = ''
@@ -5,17 +17,25 @@ function scoreGame(color, printOut)
 
     function _score(t, source)
         if t == nil or next(t) == nil then return end
+
+        -- local safeSource = string.gsub(source, ' ', '_')
         local printString = source .. ': '
         for c, points in pairs(t) do
-            if total[c] == nil then total[c] = 0 end
+
+            -- Initialize the player's score if needed
+            if total[c] == nil then total[c] = {['score'] = 0} end
+
+            -- Log the score, both totally and individually
+            total[c][source] = points
+            total[c].score = total[c].score + points
+
             printString = printString .. c..': '..tostring(points)..', '
-            total[c] = total[c] + points
         end
-        if printOut then printToColor(printString, color) end
+        if printOut and color then printToColor(printString, color) end
         fullString = fullString .. '\n' .. printString
     end
 
-    if ownerOfRace('Descendants of Draco') ~= nil then
+    if ownerOfRace('Descendants of Draco') ~= nil and printOut and color then
         printToColor(ojText('Note for Draco: ') ..
         'The scoring script scores ancient ship models AND tiles. In order ' ..
         'to not score double points for Draco, please use only one type of '..
@@ -35,10 +55,9 @@ function scoreGame(color, printOut)
 
     if getCurrentRound() >= 8 and allPlayersPassed() then
         _score(getPointsForReputation(), 'Reputation Tiles')
-    else
+    elseif printOut and color then
         printToColor('Not scoring reputation due to hidden info.', color)
     end
-
 
     local totalString = '\nTotal Points:\n'
 
@@ -46,9 +65,9 @@ function scoreGame(color, printOut)
         local name = ''
         if Player[c].seated then name = Player[c].steam_name .. ', ' end
         totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
-            ' ('.. name ..PlayerRace[c]..'): '..tostring(t)..'\n'
+            ' ('.. name ..PlayerRace[c]..'): '..tostring(t.score)..'\n'
     end
-    if printOut then printToColor(totalString, color) end
+    if printOut and color then printToColor(totalString, color) end
 
     if allPlayersPassed() and (getCurrentRound() >= 8) then
         Notes.setNotes(totalString .. '\n' .. fullString)
