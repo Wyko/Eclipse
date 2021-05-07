@@ -52,6 +52,8 @@ function scoreGame(color, printOut)
     _score(getPointsForAncients(), 'Draco Ancients')
     _score(getPointsForExileOrbitals(), 'Exiles Orbitals')
     _score(getPointsForPyxisStarbases(), 'Pyxis Starbases')
+    _score(losePointsForBeingTraitor(), 'Traitor Tile')
+
 
     if getCurrentRound() >= 8 and allPlayersPassed() then
         _score(getPointsForReputation(), 'Reputation Tiles')
@@ -364,6 +366,22 @@ function getPointsForPyxisStarbases()
             end
         end
 
+    end
+
+    return points
+end
+
+function losePointsForBeingTraitor()
+    local points = {}
+
+    -- Search each player's table for the traitor tile and score it
+    for c, _ in pairs(TableGUIDs) do
+        local t = TableGUIDs[c]
+        local results = castBoxAndCheck(t, nil, 'Traitor Tile')
+        if tableLen(results) > 0 then
+            points[c] = -2
+            break
+        end
     end
 
     return points

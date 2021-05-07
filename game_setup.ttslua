@@ -332,13 +332,13 @@ function place_ambassadors(Box, takeParams, PlayerColor)
     if (tiles~=false) then
 
         local tile
+        local rot = board.getRotation()
         while tiles.getQuantity() > 1 do
             log(tiles.getQuantity(), 'place_ambassadors:num')
             local pos = positions[place].position
-            local rot = positions[place].rotation
             tiles.takeObject({
                 position          = board.positionToWorld(pos),
-                rotation          = board.positionToWorld(rot),
+                rotation          = rot,
                 callback_function = function (obj)
                     obj.setTags({'Ambassador'})
                     obj.use_grid = false
@@ -350,7 +350,7 @@ function place_ambassadors(Box, takeParams, PlayerColor)
 
         local pos = positions[place].position
         tile.setPositionSmooth(board.positionToWorld(pos))
-        tile.setRotation(positions[place].rotation)
+        tile.setRotation(rot)
         tile.setTags({'Ambassador'})
         tile.use_grid = false
     end

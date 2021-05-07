@@ -33,8 +33,7 @@ end
 function spawnInfluenceDisc(pos, color)
 
     local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
-    local takeParams = {guid=1}
-    local disc = influenceBag.takeObject(takeParams)
+    local disc = influenceBag.takeObject()
 
     Wait.condition(
         function ()
