@@ -20,12 +20,12 @@ function loadOngoingGame()
             -- Return influence button
             spawnReturnInfluenceButton(board)
 
-            -- PlayerRace
-            PlayerRace[color] = board.getName()
+            -- Player Faction from board name
+            players[color].faction = board.getName()
 
             -- PlayerMarkers
             PlayerMarkers[color] = getObjectFromGUID(
-                factions[PlayerRace[color]].PassMarker_GUID)
+                factions[players[color].faction].PassMarker_GUID)
 
             if not PlayerMarkers[color] then
                 log('Player marker for '..color..' not found')

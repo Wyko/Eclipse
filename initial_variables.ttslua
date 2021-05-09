@@ -1275,15 +1275,6 @@ local boardSelectCallbackFunction = {
     Purple = nil
 }
 
-local PlayerRace = {
-    White = nil,
-    Yellow = nil,
-    Red = nil,
-    Green = nil,
-    Blue = nil,
-    Purple = nil
-}
-
 local PlayerNumberToColor = {
     [1] = 'White',
     [2] = 'Yellow',
@@ -1465,8 +1456,10 @@ local warpSpots = {
     },
 }
 
-local player_info = {
-    White = nil,
+local players = {
+    White = {
+        faction = nil,
+    },
     Yellow = nil,
     Red = nil,
     Green = nil,

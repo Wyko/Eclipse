@@ -80,8 +80,8 @@ function getObjectsInRepZone(args)
 end
 
 function ownerOfRace(race)
-    for color, r in pairs(PlayerRace) do
-        if r == race then
+    for color, r in pairs(players) do
+        if r.faction == race then
             return color
         end
     end

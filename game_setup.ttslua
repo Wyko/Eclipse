@@ -151,12 +151,12 @@ function basicSetup2(parameters)
 
     --     log('Starting basic setup for '..tostring(PlayerColor))
     -- check if the player already selected a faction
-    if PlayerRace[PlayerColor] ~= nil then
-        print(PlayerRace[PlayerColor], ' already selected. You can only select one faction.')
+    if players[PlayerColor].faction ~= nil then
+        print(players[PlayerColor].faction, ' already selected. You can only select one faction.')
         return false
     end
 
-    PlayerRace[PlayerColor] = FactionName .. ' '    -- A space so it can be reset in setRace
+    players[PlayerColor].faction = FactionName .. ' '    -- A space so it can be reset in setRace
 
     local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
     PlayerPosition.y = 0.15
@@ -401,7 +401,7 @@ end
 
 function saveStartingInfo()
     for _, c in pairs(getSeatedPlayers()) do
-        player_info[c] = {
+        players[c] = {
             name = Player[c].steam_name,
             id = Player[c].steam_id,
         }
@@ -482,7 +482,7 @@ function removeUnusedAreas()
 
                 PassCards[color] = nil
                 PlayerBoardZones[color] = nil
-                PlayerRace[color] = nil
+                players[PlayerColor].faction = nil
                 passRestingPositions[color] = nil
                 PlayerMarkers[color] = nil
             end
