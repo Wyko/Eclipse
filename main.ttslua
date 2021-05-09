@@ -17,7 +17,6 @@ DEBUG = false
 #include console++
 #include scoring
 #include debugging
-#include initial_draft
 #include save_and_load
 -- #include combat
 
