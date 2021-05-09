@@ -1,0 +1,19 @@
+-- Variables that need to be saved between sessions
+local players_info = {
+    White = {},
+    Yellow = {},
+    Red = {},
+    Green = {},
+    Blue = {},
+    Purple = {},
+}
+
+local start_time = nil
+
+setup_options = {
+    useWarpTiles = false,
+    useHives = false,
+    useGuardians = false,
+    useHybrid = false,
+    riseOfTheAncients = false,
+}
