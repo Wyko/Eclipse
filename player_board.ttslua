@@ -282,13 +282,13 @@ function setRace(playerColor, zone, obj)
 end
 
 function playersWithoutBoards()
-    players = {}
+    playersWithoutBoards = {}
     for _, color in pairs(getSeatedPlayers()) do
         if not hasPlayerBoard(color) then
-            table.insert(players, color)
+            table.insert(playersWithoutBoards, color)
         end
     end
-    return players
+    return playersWithoutBoards
 end
 
 function ownerOfBoard(board)

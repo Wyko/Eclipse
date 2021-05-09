@@ -1465,6 +1465,15 @@ local warpSpots = {
     },
 }
 
+local player_info = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
 local guardianBag = nil
 local guardianModelBag = nil
 local discoveryBag = nil

@@ -70,8 +70,8 @@ function movePlayersToColors(targetColors)
     -- Given a table of colors {['Red'] = true, ...} iterate through all
     -- seated players and move the first one not in the table to the color
 
-    local players = getSeatedPlayers()
-    local i, plrToMove = next(players, nil)
+    local seatedPlayers = getSeatedPlayers()
+    local i, plrToMove = next(seatedPlayers, nil)
     while i do
         -- Check if the seated player is not already seated at a color we need
         if targetColors[plrToMove] == nil then
@@ -82,7 +82,7 @@ function movePlayersToColors(targetColors)
                 end
             end
         end
-        i, plrToMove = next(players, i)
+        i, plrToMove = next(seatedPlayers, i)
     end
 end
 
@@ -376,9 +376,9 @@ function shuffleEverything()
     AmbassadorBag.shuffle()
 end
 
-function setupTiles(players)
+function setupTiles(numPlayers)
     -- Arrange various tiles for first turn setup.
-    local trim = Sector3Bag.getQuantity() - outerSectors[players]
+    local trim = Sector3Bag.getQuantity() - outerSectors[numPlayers]
     if trim > 0 then
         Wait.time(tossOuterSectors, 0.2, trim)
     end
@@ -399,12 +399,23 @@ function setup_minor_species()
     end
 end
 
-function setupFirstRound()
-    local players = #getSeatedPlayers()
-    local round = tonumber(RoundMarker.getDescription()) + 1
-    local newTechs = players + 3
+function saveStartingInfo()
+    for _, c in pairs(getSeatedPlayers()) do
+        player_info[c] = {
+            name = Player[c].steam_name,
+            id = Player[c].steam_id,
+        }
+    end
+end
 
-    printToAll(string.format("- Setting up for %d players -", players),
+function setupFirstRound()
+    local numPlayers = #getSeatedPlayers()
+    local round = tonumber(RoundMarker.getDescription()) + 1
+    local newTechs = numPlayers + 3
+
+    saveStartingInfo()
+
+    printToAll(string.format("- Setting up for %d players -", numPlayers),
     {0.8,0.8,0.8})
 
     pickRandomNPC()
@@ -417,8 +428,8 @@ function setupFirstRound()
 
     unflipColonyAndSkippers()
     shuffleEverything()
-    setupTiles(players)
-    techsToDraw = (players * 2) + 8
+    setupTiles(numPlayers)
+    techsToDraw = (numPlayers * 2) + 8
     startLuaCoroutine(Global, 'drawMultipleTechs')
     setPassCards()
     advanceRoundMarker(round)
