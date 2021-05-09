@@ -38,6 +38,28 @@ function loadOngoingGame()
     showNextRoundButton()
 
 end
-
-
 -- TODO: Add AD board
+
+
+function dataToSave()
+    local state = {
+        ['starting_players'] = starting_players,
+        ['game_id'] = game_id,
+        ['start_time'] = start_time,
+        ['setup_options'] = setup_options,
+    }
+    return JSON.encode(state)
+end
+
+function loadSave(saved_data)
+    if (saveData ~= nil and saveData ~= "") then
+        local loaded_data = JSON.decode(saved_data)
+        for k, v in pairs(loaded_data) do
+            if type(v) == 'table' then
+                Global.setTable(k, v)
+            else
+                Global.setVar(k, v)
+            end
+        end
+    end
+end

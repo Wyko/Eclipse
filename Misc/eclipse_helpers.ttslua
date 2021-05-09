@@ -87,3 +87,24 @@ function ownerOfRace(race)
     end
     return nil
 end
+
+
+function rotateDiscovery(obj)
+    -- Attempts to raotate a discovery tile to match the hex orientation
+    if not obj.hasTag('Discovery Tile') then return end
+
+    local hex = castAndCheckForTag(obj.getPosition(), 'hex')
+    if hex == nil then return end
+    obj.setRotationSmooth(hex.getRotation()+Vector(0, -45, 180))
+
+end
+
+function blipHex(obj)
+    -- Blip the size of sector hexes so they fit together --
+    if obj.use_grid == true and obj.hasTag('Hex') then
+        Wait.condition(
+            function() blip(obj) end,
+            function() return rest(obj) end,
+            2)
+    end
+end

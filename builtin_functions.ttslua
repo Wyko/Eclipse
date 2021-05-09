@@ -1,4 +1,5 @@
-function onLoad()
+function onLoad(saved_data)
+    loadSave(saved_data)
     loadObjects()
     lockSideTables()
     shuffleEverything()
@@ -10,6 +11,7 @@ function onLoad()
     if isOngoingGame() then loadOngoingGame() end
 end
 
+
 function onObjectLeaveContainer(bag, obj)
     setTechRotation(bag, obj)
 end
@@ -18,26 +20,6 @@ end
 function onObjectDrop(_, obj)
     blipHex(obj)
     rotateDiscovery(obj)
-end
-
-function rotateDiscovery(obj)
-    -- Attempts to raotate a discovery tile to match the hex orientation
-    if not obj.hasTag('Discovery Tile') then return end
-
-    local hex = castAndCheckForTag(obj.getPosition(), 'hex')
-    if hex == nil then return end
-    obj.setRotationSmooth(hex.getRotation()+Vector(0, -45, 180))
-
-end
-
-function blipHex(obj)
-    -- Blip the size of sector hexes so they fit together --
-    if obj.use_grid == true and obj.hasTag('Hex') then
-        Wait.condition(
-            function() blip(obj) end,
-            function() return rest(obj) end,
-            2)
-    end
 end
 
 
@@ -55,12 +37,19 @@ function onObjectPickUp(player, obj)
     end
 end
 
+
 function onObjectEnterScriptingZone(zone, obj)
     addButtonToTechTile(zone, obj)
     discoverBoardsToSetRace(zone, obj)
 end
 
+
 function onObjectLeaveScriptingZone(zone, leave_object)
     checkIfPlayerChangedBoards(zone, leave_object)
     removeButtonFromTechTile(zone, leave_object)
+end
+
+function onSave()
+    if DEBUG then log(luaScriptState, "onSave: Triggered") end
+    return dataToSave()
 end
