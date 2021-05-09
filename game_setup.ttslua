@@ -399,6 +399,18 @@ function setup_minor_species()
     end
 end
 
+function saveStartingInfo()
+    -- Save the starting information
+
+    start_time = Time.time
+    for _, c in pairs(getSeatedPlayers()) do
+        players_info[c] = {
+            ['steam_name'] = Player[c].steam_name,
+            ['steam_id'] = Player[c].steam_id,
+        }
+    end
+end
+
 function setupFirstRound()
     local players = #getSeatedPlayers()
     local round = tonumber(RoundMarker.getDescription()) + 1
@@ -407,12 +419,13 @@ function setupFirstRound()
     printToAll(string.format("- Setting up for %d players -", players),
     {0.8,0.8,0.8})
 
+    saveStartingInfo()
     pickRandomNPC()
 
-    if useWarpTiles then fillWithWarp()
-    elseif useGuardians then fillWithGuardians()
-    elseif useHybrid then setupHybridTwoPlayer() end
-    if useHives then addHives() end
+    if setup_options.useWarpTiles then fillWithWarp()
+    elseif setup_options.useGuardians then fillWithGuardians()
+    elseif setup_options.useHybrid then setupHybridTwoPlayer() end
+    if setup_options.useHives then addHives() end
 
 
     unflipColonyAndSkippers()

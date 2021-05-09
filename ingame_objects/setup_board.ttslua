@@ -46,11 +46,17 @@ function onload()
     self.createButton(pyxisButton)
 end
 
+function set_options(varName, value)
+    local t = Global.getTable('setup_options')
+    t[varName] = value
+    Global.setTable('setup_options', t)
+end
+
 function setupButtonFunc(obj, color, alt_click)
-    Global.setVar('useWarpTiles', switches[warpLabel])
-    Global.setVar('useGuardians', switches[guardianLabel])
-    Global.setVar('useHives', switches[hivesLabel])
-    Global.setVar('useHybrid', switches[hybridLabel])
+    set_options('useWarpTiles', switches[warpLabel])
+    set_options('useGuardians', switches[guardianLabel])
+    set_options('useHives', switches[hivesLabel])
+    set_options('useHybrid', switches[hybridLabel])
 
     Global.call('setupFirstRound')
     self.destruct()

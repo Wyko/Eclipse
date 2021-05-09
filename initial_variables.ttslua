@@ -47,9 +47,13 @@ local pop_cube_bag = nil
 local activeGuardianBag = nil
 local activeAncientsBag = nil
 
-useWarpTiles = false
-useHives = false
-riseOfTheAncients = false
+setup_options = {
+    useWarpTiles = false,
+    useHives = false,
+    useGuardians = false,
+    useHybrid = false,
+    riseOfTheAncients = false,
+}
 
 local possibleColors = {'White', 'Yellow', 'Red', 'Green', 'Blue', 'Purple'}
 
@@ -1472,6 +1476,17 @@ local warpBag = nil
 
 local colonyShipBag = nil
 local colonyShipBag_GUID = '904d0e'
+
+
+local players_info = {
+    White = {},
+    Yellow = {},
+    Red = {},
+    Green = {},
+    Blue = {},
+    Purple = {},
+}
+local start_time = nil
 
 
 function loadObjects()

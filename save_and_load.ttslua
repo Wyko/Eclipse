@@ -43,7 +43,7 @@ end
 
 function dataToSave()
     local state = {
-        ['starting_players'] = starting_players,
+        ['players_info'] = players_info,
         ['game_id'] = game_id,
         ['start_time'] = start_time,
         ['setup_options'] = setup_options,
