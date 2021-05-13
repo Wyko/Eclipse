@@ -10,6 +10,7 @@ local hybridLabel = "Set Up for \n2-Player Hybrid"
 local hivesLabel = "Include\nAncient Hives"
 local pyxisLabel = "Include Pyxis Unity"
 local lyraLabel = "Include Lyra"
+local uploadLabel = "Upload Results\nto the Cloud"
 
 local switches = {
     [rotaLabel] = true,
@@ -19,6 +20,7 @@ local switches = {
     [hybridLabel] = false,
     [pyxisLabel] = true,
     [lyraLabel] = false,
+    [uploadLabel] = false,
 }
 
 local toggleGroup_Fill = {warpLabel, guardianLabel, hybridLabel}
@@ -34,6 +36,7 @@ local hivesButton = {click_function = "hivesButtonFunc", function_owner = self, 
 local lyraButton = {click_function = "lyraButtonFunc", function_owner = self, label = lyraLabel, position = {0, 0.300000011920929, -0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[lyraLabel]], tooltip = "Include Lyra"}
 local pyxisButton = {click_function = "pyxisButtonFunc", function_owner = self, label = pyxisLabel, position = {0, 0.300000011920929, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[pyxisLabel]], tooltip = "Include Pyxis Unity"}
 
+local uploadButton = {click_function = "uploadButtonFunc", function_owner = self, label = uploadLabel, position = {1.3, 0.300000011920929, 0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[uploadLabel]], tooltip = "Upload the results of this game to the [0000ff][b]Eclipse Analytics Project[/b][-].\n\nThe Eclipse Analytics Project is a joint community effort to gather statistics over Eclipse: Second Dawn. These statistics include things like player performance, faction balance issues, average playtime, etc. The ultimate goal of the project is twofold:\nOne: It will gather valuable data about the relative power of the various factions to aid in rebalancing future editions / fan-made expansions.\nTwo: It will provide the foundation for a ranked ELO-based system to measure your skill against your peers!\n\nWe encourage you to click this button and upload your game data, but this is [b]entirely optional[/b] and, in fact, will always be [b]opt-in only[/b].\n\nSometime soon, this section will be expanded by a URL you can go to in order to view the aggregated data, but we are still working on building the website. If you happen to have any experience designing a website like this, particularly one using Flask/Python, please feel free to join the project by going to the Discord link in the mod's description on the Steam Workshop!"}
 
 function onload()
     self.createButton(setupButton)
@@ -44,6 +47,8 @@ function onload()
     self.createButton(hybridButton)
     -- self.createButton(lyraButton)
     self.createButton(pyxisButton)
+
+    self.createButton(uploadButton)
 end
 
 function set_options(varName, value)
@@ -60,6 +65,7 @@ function setupButtonFunc(obj, color, alt_click)
     set_options('useRota', switches[rotaLabel])
     set_options('usePyxis', switches[pyxisLabel])
     set_options('useLyra', switches[lyraLabel])
+    set_options('uploadData', switches[uploadLabel])
 
     Global.call('setupFirstRound')
     self.destruct()
@@ -79,6 +85,10 @@ end
 
 function hivesButtonFunc()
     updateInterface(hivesLabel)
+end
+
+function uploadButtonFunc()
+    updateInterface(uploadLabel)
 end
 
 function lyraButtonFunc()

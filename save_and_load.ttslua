@@ -48,11 +48,12 @@ function dataToSave()
         ['start_time'] = start_time,
         ['setup_options'] = setup_options,
     }
-    return JSON.encode(state)
+    return JSON.encode_pretty(state)
 end
 
 function loadSave(saved_data)
-    if (saveData ~= nil and saveData ~= "") then
+    if (saved_data ~= nil and saved_data ~= "") then
+        log(saved_data, 'Loaded saved_data')
         local loaded_data = JSON.decode(saved_data)
         for k, v in pairs(loaded_data) do
             if type(v) == 'table' then

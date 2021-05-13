@@ -1,5 +1,5 @@
 function makeDebugButton()
-    -- if not DEBUG then return end
+    if not DEBUG then return end
     local tooltip= "Debugging Button. You probably shouldn't be seeing this."
     local data = {click_function = "debugButton", tooltip=tooltip, function_owner = self, label = "Debug\nButton", position = {5.45, 0.2, 4.15}, scale = {0.3, 0.3, 0.3}, width = 1600, height = 800, font_size = 300}
     local board = getObjectFromGUID('48e151')
@@ -8,13 +8,5 @@ function makeDebugButton()
 end
 
 function debugButton(obj, color, alt_click)
-    local data = {
-        scores = JSON.encode(scoreGame()),
-    }
-
-    WebRequest.post("https://eclipse-analytics.uc.r.appspot.com/", data, returnHandler)
-end
-
-function returnHandler(response)
-    log(response.text)
+    uploadGame()
 end

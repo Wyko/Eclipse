@@ -1,0 +1,54 @@
+local url = "https://eclipse-analytics.uc.r.appspot.com/"
+-- local url = "http://localhost/"
+
+function returnHandler(response)
+    log(response.text)
+end
+
+function uploadGame()
+    local host = get_host()
+    local data = {
+        scores = JSON.encode(scoreGame()),
+        players_info = JSON.encode(players_info),
+        setup_options = JSON.encode(setup_options),
+        player_races = JSON.encode(PlayerRace),
+        start_time = start_time,
+        host_name = host.steam_name,
+        host_id = host.steam_id,
+        game_id = game_id,
+    }
+
+    WebRequest.post(url .. 'post_game', data, returnHandler)
+end
+
+
+function get_host()
+    -- Get the host
+    for _, player in ipairs(Player.getPlayers()) do
+        if player.host then
+            return player
+        end
+    end
+end
+
+function getGameId()
+
+    local host = get_host()
+
+    local data = {
+        host_name = host.steam_name,
+        host_id = host.steam_id,
+        players_info = JSON.encode(players_info),
+    }
+
+    WebRequest.post(url .. 'game_id', data, processGameId)
+end
+
+function processGameId(response)
+    if response.is_error then
+        log(response.error)
+    else
+        log(response.text, 'New Game_ID')
+        game_id = response.text
+    end
+end

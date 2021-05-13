@@ -421,6 +421,12 @@ function setupFirstRound()
 
     saveStartingInfo()
     pickRandomNPC()
+    if setup_options.uploadData then
+        printToAll('\nThis game will be uploaded to the Eclipse Analytics Project.\n\nPlease note that this is still an experimental feature. If you encounter any problems with scoring or uploading (happens automatically during scoring), please make a bug report in the discussions tab of the Steam Workshop page for this mod. Thanks!\n')
+        getGameId()
+    else
+        printToAll('This game will [ff0000]not[-] be uploaded to the Eclipse Analytics Project.')
+    end
 
     if setup_options.useWarpTiles then fillWithWarp()
     elseif setup_options.useGuardians then fillWithGuardians()

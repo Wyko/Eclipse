@@ -15,5 +15,6 @@ setup_options = {
     useHives = false,
     useGuardians = false,
     useHybrid = false,
-    riseOfTheAncients = false,
+    useRota = true,
+    uploadData = false,
 }

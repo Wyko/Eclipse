@@ -8,7 +8,19 @@ end
 
 function scoreButton(obj, color, alt_click)
     scoreGame(color, true)
+
+    -- Upload the game data
+    local eg = isEndGame()
+    if setup_options.uploadData and (eg or DEBUG) then
+        log('Attempting to upload game to the Eclipse Analytics Project',
+            'scoreButton')
+        if not pcall(uploadGame) then log('Error while uploading game!') end
+    else
+        log('Not uploading game. uploadData: ['..setup_options.uploadData..
+            '] or isEndGame(): ['..eg..'] is false.')
+    end
 end
+
 
 function scoreGame(color, printOut)
     printOut = printOut or true
@@ -71,7 +83,7 @@ function scoreGame(color, printOut)
     end
     if printOut and color then printToColor(totalString, color) end
 
-    if allPlayersPassed() and (getCurrentRound() >= 8) then
+    if isEndGame() then
         Notes.setNotes(totalString .. '\n' .. fullString)
     end
 
