@@ -16,8 +16,9 @@ function scoreButton(obj, color, alt_click)
             'scoreButton')
         if not pcall(uploadGame) then log('Error while uploading game!') end
     else
-        log('Not uploading game. uploadData: ['..setup_options.uploadData..
-            '] or isEndGame(): ['..eg..'] is false.')
+        log('Not uploading game. uploadData: ['..
+            tostring(setup_options.uploadData) ..'] or isEndGame(): ['..
+            tostring(eg)..'] is false.')
     end
 end
 

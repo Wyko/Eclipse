@@ -411,6 +411,8 @@ function saveStartingInfo()
     end
 end
 
+
+
 function setupFirstRound()
     local players = #getSeatedPlayers()
     local round = tonumber(RoundMarker.getDescription()) + 1

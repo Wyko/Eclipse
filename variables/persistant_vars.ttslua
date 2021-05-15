@@ -1,5 +1,5 @@
 -- Variables that need to be saved between sessions
-local players_info = {
+players_info = {
     White = {},
     Yellow = {},
     Red = {},
@@ -8,7 +8,7 @@ local players_info = {
     Purple = {},
 }
 
-local start_time = nil
+start_time = nil
 
 setup_options = {
     useWarpTiles = false,
