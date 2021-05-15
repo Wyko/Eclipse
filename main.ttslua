@@ -2,8 +2,9 @@ local hideStuff = true
 
 DEBUG = false
 
+-- Variables
+#include variables\all_vars
 
-#include initial_variables
 #include builtin_functions
 #include game_setup
 #include player_board
@@ -16,8 +17,8 @@ DEBUG = false
 #include console++
 #include scoring
 #include debugging
-#include initial_draft
 #include save_and_load
+#include web
 -- #include combat
 
 -- Factions

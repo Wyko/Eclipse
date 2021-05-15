@@ -1,0 +1,20 @@
+-- Variables that need to be saved between sessions
+players_info = {
+    White = {},
+    Yellow = {},
+    Red = {},
+    Green = {},
+    Blue = {},
+    Purple = {},
+}
+
+start_time = nil
+
+setup_options = {
+    useWarpTiles = false,
+    useHives = false,
+    useGuardians = false,
+    useHybrid = false,
+    useRota = true,
+    uploadData = false,
+}

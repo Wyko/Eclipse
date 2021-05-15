@@ -108,3 +108,8 @@ function blipHex(obj)
             2)
     end
 end
+
+
+function isEndGame()
+    return (getCurrentRound() >= 8 and allPlayersPassed())
+end
