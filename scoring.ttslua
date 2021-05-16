@@ -67,7 +67,7 @@ function scoreGame(color, printOut)
     _score(getPointsForWarpTokens(), 'Warp Tokens')
     _score(getPointsForAncients(), 'Draco Ancients')
     _score(getPointsForExileOrbitals(), 'Exiles Orbitals')
-    _score(getPointsForPyxisStarbases(), 'Pyxis Starbases')
+    _score(getPointsForPyxisStarbases(), 'Pyxis Deathmoons')
     _score(losePointsForBeingTraitor(), 'Traitor Tile')
 
     -- Only score rep at the end of the game
@@ -387,10 +387,11 @@ function getPointsForPyxisStarbases()
 
                 -- Score the starbase
                 if points[c] == nil then points[c] = 0 end
-                points[c] = points[c] + 4
+
+                -- Check if the deathmoon is stacked
+                points[c] = points[c] + (4 * numStackedObjects(m))
             end
         end
-
     end
 
     return points

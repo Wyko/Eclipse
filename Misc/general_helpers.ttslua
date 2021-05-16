@@ -310,3 +310,13 @@ function get_host()
         end
     end
 end
+
+
+function numStackedObjects(obj)
+    -- Returns the number of stacked objects, or 1 if unstacked
+    if obj.getQuantity() == -1 then
+        return 1
+    else
+        return obj.getQuantity()
+    end    
+end
