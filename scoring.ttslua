@@ -11,14 +11,14 @@ function scoreButton(obj, color, alt_click)
 
     -- Upload the game data
     local eg = isEndGame()
-    if setup_options.uploadData and (eg or DEBUG) then
+    if setup_options.ranked and (eg or DEBUG) then
         log('Attempting to upload game to the Eclipse Analytics Project',
             'scoreButton')
         if not pcall(uploadGame) then log('Error while uploading game!') end
     else
-        log('Not uploading game. uploadData: ['..
-            tostring(setup_options.uploadData) ..'] or isEndGame(): ['..
-            tostring(eg)..'] is false.')
+        log('Not uploading game. Either setup_options.ranked ['..
+            tostring(setup_options.ranked) ..'] or isEndGame() ['..
+            tostring(eg)..'] is set to "false".')
     end
 end
 
