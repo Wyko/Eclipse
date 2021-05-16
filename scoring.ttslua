@@ -309,7 +309,8 @@ function getPointsForAncients()
         -- Score the ancient
         if hex ~= nil then
             if points[c] == nil then points[c] = 0 end
-            points[c] = points[c] + 1
+            -- Score stacks of ancients too
+            points[c] = points[c] + numStackedObjects(m)
         end
     end
 
