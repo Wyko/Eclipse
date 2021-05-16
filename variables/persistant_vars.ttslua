@@ -7,14 +7,18 @@ players_info = {
     Blue = {},
     Purple = {},
 }
-
 start_time = nil
+setup_options = {}
 
-setup_options = {
-    useWarpTiles = false,
-    useHives = false,
-    useGuardians = false,
-    useHybrid = false,
-    useRota = true,
-    ranked = false,
-}
+function clearSaveState()
+    players_info = {
+        White = {},
+        Yellow = {},
+        Red = {},
+        Green = {},
+        Blue = {},
+        Purple = {},
+    }
+    start_time = nil
+    setup_options = {}
+end

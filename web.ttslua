@@ -34,8 +34,6 @@ function uploadGame()
 end
 
 
-
-
 function getGameId()
     log('Requesting new game id')
     WebRequest.get(url .. 'game_id', processGameId)

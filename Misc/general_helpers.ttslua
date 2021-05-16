@@ -318,5 +318,16 @@ function numStackedObjects(obj)
         return 1
     else
         return obj.getQuantity()
-    end    
+    end
+end
+
+
+function isDev(plr)
+    -- Returns true if the given player is a developer. Currently, just me.
+    local devs = {'76561197970723950', }
+
+    for _, d in ipairs(devs) do
+        if plr.steam_id == d then return true end
+    end
+    return false
 end
