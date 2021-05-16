@@ -234,14 +234,18 @@ function getPointsForReputation()
 end
 
 function scoreReputation(color)
-    local t = TableGUIDs[color]
     local points = 0
-    local results = castBoxAndCheck(t, nil, 'Rep Tile')
+    local results = getReputationTiles(color)
 
     for _, tile in pairs(results) do
         points = points + tile.getVar('reputation')
     end
     return points
+end
+
+function getReputationTiles(color)
+    local t = TableGUIDs[color]
+    return castBoxAndCheck(t, nil, 'Rep Tile')
 end
 
 function getPointsForAmbassadors()
