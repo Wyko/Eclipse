@@ -24,6 +24,8 @@ end
 
 
 function scoreGame(color, printOut)
+    log('Color: ['..tostring(color)..'], printOut: ['..tostring(printOut)..
+        ']', 'scoreGame: Passed Arguments')
     printOut = printOut or true
     local fullString = ''
     local total = {}
@@ -48,6 +50,7 @@ function scoreGame(color, printOut)
         fullString = fullString .. '\n' .. printString
     end
 
+    -- TODO: Add check to verify that there are no models AND tiles on a hex
     if ownerOfRace('Descendants of Draco') ~= nil and printOut and color then
         printToColor(ojText('Note for Draco: ') ..
         'The scoring script scores ancient ship models AND tiles. In order ' ..
@@ -67,25 +70,34 @@ function scoreGame(color, printOut)
     _score(getPointsForPyxisStarbases(), 'Pyxis Starbases')
     _score(losePointsForBeingTraitor(), 'Traitor Tile')
 
-
-    if getCurrentRound() >= 8 and allPlayersPassed() then
+    -- Only score rep at the end of the game
+    if isEndGame() then
         _score(getPointsForReputation(), 'Reputation Tiles')
     elseif printOut and color then
-        printToColor('Not scoring reputation due to hidden info.', color)
+        printToColor('Not scoring reputation until the end of round 8.', color)
     end
 
-    local totalString = '\nTotal Points:\n'
 
+    -- Generate the final score message to print to the chat
+    local totalString = '\nTotal Points:\n'
     for c, t in pairs(total) do
         local name = ''
         if Player[c].seated then name = Player[c].steam_name .. ', ' end
         totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
             ' ('.. name ..PlayerRace[c]..'): '..tostring(t.score)..'\n'
     end
-    if printOut and color then printToColor(totalString, color) end
 
+    -- Print the score to all players if the game is over, otherwise only to
+    -- the one player
     if isEndGame() then
+        log('Printing score to all players', 'scoreGame')
         Notes.setNotes(totalString .. '\n' .. fullString)
+        printToAll(totalString)
+    else
+        if printOut and color then
+            log('Printing score to player ['..tostring(color)..']', 'scoreGame')
+            printToColor(totalString, color)
+        end
     end
 
     return total

@@ -42,26 +42,32 @@ end
 
 
 function dataToSave()
+    -- This is tied to the onSave builtin function. 'State' stores the variables
+    -- saved in the onSave action
 
-    -- log(players_info, 'dataToSave: players_info')
+    if DEBUG then log(players_info, 'dataToSave: players_info') end
+
     local state = {
         ['players_info'] = players_info,
         ['setup_options'] = setup_options,
         ['game_id'] = game_id,
         ['start_time'] = start_time,
     }
-    -- log(state, 'dataToSave: Pre-Encode State')
+
+    if DEBUG then log(state, 'dataToSave: Pre-Encode State') end
     local save_data = JSON.encode_pretty(state)
-    log(save_data, 'dataToSave: Saved Data')
+    if DEBUG then log(save_data, 'dataToSave: Saved Data') end
     return save_data
 end
 
 function loadSave(saved_data)
+    -- Load saved data into memory
+
     if (saved_data ~= nil and saved_data ~= "") then
         log(saved_data, 'loadSave: Loaded saved_data')
 
         local loaded_data = JSON.decode(saved_data)
-        -- log(loaded_data, 'loadSave: Decoded data')
+        if DEBUG then log(loaded_data, 'loadSave: Decoded data') end
 
         for k, v in pairs(loaded_data) do
             if type(v) == 'table' then
