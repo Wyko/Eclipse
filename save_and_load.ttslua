@@ -20,12 +20,12 @@ function loadOngoingGame()
             -- Return influence button
             spawnReturnInfluenceButton(board)
 
-            -- Player Faction from board name
-            players[color].faction = board.getName()
+            -- PlayerRace
+            PlayerRace[color] = board.getName()
 
             -- PlayerMarkers
             PlayerMarkers[color] = getObjectFromGUID(
-                factions[players[color].faction].PassMarker_GUID)
+                factions[PlayerRace[color]].PassMarker_GUID)
 
             if not PlayerMarkers[color] then
                 log('Player marker for '..color..' not found')
@@ -52,9 +52,7 @@ function dataToSave()
     }
     -- log(state, 'dataToSave: Pre-Encode State')
     local save_data = JSON.encode_pretty(state)
-    if DEBUG then
-        log(save_data, 'dataToSave: Saved Data')
-    end
+    log(save_data, 'dataToSave: Saved Data')
     return save_data
 end
 

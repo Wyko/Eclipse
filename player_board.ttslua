@@ -199,7 +199,7 @@ function discoverBoardsToSetRace(zone, obj)
     end
 
     local color = split(zone.getName(), " ")[1] -- Get the player's name
-    if players[color].faction ~= obj.getName() then
+    if PlayerRace[color] ~= obj.getName() then
 
         -- Restart the timer on the set race function
         if boardSelectCallbackFunction[color] then
@@ -228,7 +228,7 @@ function checkIfPlayerChangedBoards(zone, obj)
     -- then trigger the race reset timer. If the timer runs out and the board
     -- is still absent from the zone, return the player markers and clear the
     -- saved race variables.
-    if players[color].faction == obj.getName() then
+    if PlayerRace[color] == obj.getName() then
         Wait.time(function() resetRace(color, zone, obj) end, 5, 0)
     end
 end
@@ -243,11 +243,11 @@ function resetRace(playerColor, zone, obj)
     end
 
     -- Don't spam the chat in case multiple checks were started
-    if players[color].faction == obj.getName() then
+    if PlayerRace[playerColor] == obj.getName() then
         printToAll(playerColor .. " returned " .. obj.getName(), playerColor)
     end
 
-    players[color].faction = nil
+    PlayerRace[playerColor] = nil
     if PlayerMarkers[playerColor] ~= nil then
         PlayerMarkers[playerColor].setColorTint(Color.White)
         PlayerMarkers[playerColor].setDescription('')
@@ -268,12 +268,12 @@ function setRace(playerColor, zone, obj)
 
             -- Only print to chat if this is the first time the player selects
             -- this race (in case they move their board, etc)
-            if players[color].faction ~= obj.getName() then
+            if PlayerRace[playerColor] ~= obj.getName() then
                 broadcastToAll(playerColor .. " has picked " .. obj.getName(),
                                playerColor)
             end
 
-            players[color].faction = obj.getName()
+            PlayerRace[playerColor] = obj.getName()
             PlayerMarkers[playerColor] = takePassMarker(playerColor)
             obj.setLock(true)
             break
@@ -282,13 +282,13 @@ function setRace(playerColor, zone, obj)
 end
 
 function playersWithoutBoards()
-    playersWithoutBoards = {}
+    players = {}
     for _, color in pairs(getSeatedPlayers()) do
         if not hasPlayerBoard(color) then
-            table.insert(playersWithoutBoards, color)
+            table.insert(players, color)
         end
     end
-    return playersWithoutBoards
+    return players
 end
 
 function ownerOfBoard(board)

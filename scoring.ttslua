@@ -80,7 +80,7 @@ function scoreGame(color, printOut)
         local name = ''
         if Player[c].seated then name = Player[c].steam_name .. ', ' end
         totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
-            ' ('.. name ..players[c].faction..'): '..tostring(t.score)..'\n'
+            ' ('.. name ..PlayerRace[c]..'): '..tostring(t.score)..'\n'
     end
     if printOut and color then printToColor(totalString, color) end
 
@@ -116,7 +116,7 @@ function getPointsForControlledHexes()
             assert(rep~=nil, 'Hex ['..hex.getDescription()..'] has no VP data.' )
 
             -- Score Planta
-            if players[c].faction == 'Planta' then points[c] = points[c] + 1 end
+            if PlayerRace[c] == 'Planta' then points[c] = points[c] + 1 end
 
             -- Add the points to the owner's score
             points[c] = points[c] + rep
@@ -152,8 +152,8 @@ function scoreDiscoveryTile(tile, color)
         return 2
 
     -- Score Magellan
-    elseif players[color].faction ~= nil and
-           string.find(players[color].faction, 'Magellan') then
+    elseif PlayerRace[color] ~= nil and
+           string.find(PlayerRace[color], 'Magellan') then
         score = score + 1
     end
 
@@ -279,8 +279,8 @@ end
 function getPointsForAncients()
     -- Only score if Draco is present
     local c = nil
-    for color, v in pairs(players) do
-        if v.faction == 'Descendants of Draco' then
+    for color, race in pairs(PlayerRace) do
+        if race == 'Descendants of Draco' then
             c = color
             break
         end

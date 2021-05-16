@@ -146,15 +146,15 @@ function takePassMarker(playerColor)
         position = passRestingPositions[playerColor],
         callback_function = function(obj) colorPassMarker(obj, playerColor) end,
     }
-    marker = SeekAndTake(players[playerColor].faction, turnBag, param)
+    marker = SeekAndTake(PlayerRace[playerColor], turnBag, param)
 
     -- Check to see if it's on the map
     if not marker then
-        log('Turn marker ' .. tostring(players[playerColor].faction) ..
+        log('Turn marker ' .. tostring(PlayerRace[playerColor]) ..
             ' not found anywhere for ' .. playerColor)
         return false
     else
-        log('Turn marker ' .. tostring(players[playerColor].faction) ..
+        log('Turn marker ' .. tostring(PlayerRace[playerColor]) ..
             ' found for ' .. playerColor)
     end
     marker.setDescription(Player[playerColor].steam_name)
