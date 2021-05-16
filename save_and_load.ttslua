@@ -1,0 +1,93 @@
+function loadOngoingGame()
+    printToAll('Script is attempting to recover ongoing game state')
+
+    -- Pass state
+    for color,guid in pairs(PassCards) do
+        local obj = getObjectFromGUID(guid)
+        if obj then
+            printToAll(color .. " passed: " .. tostring(obj.is_face_down), color)
+            passed[color] = obj.is_face_down
+        end
+    end
+    -- After four seconds, start the "All players passed" check
+    Wait.time(setPassCheck, 4)
+
+    for color, _ in pairs(PlayerBoardZones) do
+        if hasPlayerBoard(color) then
+            local board = hasPlayerBoard(color)
+            printToAll(color .. " picked " .. board.getName(), color)
+
+            -- Return influence button
+            spawnReturnInfluenceButton(board)
+
+            -- PlayerRace
+            PlayerRace[color] = board.getName()
+
+            -- PlayerMarkers
+            PlayerMarkers[color] = getObjectFromGUID(
+                factions[PlayerRace[color]].PassMarker_GUID)
+
+            if not PlayerMarkers[color] then
+                log('Player marker for '..color..' not found')
+                PlayerMarkers[color] = takePassMarker(color)
+            else
+                log('Player marker for '..color..' found: '..tostring(PlayerMarkers[color].getName()))
+            end
+        end
+    end
+    showNextRoundButton()
+
+end
+-- TODO: Add AD board
+
+
+function dataToSave()
+    -- This is tied to the onSave builtin function. 'State' stores the variables
+    -- saved in the onSave action
+
+    if DEBUG then log(players_info, 'dataToSave: players_info') end
+
+    local state = {
+        ['players_info'] = players_info,
+        ['setup_options'] = setup_options,
+        ['game_id'] = game_id,
+        ['start_time'] = start_time,
+    }
+
+    if DEBUG then log(state, 'dataToSave: Pre-Encode State') end
+    local save_data = JSON.encode_pretty(state)
+    if DEBUG then log(save_data, 'dataToSave: Saved Data') end
+    return save_data
+end
+
+function loadSave(saved_data)
+    -- Load saved data into memory
+
+    if (saved_data ~= nil and saved_data ~= "") then
+        log(saved_data, 'loadSave: Loaded saved_data')
+
+        local loaded_data = JSON.decode(saved_data)
+        if DEBUG then log(loaded_data, 'loadSave: Decoded data') end
+
+        for k, v in pairs(loaded_data) do
+            if type(v) == 'table' then
+                Global.setTable(k, v)
+            else
+                Global.setVar(k, v)
+            end
+        end
+    end
+end
+
+--
+-- function encode_table(t)
+--     local encoded_t = {}
+--
+--     for k, v in pairs(t) do
+--         if type(v) == 'table' then
+--             v = encode_table(v)
+--         end
+--         encoded_t[k] = JSON.encode(v)
+--     end
+--     return encoded_t
+-- end

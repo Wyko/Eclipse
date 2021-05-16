@@ -1,21 +1,57 @@
+function makeScoreButton()
+    local tooltip= "Score the game and print the results to chat. Reputation will only be scored at the end of the game."
+    local data = {click_function = "scoreButton", tooltip=tooltip, function_owner = self, label = "Score", position = {3.5, 0.2, 3.6}, scale = {0.5, 0.5, 0.5}, width = 2000, height = 600, font_size = 400}
+    local board = getObjectFromGUID('48e151')
+    assert(board ~= nil)
+    board.createButton(data)
+end
+
+function scoreButton(obj, color, alt_click)
+    scoreGame(color, true)
+
+    -- Upload the game data
+    local eg = isEndGame()
+    if setup_options.ranked and (eg or DEBUG) then
+        log('Attempting to upload game to the Eclipse Analytics Project',
+            'scoreButton')
+        if not pcall(uploadGame) then log('Error while uploading game!') end
+    else
+        log('Not uploading game. Either setup_options.ranked ['..
+            tostring(setup_options.ranked) ..'] or isEndGame() ['..
+            tostring(eg)..'] is set to "false".')
+    end
+end
+
+
 function scoreGame(color, printOut)
+    log('Color: ['..tostring(color)..'], printOut: ['..tostring(printOut)..
+        ']', 'scoreGame: Passed Arguments')
     printOut = printOut or true
     local fullString = ''
     local total = {}
 
     function _score(t, source)
         if t == nil or next(t) == nil then return end
+
+        -- local safeSource = string.gsub(source, ' ', '_')
         local printString = source .. ': '
         for c, points in pairs(t) do
-            if total[c] == nil then total[c] = 0 end
+
+            -- Initialize the player's score if needed
+            if total[c] == nil then total[c] = {['score'] = 0} end
+
+            -- Log the score, both totally and individually
+            total[c][source] = points
+            total[c].score = total[c].score + points
+
             printString = printString .. c..': '..tostring(points)..', '
-            total[c] = total[c] + points
         end
-        if printOut then printToColor(printString, color) end
+        if printOut and color then printToColor(printString, color) end
         fullString = fullString .. '\n' .. printString
     end
 
-    if ownerOfRace('Descendants of Draco') ~= nil then
+    -- TODO: Add check to verify that there are no models AND tiles on a hex
+    if ownerOfRace('Descendants of Draco') ~= nil and printOut and color then
         printToColor(ojText('Note for Draco: ') ..
         'The scoring script scores ancient ship models AND tiles. In order ' ..
         'to not score double points for Draco, please use only one type of '..
@@ -31,27 +67,37 @@ function scoreGame(color, printOut)
     _score(getPointsForWarpTokens(), 'Warp Tokens')
     _score(getPointsForAncients(), 'Draco Ancients')
     _score(getPointsForExileOrbitals(), 'Exiles Orbitals')
-    _score(getPointsForPyxisStarbases(), 'Pyxis Starbases')
+    _score(getPointsForPyxisStarbases(), 'Pyxis Deathmoons')
+    _score(losePointsForBeingTraitor(), 'Traitor Tile')
 
-    if getCurrentRound() >= 8 and allPlayersPassed() then
+    -- Only score rep at the end of the game
+    if isEndGame() then
         _score(getPointsForReputation(), 'Reputation Tiles')
-    else
-        printToColor('Not scoring reputation due to hidden info.', color)
+    elseif printOut and color then
+        printToColor('Not scoring reputation until the end of round 8.', color)
     end
 
 
+    -- Generate the final score message to print to the chat
     local totalString = '\nTotal Points:\n'
-
     for c, t in pairs(total) do
         local name = ''
         if Player[c].seated then name = Player[c].steam_name .. ', ' end
         totalString = totalString .. '   ['..Color[c]:toHex()..']'..c..'[-]'..
-            ' ('.. name ..PlayerRace[c]..'): '..tostring(t)..'\n'
+            ' ('.. name ..PlayerRace[c]..'): '..tostring(t.score)..'\n'
     end
-    if printOut then printToColor(totalString, color) end
 
-    if allPlayersPassed() and (getCurrentRound() >= 8) then
+    -- Print the score to all players if the game is over, otherwise only to
+    -- the one player
+    if isEndGame() then
+        log('Printing score to all players', 'scoreGame')
         Notes.setNotes(totalString .. '\n' .. fullString)
+        printToAll(totalString)
+    else
+        if printOut and color then
+            log('Printing score to player ['..tostring(color)..']', 'scoreGame')
+            printToColor(totalString, color)
+        end
     end
 
     return total
@@ -188,14 +234,18 @@ function getPointsForReputation()
 end
 
 function scoreReputation(color)
-    local t = TableGUIDs[color]
     local points = 0
-    local results = castBoxAndCheck(t, nil, 'Rep Tile')
+    local results = getReputationTiles(color)
 
     for _, tile in pairs(results) do
         points = points + tile.getVar('reputation')
     end
     return points
+end
+
+function getReputationTiles(color)
+    local t = TableGUIDs[color]
+    return castBoxAndCheck(t, nil, 'Rep Tile')
 end
 
 function getPointsForAmbassadors()
@@ -263,7 +313,8 @@ function getPointsForAncients()
         -- Score the ancient
         if hex ~= nil then
             if points[c] == nil then points[c] = 0 end
-            points[c] = points[c] + 1
+            -- Score stacks of ancients too
+            points[c] = points[c] + numStackedObjects(m)
         end
     end
 
@@ -341,10 +392,27 @@ function getPointsForPyxisStarbases()
 
                 -- Score the starbase
                 if points[c] == nil then points[c] = 0 end
-                points[c] = points[c] + 4
+
+                -- Check if the deathmoon is stacked
+                points[c] = points[c] + (4 * numStackedObjects(m))
             end
         end
+    end
 
+    return points
+end
+
+function losePointsForBeingTraitor()
+    local points = {}
+
+    -- Search each player's table for the traitor tile and score it
+    for c, _ in pairs(TableGUIDs) do
+        local t = TableGUIDs[c]
+        local results = castBoxAndCheck(t, nil, 'Traitor Tile')
+        if tableLen(results) > 0 then
+            points[c] = -2
+            break
+        end
     end
 
     return points

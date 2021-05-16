@@ -1,0 +1,19 @@
+function orchestrateCombat()
+    highlightTilesWithCombat()
+end
+
+function getTilesWithCombat()
+    local hexes = {}
+    local ships = getItemsInZone{zone= TableZone, tag='Ship'}
+
+    -- Make a table of all the ships on each hex
+    for _, ship in ipairs(ships) do
+        local hex = castAndCheckForTag(ship.getPosition(), 'hex')
+        if hexes[hex] == nil then hexes[hex] = {} end
+        table.insert(hexes[hex], ship)
+    end
+end
+
+function highlightTilesWithCombat()
+    error('Not Implemented')
+end

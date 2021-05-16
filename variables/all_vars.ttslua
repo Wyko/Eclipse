@@ -1,0 +1,35 @@
+#include general_vars
+#include persistant_vars
+#include faction_vars
+#include location_vars
+
+
+function loadObjects()
+    Rare_Technologies_board = getObjectFromGUID(Rare_Technologies_board_GUID)
+    TableZone = getObjectFromGUID(TableZone)
+    RoundMarker = getObjectFromGUID(RoundMarker_GUID)
+    TechBag = getObjectFromGUID(TechBag_GUID)
+    ReputationBag = getObjectFromGUID(ReputationBag_GUID)
+    DiscoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
+    Sector1Bag = getObjectFromGUID(Sector1Bag_GUID)
+    Sector2Bag = getObjectFromGUID(Sector2Bag_GUID)
+    Sector3Bag = getObjectFromGUID(Sector3Bag_GUID)
+    ExtraS3Bag = getObjectFromGUID(ExtraS3Bag_GUID)
+    OutpostBag = getObjectFromGUID(OutpostBag_GUID)
+    turnBag = getObjectFromGUID(turnBag)
+    turnTracker = getObjectFromGUID(turnTracker)
+    AmbassadorBag = getObjectFromGUID(AmbassadorBag_GUID)
+    pop_cube_bag = getObjectFromGUID(pop_cube_bag_GUID)
+    cruiser_bag_bag = getObjectFromGUID(cruiser_bag_bag_GUID)
+    interceptor_bag_bag = getObjectFromGUID(interceptor_bag_bag_GUID)
+    dread_bag_bag = getObjectFromGUID(dread_bag_bag_GUID)
+    starbase_bag_bag = getObjectFromGUID(starbase_bag_bag_GUID)
+    a_and_disc_bag = getObjectFromGUID(a_and_disc_bag_GUID)
+    orbitals_bag = getObjectFromGUID(orbitals_bag_GUID)
+    guardianBag = getObjectFromGUID('54fe91')
+    guardianModelBag = getObjectFromGUID('19e48c')
+    discoveryBag = getObjectFromGUID(DiscoveryBag_GUID)
+    warpBag = getObjectFromGUID('257134')
+    colonyShipBag = getObjectFromGUID(colonyShipBag_GUID)
+    scriptTechBag = getObjectFromGUID(scriptTechBag_GUID)
+end

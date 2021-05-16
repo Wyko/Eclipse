@@ -1,0 +1,24 @@
+-- Variables that need to be saved between sessions
+players_info = {
+    White = {},
+    Yellow = {},
+    Red = {},
+    Green = {},
+    Blue = {},
+    Purple = {},
+}
+start_time = nil
+setup_options = {}
+
+function clearSaveState()
+    players_info = {
+        White = {},
+        Yellow = {},
+        Red = {},
+        Green = {},
+        Blue = {},
+        Purple = {},
+    }
+    start_time = nil
+    setup_options = {}
+end

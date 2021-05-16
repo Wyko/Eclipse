@@ -1,0 +1,227 @@
+local RoundMarker_GUID = '7ad23d'
+local TechBag_GUID = 'd67d39'
+local ReputationBag_GUID = '3c5d08'
+local DiscoveryBag_GUID = '3c0b57'
+local Sector1Bag_GUID = '2adc64'
+local Sector2Bag_GUID = '3ae266'
+local Sector3Bag_GUID = 'd5cb79'
+local ExtraS3Bag_GUID = '69b446'
+local OutpostBag_GUID = '54fe91'
+local AmbassadorBag_GUID = '460e45'
+local nextRoundButton_GUID = '3d6d3a'
+
+local TableZone = '4980a7'
+local TechTileZone_GUID = 'd22a87'
+local pop_cube_bag_GUID = '8b1da0'
+local a_and_disc_bag_GUID = '0eff17'
+local orbitals_bag_GUID = 'f04483'
+
+local cruiser_bag_bag_GUID = '402516'
+local interceptor_bag_bag_GUID = 'dd7301'
+local dread_bag_bag_GUID = '6d8ec7'
+local starbase_bag_bag_GUID = 'bf2b77'
+local cruiser_bag_bag = nil
+local interceptor_bag_bag = nil
+local dread_bag_bag = nil
+local starbase_bag_bag = nil
+
+local hive_sector_2_GUID = '0387a0'
+local hive_sector_3_GUID = '545ff9'
+
+local scriptTechBag_GUID = '1bac99'
+local scriptTechBag = nil
+
+RoundMarker = nil
+local TechBag = nil
+local ReputationBag = nil
+local DiscoveryBag = nil
+local Sector1Bag = nil
+local Sector2Bag = nil
+local Sector3Bag = nil
+local OutpostBag = nil
+local AmbassadorBag = nil
+local pop_cube_bag = nil
+
+local activeGuardianBag = nil
+local activeAncientsBag = nil
+
+local possibleColors = {'White', 'Yellow', 'Red', 'Green', 'Blue', 'Purple'}
+
+Rare_Technologies_board_GUID = 'b4d2bf'
+Rare_Technologies_board = nil
+
+local Minor_Species_Board_GUID = '9b1821'
+
+
+local PlayerMarkers = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local player_ad_board = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local extra_bag_GUID = {
+    White = '86d7bb',
+    Yellow = '585779',
+    Red = '173754',
+    Green = '0868fd',
+    Blue = 'bc00b9',
+    Purple = '3a5eaa'
+}
+
+local materialsResourceMarker_GUID = '1f8225'
+local scienceResourceMarker_GUID = 'f83ba1'
+local moneyResourceMarker_GUID = '500402'
+
+local PlayerResourceMarkers = {
+    White = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Yellow = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Red = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Green = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Blue = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    },
+    Purple = {
+        ['money'] = nil,
+        ['science'] = nil,
+        ['materials'] = nil,
+    }
+}
+
+local TableGUIDs = {
+    ['White'] = 'f7a579', -- White
+    ['Yellow'] = '69781d', -- Yellow
+    ['Red'] = '4493a4', -- Red
+    ['Green'] = 'd38d11', -- Green
+    ['Blue'] = '63752e', -- Blue
+    ['Purple'] = 'cafe1f', -- Purple
+    -- ['RaceTable'] = 'ac4050', -- Table under the races at the end
+}
+
+local PassCards = { White = '891c67',
+                    Yellow = 'e2c83f',
+                    Red = '9ea7f0',
+                    Green = 'ec66c3',
+                    Blue = 'e1fdba',
+                    Purple = '6f944e'}
+
+local PassAreas = {[1] = 'b959ad',
+                   [2] = 'c3cc14',
+                   [3] = 'dc079b',
+                   [4] = 'a594ec',
+                   [5] = '22e3e7',
+                   [6] = '4a38d2'}
+
+local PlayerBoardZones = {
+    White = 'c98866',
+    Yellow = '150bb8',
+    Red = '9d03e7',
+    Green = 'e1765f',
+    Blue = 'f39a79',
+    Purple = '777f5a',
+}
+
+-- Stores the callback function when a player selects a board
+local boardSelectCallbackFunction = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local PlayerRace = {
+    White = nil,
+    Yellow = nil,
+    Red = nil,
+    Green = nil,
+    Blue = nil,
+    Purple = nil
+}
+
+local PlayerNumberToColor = {
+    [1] = 'White',
+    [2] = 'Yellow',
+    [3] = 'Red',
+    [4] = 'Green',
+    [5] = 'Blue',
+    [6] = 'Purple',
+}
+
+
+
+local tColor = { M = {1, 0.7, 0.8},
+                 G = {0.7, 1, 0.7},
+                 N = {1, 1, 0.7},
+                 R = {0.7, 0.8, 1}}
+local tBase = {  M = Vector(40.50, 1.38,  9.12),
+                 G = Vector(38.68, 1.38,  9.12),
+                 N = Vector(36.86, 1.38,  9.12),
+                 R = Vector(40.77, 1.04, 13.76)}
+local rBase = Vector(42.44, 1.5, 10.54)
+local aBase = Vector(36.07, 2.5, 16.55)
+local rdBase = Vector(42.5, 1.5, 10.56)
+local offsetTech = -1.814
+local offsetRare = -1.72
+local offsetRound = -1.56
+local offsetAmbassador = -2.04
+local outerSectors = {2, 5, 8, 14, 16, 18}
+local passed = {White = true, Yellow = true, Red = true,
+                Green = true, Blue = true, Purple = true}
+local passCheck = nil
+local turnBag = '9d696e'
+local turnTracker ='bcaf12'
+local InfluenceDiscs_GUID = '8f4c6b'
+
+techsToDraw = 0
+startPos = 1
+
+local shown = {buttons = false}
+
+local DisableGUIDs = {
+  '2204dd', 'fcb072', '476743', '8e569b', '833026', '8051ff',
+  'ac4050', --Race table
+  '77e0d1', --Turn Tracker
+  '2bd7cb', --Setup Board
+  'b9e58d', --Side Table
+}
+
+
+
+local guardianBag = nil
+local guardianModelBag = nil
+local discoveryBag = nil
+local warpBag = nil
+
+local colonyShipBag = nil
+local colonyShipBag_GUID = '904d0e'

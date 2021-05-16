@@ -332,13 +332,13 @@ function place_ambassadors(Box, takeParams, PlayerColor)
     if (tiles~=false) then
 
         local tile
+        local rot = board.getRotation()
         while tiles.getQuantity() > 1 do
             log(tiles.getQuantity(), 'place_ambassadors:num')
             local pos = positions[place].position
-            local rot = positions[place].rotation
             tiles.takeObject({
                 position          = board.positionToWorld(pos),
-                rotation          = board.positionToWorld(rot),
+                rotation          = rot,
                 callback_function = function (obj)
                     obj.setTags({'Ambassador'})
                     obj.use_grid = false
@@ -350,7 +350,7 @@ function place_ambassadors(Box, takeParams, PlayerColor)
 
         local pos = positions[place].position
         tile.setPositionSmooth(board.positionToWorld(pos))
-        tile.setRotation(positions[place].rotation)
+        tile.setRotation(rot)
         tile.setTags({'Ambassador'})
         tile.use_grid = false
     end
@@ -399,6 +399,18 @@ function setup_minor_species()
     end
 end
 
+function saveStartingInfo()
+    -- Save the starting information
+
+    start_time = Time.time
+    for _, c in pairs(getSeatedPlayers()) do
+        players_info[c] = {
+            ['steam_name'] = Player[c].steam_name,
+            ['steam_id'] = Player[c].steam_id,
+        }
+    end
+end
+
 function setupFirstRound()
     local players = #getSeatedPlayers()
     local round = tonumber(RoundMarker.getDescription()) + 1
@@ -407,12 +419,21 @@ function setupFirstRound()
     printToAll(string.format("- Setting up for %d players -", players),
     {0.8,0.8,0.8})
 
+    saveStartingInfo()
     pickRandomNPC()
+    if setup_options.ranked == true then
+        broadcastToAll('[ff0000]Notice[-]: This is a [ff0000]Ranked[-] game')
+        printToAll('\nRanked game mode enabled. At the end of the final round, your score will be uploaded and your ranked ELO (player ranking) will be updated.\n\nPlease note that this is still an experimental feature. If you encounter any problems with scoring or uploading (happens automatically during scoring), please make a bug report in the discussions tab of the Steam Workshop page for this mod. Thanks!\n')
 
-    if useWarpTiles then fillWithWarp()
-    elseif useGuardians then fillWithGuardians()
-    elseif useHybrid then setupHybridTwoPlayer() end
-    if useHives then addHives() end
+    else
+        printToAll('Casual game mode enabled. Player scores will not be uploaded.')
+    end
+    getGameId()
+
+    if setup_options.useWarpTiles then fillWithWarp()
+    elseif setup_options.useGuardians then fillWithGuardians()
+    elseif setup_options.useHybrid then setupHybridTwoPlayer() end
+    if setup_options.useHives then addHives() end
 
 
     unflipColonyAndSkippers()

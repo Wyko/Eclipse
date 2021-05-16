@@ -33,8 +33,7 @@ end
 function spawnInfluenceDisc(pos, color)
 
     local influenceBag= getObjectFromGUID(InfluenceDiscs_GUID)
-    local takeParams = {guid=1}
-    local disc = influenceBag.takeObject(takeParams)
+    local disc = influenceBag.takeObject()
 
     Wait.condition(
         function ()
@@ -73,11 +72,6 @@ end
 function returnInfluenceDiscs(board, color)
     -- Returns influence discs from the action spots on the board and the pass
     -- marker to the influence track for each player
-
-    -- if DEBUG then
-    --     placePyxisResources{color='White'}
-    --     return nil
-    -- end
 
     local InvPos = boardInvertFactor(board)
 

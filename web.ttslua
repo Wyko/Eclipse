@@ -1,0 +1,49 @@
+local url = "https://eclipse-analytics.uc.r.appspot.com/"
+-- local url = "http://localhost/"
+
+function returnHandler(response)
+    log(response.text, 'Upload Game Result')
+end
+
+function add_ranked_player_data(data)
+    -- Only upload player data if ranked mode was enabled during setup
+    if setup_options.ranked ~= true then return data end
+
+    local host = get_host()
+    data['players_info'] = JSON.encode(players_info)
+    data['host_name'] = host.steam_name
+    data['host_id'] = host.steam_id
+
+    return data
+end
+
+function uploadGame()
+    -- Upload only non-identifying data unless ranked mode was enabled
+    local data = {
+        scores = JSON.encode(scoreGame()),
+        setup_options = JSON.encode(setup_options),
+        player_races = JSON.encode(PlayerRace),
+        start_time = start_time,
+        host_id = '',
+        host_name = '',
+        game_id = game_id,
+    }
+    data = add_ranked_player_data(data)
+
+    WebRequest.post(url .. 'post_game', data, returnHandler)
+end
+
+
+function getGameId()
+    log('Requesting new game id')
+    WebRequest.get(url .. 'game_id', processGameId)
+end
+
+function processGameId(response)
+    if response.is_error then
+        log(response.error, 'Error while getting game ID')
+    else
+        log(response.text, 'New Game ID Assigned')
+        game_id = response.text
+    end
+end
