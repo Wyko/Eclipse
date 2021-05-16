@@ -17,4 +17,5 @@ setup_options = {
     useHybrid = false,
     useRota = true,
     uploadData = false,
+    ranked = false,
 }

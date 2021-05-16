@@ -52,7 +52,9 @@ function dataToSave()
     }
     -- log(state, 'dataToSave: Pre-Encode State')
     local save_data = JSON.encode_pretty(state)
-    log(save_data, 'dataToSave: Saved Data')
+    if DEBUG then
+        log(save_data, 'dataToSave: Saved Data')
+    end
     return save_data
 end
 
