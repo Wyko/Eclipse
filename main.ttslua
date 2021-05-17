@@ -19,7 +19,7 @@ DEBUG = false
 #include debugging
 #include save_and_load
 #include web
--- #include combat
+#include combat
 
 -- Factions
 #include Factions\pyxis

@@ -15,6 +15,7 @@ end
 function addContextMenus()
     addContextMenuItem("Score Game", function (c, _) scoreGame(c) end)
     addContextMenuItem("Debug (Dev Only)", addDebugMenu)
+    addContextMenuItem("Orchestrate Combat", getTilesWithCombat)
 end
 
 function addDebugMenu(c, _)

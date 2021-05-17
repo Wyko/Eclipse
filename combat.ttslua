@@ -9,11 +9,91 @@ function getTilesWithCombat()
     -- Make a table of all the ships on each hex
     for _, ship in ipairs(ships) do
         local hex = castAndCheckForTag(ship.getPosition(), 'hex')
-        if hexes[hex] == nil then hexes[hex] = {} end
-        table.insert(hexes[hex], ship)
+
+        -- Create a table for each Hex that stores the ships on it
+        if hex then
+            if hexes[hex] == nil then hexes[hex] = {} end
+            table.insert(hexes[hex], ship)
+        end
+    end
+
+    local ancients = getItemsInZone{zone= TableZone, tag='Ancient'}
+    -- Make a table of all the ships on each hex
+    for _, ship in ipairs(ancients) do
+        local hex = castAndCheckForTag(ship.getPosition(), 'hex')
+
+        -- Create a table for each Hex that stores the ships on it
+        if hex then
+            if hexes[hex] == nil then hexes[hex] = {} end
+            table.insert(hexes[hex], ship)
+        end
+    end
+
+    -- Check each hex to see if ships belonging to different players are on it
+    local combat_hexes = {}
+    for h, ships in pairs(hexes) do
+
+        -- Check if multiple players have a ship in the hex
+        local players_on_hex = {}
+        for _, ship in ipairs(ships) do
+            if ship.hasTag('Ancient') then
+                players_on_hex['Aliens'] = true
+            else
+                players_on_hex[getOwnerOfColoredObject(ship)] = true
+            end
+        end
+        if tableLen(players_on_hex) > 1 then
+            table.insert(combat_hexes, h)
+        end
+    end
+
+    highlightTilesWithCombat(combat_hexes)
+end
+
+function highlightTilesWithCombat(combat_hexes)
+    for _, hex in ipairs(getObjectsWithTag('Hex')) do
+        hex.highlightOff()
+    end
+
+    local highest = -1
+    for i, hex in pairs(combat_hexes) do
+        hex.highlightOn('Red', 15)
+        local num = hex.getVar('number')
+        if num > highest then
+            highest = num
+            highest_hex = hex
+        end
+    end
+    if highest_hex ~= nil then
+        -- Flash the first combat hex
+        startLuaCoroutine(Global, 'co_fade_highlight')
     end
 end
 
-function highlightTilesWithCombat()
-    error('Not Implemented')
+function co_fade_highlight(obj, speed, seconds)
+    speed = speed or 1
+    obj = obj or highest_hex
+    seconds = seconds or 15
+
+    -- Set the amount of time to run for
+    local end_time = os.clock() + seconds
+    while (os.clock() < end_time) do
+
+        -- Fade the highlight in from nothing
+        for x = 0, 100, speed do
+            local c = color(0.905, 0.898, 0.172, x*0.01)
+            obj.highlightOn(c)
+            coroutine.yield(0)
+        end
+
+        -- Fade the highlight back out
+        for x = 100, 0, -1*speed do
+            local c = color(0.905, 0.898, 0.172, x*0.01)
+            obj.highlightOn(c)
+            coroutine.yield(0)
+        end
+    end
+
+    obj.highlightOff()
+    return 1
 end

@@ -113,3 +113,9 @@ end
 function isEndGame()
     return (getCurrentRound() >= 8 and allPlayersPassed())
 end
+
+
+function getOwnerOfColoredObject(obj)
+    local c = obj.getColorTint()
+    return c:toString()
+end
