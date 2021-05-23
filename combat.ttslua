@@ -1,7 +1,3 @@
-function orchestrateCombat()
-    highlightTilesWithCombat()
-end
-
 function getTilesWithCombat()
     local hexes = {}
     local ships = getItemsInZone{zone= TableZone, tag='Ship'}
@@ -71,6 +67,7 @@ function highlightTilesWithCombat(combat_hexes)
 end
 
 function co_fade_highlight(obj, speed, seconds)
+    -- Coroutine to highlight an object with a color that fades in and out
     speed = speed or 1
     obj = obj or highest_hex
     seconds = seconds or 15
