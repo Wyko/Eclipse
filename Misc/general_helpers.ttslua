@@ -53,7 +53,14 @@ function triggerFunctionIfResting(obj, pointerFnc, waitSeconds)
     waitSeconds = waitSeconds or 1
     Wait.time(
         function()
-            Wait.condition(pointerFnc, function() return obj.resting end )
+            Wait.condition(
+                pointerFnc,
+                function()
+                    return (
+                    obj.resting and
+                    not obj.spawning)
+                end 
+            )
         end,
         waitSeconds
     )

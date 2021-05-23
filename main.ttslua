@@ -1,4 +1,4 @@
-local hideStuff = true
+local hideStuff = false
 
 DEBUG = false
 
@@ -20,6 +20,7 @@ DEBUG = false
 #include save_and_load
 #include web
 #include combat
+#include ships
 
 -- Factions
 #include Factions\pyxis
