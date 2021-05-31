@@ -1,4 +1,4 @@
-function placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
+function placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor, Box)
     -- This is for easy switching of ship locations
     local loc = 'left'
     local shipPos = {
@@ -16,19 +16,19 @@ function placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
         }
     }
 
-    for type, pos in pairs(shipPos['left']) do
-        table.insert(wq, 1,
+    for ship_type, pos in pairs(shipPos['left']) do
+        table.insert(tq_makeShipBags, 1,
         {
-            func =              makeShipBags,
-            playerPartsBag =    getObjectFromGUID('425928'),
-            ship_GUID =         'f7d8a7',
+            func =              task_makeShipBags,
+            playerPartsBag =    Box,
+            ship_type =         ship_type,
             pos =               pos,
             rot =               takeParams.rotation + vector(0,180,0),
         })
         break
     end
-    table.insert(wq, 'STOPQUEUE')
-    startLuaCoroutine(Global, 'worker')
+    -- table.insert(wq, 'STOPQUEUE')
+    startLuaCoroutine(Global, 'worker_makeShipBags')
     -- -- Deploy ships
     -- dread_bag_bag.takeObject({
     --     position = shipPos[loc].Dreadnought,
@@ -52,9 +52,16 @@ function placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
 
 end
 
-wq = {} -- Worker Queue
-rq = {} -- Return Queue
-function worker()
+function worker(
+        tq, -- Task queue, in the form of:
+            -- {
+            --  ['func'] = functionToExecute,
+            --  ['...'] = Any additional arguments to pass to the function
+            -- }
+
+        rq  -- Result queue
+        )
+
     -- Set the max amount of time to run the worker for
     timeout = timeout or 15
     local end_time = os.clock() + timeout --Seconds
@@ -62,7 +69,7 @@ function worker()
     while (os.clock() < end_time) do
 
         -- Check the queue for a task, or wait a random number of frames
-        if next(wq) == nil then
+        if next(tq) == nil then
 
             local count = 0
             local wait_frames = math.random(20, 70)
@@ -73,12 +80,12 @@ function worker()
                 coroutine.yield(0)
             end
         else
-            args = table.remove(wq, 1)
+            args = table.remove(tq, 1)
 
             -- Check if the worker should be killed
             if args == 'STOPQUEUE' then
                 log('Killing worker', 'worker')
-                table.insert(wq, 'STOPQUEUE')
+                table.insert(tq, 'STOPQUEUE')
                 return 1
             end
             log('Worker got task!', 'worker')
@@ -90,60 +97,64 @@ function worker()
     log('Killing worker due to timeout', 'worker')
 end
 
-wq_makeShipBags = {} -- Worker queue
-rq_makeShipBags = {}
-function makeShipBags(args)
+tq_makeShipBags = {} -- Task queue
+rq_makeShipBags = {} -- Result queue
+function worker_makeShipBags() worker(tq_makeShipBags, rq_makeShipBags) end
+function task_makeShipBags(args)
+
     log('Starting:\nbag: ['..tostring(args.playerPartsBag)..']\n' ..
         'shipGuid: ['..tostring(shipGUID)..']\n' ..
         'args.pos: ['..tostring(args.pos)..']\n' ..
         'args.rot: ['..tostring(args.rot)..']'
-        , 'makeShipBag')
-    -- Take a ship and make a bag from
-    local obj = args.playerPartsBag.takeObject({guid = args.ship_GUID})
+        , '\ntask_makeShipBag')
 
-    log('Making Bag', 'makeShipBag')
-    -- Make the bag
-    local shipBag = obj.clone()
-    shipBag.setPosition(args.pos)
-    shipBag.setRotation(args.rot)
-    shipBag.setScale(obj.getScale() * 1.4)
+    -- Take a ship and make a bag from it
+    local shipBag = SeekAndClone(
+        args.ship_type,
+        args.playerPartsBag,
+        args.pos,
+        args.rot
+        )
+
+-- TODO: Split this here.
+    shipBag.setScale(shipBag.getScale() * 1.4)
     shipBag.setCustomObject({
         type = 6, -- Turn it into a bag
     })
-
     shipBag = shipBag.reload()
+
 
     log('Setting num', 'makeShipBag')
 
     -- Set number of ships to clone
     local num = 11
-    if obj.getName():lower() == 'interceptor' then
+    if shipBag.getName():lower() == 'interceptor' then
         num = 8
-    elseif obj.getName():lower() == 'cruiser' then
+    elseif shipBag.getName():lower() == 'cruiser' then
         num = 4
-    elseif obj.getName():lower() == 'dreadnought' then
+    elseif shipBag.getName():lower() == 'dreadnought' then
         num = 2
-    elseif (obj.getName():lower() == 'starbase' or
-            obj.getName():lower() == 'deathmoon') then
+    elseif (shipBag.getName():lower() == 'starbase' or
+            shipBag.getName():lower() == 'deathmoon') then
         num = 4
     end
-
-    log('Populating bag', 'makeShipBag')
-
-    triggerFunctionIfResting(shipBag,
-        function()
-            -- Populate the ship bag
-            log('num: ['..tostring(num)..']')
-            for x = 1, num do
-                log('Boo')
-                shipBag.put(obj.clone())
-            end
-
-            -- Put back the original ship
-            args.playerPartsBag.putObject(obj)
-            return 1
-        end
-    )
+    --
+    -- log('Populating bag', 'task_makeShipBag')
+    --
+    -- triggerFunctionIfResting(shipBag,
+    --     function()
+    --         -- Populate the ship bag
+    --         log('num: ['..tostring(num)..']')
+    --         for x = 1, num do
+    --             log('Boo')
+    --             shipBag.put(obj.clone())
+    --         end
+    --
+    --         -- Put back the original ship
+    --         args.playerPartsBag.putObject(obj)
+    --         return 1
+    --     end
+    -- )
 
     return shipBag
 end

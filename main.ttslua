@@ -2,6 +2,7 @@ local hideStuff = false
 
 DEBUG = false
 
+
 -- Variables
 #include variables\all_vars
 

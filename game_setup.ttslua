@@ -181,7 +181,13 @@ function basicSetup2(parameters)
     --         Object.setDescription('These are custom fleet units for your race. If you want, you can use these to replace the default ship models.')
     -- end
 
-    placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor)
+    placePlayerShips(
+        takeParams,
+        PlayerPosition,
+        InvPos,
+        PlayerColor,
+        factions[FactionName].Box_GUID
+        )
 
     -- Take an Ambassador and Discovery Board
     local a = a_and_disc_bag.takeObject({
