@@ -59,7 +59,7 @@ function triggerFunctionIfResting(obj, pointerFnc, waitSeconds)
                     return (
                     obj.resting and
                     not obj.spawning)
-                end 
+                end
             )
         end,
         waitSeconds
@@ -337,4 +337,14 @@ function isDev(plr)
         if plr.steam_id == d then return true end
     end
     return false
+end
+
+
+function table.anySpawning(table)
+  for _, obj in pairs(table) do
+    if obj.spawning then
+      return true
+    end
+  end
+  return false
 end

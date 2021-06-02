@@ -31,6 +31,7 @@ DEBUG = false
 #include Misc\general_helpers
 #include Misc\eclipse_helpers
 #include Misc\color_text_helpers
+#include Misc\queuing
 
 -- Error Checking
 #include error_checking\tests
