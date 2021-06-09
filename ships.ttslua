@@ -1,85 +1,151 @@
-loc = 'left'
-shipPos = {
-    ['above'] = {
-        ['Interceptor'] = PlayerPosition + Vector(-6*InvPos, 1.0, 28*InvPos),
-        ['Cruiser'] = PlayerPosition + Vector(-2*InvPos, 1.2, 28*InvPos),
-        ['Dreadnought'] = PlayerPosition + Vector(2*InvPos, 1.2, 28*InvPos),
-        ['Starbase'] = PlayerPosition + Vector(6*InvPos, 1.2, 28*InvPos),
-    },
-    ['left'] =  {
-        ['Interceptor'] = PlayerPosition + Vector(-19*InvPos, 0, 10*InvPos),
-        ['Cruiser'] = PlayerPosition + Vector(-14*InvPos, 0, 10*InvPos),
-        ['Dreadnought'] = PlayerPosition + Vector(-19*InvPos, -0.48, 6*InvPos),
-        ['Starbase'] = PlayerPosition + Vector(-14*InvPos, 0.2, 6*InvPos),
-    }
-}
+function placePlayerShips(PlayerColor, faction)
+    local s_pos = getPlayerShipsPositions(PlayerColor)
 
-
-function placePlayerShips(takeParams, PlayerPosition, InvPos, PlayerColor, Box)
-    -- This is for easy switching of ship locations
-    for ship_type, pos in pairs(shipPos[loc]) do
-        table.insert(tq_makeShipBags, 1,
-        {
-            func    = task_makeShipBags,
-            shipBag = SeekAndClone(
-                        args.ship_type,
-                        args.playerPartsBag,
-                        args.pos,
-                        args.rot)
-        })
-        break
-    end
-
-    startLuaCoroutine(Global, 'worker_makeShipBags')
+    table.insert(tq_placePlayerShips, 1,
+    {
+        task        = task_placePlayerShips,
+        s_pos       = s_pos,
+        PlayerColor = PlayerColor,
+        faction     = faction,
+    })
+    startLuaCoroutine(Global, 'worker_placePlayerShips')
 end
 
 
-tq_makeShipBags = {} -- Task queue
-rq_makeShipBags = {} -- Result queue
-function worker_makeShipBags() worker(tq_makeShipBags, rq_makeShipBags) end
-function task_makeShipBags(args)
+tq_placePlayerShips = {} -- Task queue
+rq_placePlayerShips = {} -- Result queue
+function worker_placePlayerShips() worker(tq_placePlayerShips, rq_placePlayerShips) end
+function task_placePlayerShips(args)
+    -- Get the ship out of the bag
+    -- local ship_templates = getShipsFromBag(args.faction.Box_GUID, args.s_pos.shipPos)
+    local ship_templates = getShipsFromBag('c9573a', args.s_pos.shipPos)
+    local bags = makeShipBags{
+        ship_templates= ship_templates,
+        shipPos= args.s_pos.shipPos,
+        rot = args.s_pos.rot}
 
-    log('Starting Worker:\n' ..
-        'bag: ['..tostring(args.shipBag)..']\n',
-        '\ntask_makeShipBag')
+    fillShipBags{
+        ship_templates= ship_templates,
+        bags = bags
+    }
 
-    -- Set number of ships to clone
-    local num = 11
-    if shipBag.getName():lower() == 'interceptor' then
-        tags = {'Ship', 'Interceptor'}
-        num = 8
-    elseif shipBag.getName():lower() == 'cruiser' then
-        tags = {'Ship', 'Cruiser'}
-        num = 4
-    elseif shipBag.getName():lower() == 'dreadnought' then
-        tags = {'Ship', 'Dreadnought'}
-        num = 2
-    elseif (shipBag.getName():lower() == 'starbase' or
-            shipBag.getName():lower() == 'deathmoon') then
-        tags = {'Ship', 'Starbase'}
-        num = 4
-    end
-    ships = {}
-    for x = 1, num do
-        table.insert(ships, shipBag.clone())
+    return true
+end
+
+function makeShipBags(args)
+    local bags = {}
+    local reloaded_bags = {}
+    for ship_type, ship in pairs(args.ship_templates) do
+        bags[ship_type] = ship.clone({position = args.shipPos[ship_type]})
+        log(ship_type..': ' .. tostring(dump(args.shipPos[ship_type])))
     end
 
-    shipBag.setScale(shipBag.getScale() * 1.4)
-    shipBag.setCustomObject({
-        type = 6, -- Turn it into a bag
-    })
-    shipBag = shipBag.reload()
-
-    while (shipBag.spawning or
-           table.anySpawning(ships)) do
-        log('Yielding while spawning', 'task_makeShipBags')
+    -- Wait while they spawn
+    while anySpawning(bags) do
+        log('Waiting while bags spawn', 'makeShipBags')
         coroutine.yield(0)
     end
 
-    -- log('Settings tags on', 'task_makeShipBags')
-    for _, ship in pairs(ships) do
-        ship.setTags(tags)
-        shipBag.putObject(ship)
+    for ship_type, ship in pairs(bags) do
+        bags[ship_type].setScale(bags[ship_type].getScale() * 1.4)
+        bags[ship_type].setRotation(args.rot)
     end
 
+    for ship_type, ship in pairs(bags) do
+        while (not bags[ship_type].resting) do
+            for i = 1, 10 do coroutine.yield(0) end
+        end
+
+        bags[ship_type].setCustomObject({
+            type = 6, -- Turn it into a bag
+        })
+
+        bags[ship_type].setName(ship_type .. ' Bag')
+        bags[ship_type].setLock(true)
+        reloaded_bags[ship_type] = bags[ship_type].reload()
+    end
+
+    -- Wait while they spawn
+    while next(reloaded_bags) == nil do
+        log('Waiting while bags reload', 'makeShipBags')
+        coroutine.yield(0)
+    end
+
+    return reloaded_bags
+end
+
+function fillShipBags(args)
+    ship_templates = args.ship_templates
+
+    for ship_type, ship in pairs(ship_templates) do
+        -- Set number of ships to clone
+        local num = 11
+        if ship_type:lower() == 'interceptor' then
+            tags = {'Ship', 'Interceptor'}
+            num = 8
+        elseif ship_type:lower() == 'cruiser' then
+            tags = {'Ship', 'Cruiser'}
+            num = 4
+        elseif ship_type:lower() == 'dreadnought' then
+            tags = {'Ship', 'Dreadnought'}
+            num = 2
+        elseif ship_type:lower() == 'starbase' then
+            tags = {'Ship', 'Starbase'}
+            num = 4
+        end
+
+        log('fillShipBags: Making ['..num..'] ships of type ['..ship_type..']')
+
+        for x = 1, num do
+            log('Putting ' ..tostring(ship) ..' in ' .. args.bags[ship_type].getName())
+            x = ship.clone()
+            while x.spawning do
+                coroutine.yield(0)
+            end
+
+            args.bags[ship_type].putObject(x)
+        end
+    end
+end
+
+
+function getPlayerShipsPositions(PlayerColor)
+    local PlayerPosition = Player[PlayerColor].getHandTransform(int).position
+    PlayerPosition.y = 2
+
+    -- Define ship positions and rotations
+    local InvPos = boardInvertFactor(_, PlayerPosition)
+    local shipPos = {
+        ['Interceptor'] = PlayerPosition + Vector(-19*InvPos, 0, 10*InvPos),
+        ['Cruiser'] = PlayerPosition + Vector(-14*InvPos, 0, 10*InvPos),
+        ['Dreadnought'] = PlayerPosition + Vector(-19*InvPos, 0, 6*InvPos),
+        ['Starbase'] = PlayerPosition + Vector(-14*InvPos, 0, 6*InvPos)
+    }
+
+    local rot
+    if PlayerPosition.z < 0 then
+        rot = vector(0,180,0)
+    else
+        rot = vector(0,0,0)
+    end
+
+    return {
+        shipPos = shipPos,
+        rot     = rot,
+    }
+end
+
+
+function getShipsFromBag(ContainerOrGUID, shipPos)
+    ships = {}
+    for ship_type, _ in pairs(shipPos) do
+        ships[ship_type] = SeekAndTake(ship_type, ContainerOrGUID)
+    end
+
+    while anySpawning(ships) do
+        coroutine.yield(0)
+    end
+
+    log(ships, 'getShipsFromBag')
+    return ships
 end

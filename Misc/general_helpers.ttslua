@@ -91,10 +91,12 @@ function SeekAndTake(ObjectName, ContainerOrGUID, TakeParams)
    end
 
    if #guids == 0 then
-     log('Did not find '..ObjectName)
+     log('SeekAndTake: Did not find ['..ObjectName..']')
      return false
    end
 
+
+   log('SeekAndTake: Found ['..ObjectName..']')
    TakeParams.guid = guids[math.random(#guids)]
    return container.takeObject(TakeParams)
 end
@@ -340,8 +342,8 @@ function isDev(plr)
 end
 
 
-function table.anySpawning(table)
-  for _, obj in pairs(table) do
+function anySpawning(t)
+  for _, obj in pairs(t) do
     if obj.spawning then
       return true
     end

@@ -35,8 +35,8 @@ function worker(
                 return 1
             end
             log('Worker got task!', 'worker')
-            local result = args.func(args)
-            log('Worker got: ['..tostring(result)..']', 'worker')
+            local result = args.task(args)
+            log('Worker finished with result: ['..tostring(result)..']', 'worker')
             table.insert(rq, result)
         end
     end

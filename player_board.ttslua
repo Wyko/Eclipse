@@ -1,6 +1,10 @@
-function boardInvertFactor(board)
+function boardInvertFactor(board, pos)
+    if board then
+        pos = board.getPosition()
+    end
+
     -- Checks which side of the table it's on
-    if board.getPosition().z > 0 then
+    if pos.z > 0 then
         return -1
     else
         return 1
