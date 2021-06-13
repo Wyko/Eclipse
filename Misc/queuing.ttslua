@@ -5,7 +5,8 @@ function worker(
             --  ['...'] = Any additional arguments to pass to the function
             -- }
 
-        rq  -- Result queue
+        rq,  -- Result queue
+        timeout
         )
 
     -- Set the max amount of time to run the worker for
@@ -19,8 +20,7 @@ function worker(
 
             local count = 0
             local wait_frames = math.random(20, 70)
-            log('No task found in queue, waiting ['..tostring(wait_frames)..']',
-                'worker')
+            log('worker: No task; waiting ['..tostring(wait_frames)..'] frames')
             while count < wait_frames do
                 count = count + 1
                 coroutine.yield(0)
@@ -30,15 +30,16 @@ function worker(
 
             -- Check if the worker should be killed
             if args == 'STOPQUEUE' then
-                log('Killing worker', 'worker')
+                log('worker: Got term signal')
                 table.insert(tq, 'STOPQUEUE')
                 return 1
             end
-            log('Worker got task!', 'worker')
+            log('worker: Got task!')
             local result = args.task(args)
-            log('Worker finished with result: ['..tostring(result)..']', 'worker')
+            log('worker: Worker finished with result: ['..tostring(result)..']')
             table.insert(rq, result)
         end
     end
-    log('Killing worker due to timeout', 'worker')
+    log('worker: Killing worker due to timeout')
+    return 1
 end

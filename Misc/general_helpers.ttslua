@@ -344,8 +344,8 @@ end
 
 function anySpawning(t)
   for _, obj in pairs(t) do
-    if obj.spawning then
-      return true
+    if obj ~= nil and obj ~= false and obj.spawning then
+        return true
     end
   end
   return false
