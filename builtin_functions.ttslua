@@ -16,7 +16,21 @@ function addContextMenus()
     addContextMenuItem("Score Game", function (c, _) scoreGame(c) end)
     addContextMenuItem("Debug (Dev Only)", addDebugMenu)
     addContextMenuItem("Orchestrate Combat", getTilesWithCombat)
+    addContextMenuItem("Toggle Bag Visibility", toggleHiddenObjects)
 end
+
+
+function toggleHiddenObjects()
+    hideStuff = (not hideStuff)
+    for _, obj in pairs(getObjectsWithTag('Player Part Bag')) do
+        if hideStuff then
+            obj.setInvisibleTo({"Blue", "White", "Red", "Yellow", "Green", 'Purple'})
+        else
+            obj.setInvisibleTo()
+        end
+    end
+end
+
 
 function addDebugMenu(c, _)
     -- if Player[c].steam_id ~= get_host().steam_id then return end
