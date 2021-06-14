@@ -118,6 +118,8 @@ end
 function pyxisButtonFunc()
     updateInterface(pyxisLabel)
     local factions = Global.getTable('factions')
+    factions['Pyxis Unity'].available = switches.pyxisLabel
+    Global.setTable('factions', factions)
 
     for _, obj in ipairs({
         factions['Pyxis Unity'].selector_button_GUID,

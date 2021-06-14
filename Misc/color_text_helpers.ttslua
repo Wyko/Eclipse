@@ -1,3 +1,7 @@
 function ojText(txt)
     return "[" .. Color.Orange:toHex() .. ']' .. txt .. '[-]'
 end
+
+function cText(txt, text_color)
+    return "[" .. Color.fromString(text_color):toHex() .. ']' .. txt .. '[-]'
+end

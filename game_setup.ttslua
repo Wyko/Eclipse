@@ -407,7 +407,23 @@ function setupFirstRound()
     removeUnusedAreas()
     getObjectFromGUID('516e93').destruct() -- Kill the text box above the button
     showNextRoundButton()
+    Wait.time(function () chooseFirstPlayer() end, 5)
 end
+
+
+function chooseFirstPlayer()
+    local player_color = getSeatedPlayers()[math.random(1, #getSeatedPlayers())]
+    broadcastToAll("Randomly Chosen First Player\n" ..
+        cText(Player[player_color].steam_name, player_color) ..
+        " (" .. player_color .. ")")
+    printToAll("House rules are that this player will be the first to "..
+               "pick their race, with players in reverse turn order picking " ..
+               "their race afterwards. Then the last person to pick will "..
+               "be the first person to play, and turns advance in normal "..
+               "turn order. Feel free to ignore this and play your own way!")
+    Turns.turn_color = player_color
+end
+
 
 function addHives()
     hive_sector_2 = getObjectFromGUID(hive_sector_2_GUID)
