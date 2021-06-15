@@ -1,5 +1,5 @@
 local hideStuff = true
-local VERSION = '2.72.0-beta-release'
+local VERSION = '2.76.0-beta-release'
 
 DEBUG = false
  
