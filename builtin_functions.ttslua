@@ -7,9 +7,14 @@ function onLoad(saved_data)
     makeScoreButton()
     makeDebugButton()
     addContextMenus()
+    setText()
 
     if hideStuff then hideAndLockStuff() end
     if isOngoingGame() then loadOngoingGame() end
+end
+
+function setText()
+    modInfoText.setValue("Mod By: Wyko\n Version: " .. VERSION)
 end
 
 function addContextMenus()

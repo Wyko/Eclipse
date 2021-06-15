@@ -32,4 +32,5 @@ function loadObjects()
     warpBag = getObjectFromGUID('257134')
     colonyShipBag = getObjectFromGUID(colonyShipBag_GUID)
     scriptTechBag = getObjectFromGUID(scriptTechBag_GUID)
+    modInfoText = getObjectFromGUID(modInfoText_GUID)
 end

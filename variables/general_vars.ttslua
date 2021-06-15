@@ -9,6 +9,7 @@ local ExtraS3Bag_GUID = '69b446'
 local OutpostBag_GUID = '54fe91'
 local AmbassadorBag_GUID = '460e45'
 local nextRoundButton_GUID = '3d6d3a'
+local modInfoText_GUID = '897b9e'
 
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'
