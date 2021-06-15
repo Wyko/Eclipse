@@ -1,0 +1,42 @@
+local turnSkipPlayer = nil
+
+function onLoad()
+    turnSkipPlayer = getColor()
+    -- log(self.getName() .. " assigned to " .. turnSkipPlayer)
+    self.setColorTint(turnSkipPlayer)
+end
+
+-- If it's turnSkipPlayer's turn and the token is flipped, skip their turn
+function onPlayerTurn(plr)
+    log("plr.color: " .. plr.color)
+    log("Player[turnSkipPlayer]: ".. tostring(Player[turnSkipPlayer].color))
+    if (plr.color == Player[turnSkipPlayer].color
+        and self.is_face_down
+        and not allSkippersFlipped()
+        ) then
+        broadcastToAll("Skipping " .. plr.steam_name .. "'s turn.", plr.color)
+        Wait.frames(skipTurn, 2)
+    end
+end
+
+function skipTurn()
+    Turns.turn_color = Turns.getNextTurnColor()
+end
+
+function allSkippersFlipped()
+    for _, skipper in pairs(getObjectsWithTag("Turn Skipper")) do
+        if not skipper.is_face_down then
+            return false
+        end
+    end
+    printToAll('All turn skippers are flipped.')
+    return true
+end
+
+function getColor()
+    for _, color in pairs(Color.list) do
+        if self.hasTag(color) then
+            return color
+        end
+    end
+end
