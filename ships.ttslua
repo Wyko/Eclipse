@@ -36,7 +36,8 @@ function task_placePlayerShips(args)
     local ship_bags = makeShipBags{
         ship_templates= ship_templates,
         shipPos= args.s_pos.shipPos,
-        rot = args.s_pos.rot
+        rot = args.s_pos.rot,
+        PlayerColor = args.PlayerColor,
     }
 
     -- Fill the ship bags with clones of the original ship
@@ -95,6 +96,7 @@ function makeShipBags(args)
         bags[ship_type].setScale(bags[ship_type].getScale() * 1.4)
         bags[ship_type].setRotation(args.rot)
         bags[ship_type].setPosition(args.shipPos[ship_type])
+        bags[ship_type].setColorTint(Color.fromString(args.PlayerColor))
     end
 
 

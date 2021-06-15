@@ -404,12 +404,18 @@ end
 
 function losePointsForBeingTraitor()
     local points = {}
+    local r = ownerOfRace('Rho Indi Syndicate')
 
     -- Search each player's table for the traitor tile and score it
     for c, _ in pairs(TableGUIDs) do
         local t = TableGUIDs[c]
         local results = castBoxAndCheck(t, nil, 'Traitor Tile')
         if tableLen(results) > 0 then
+            if c == r then
+                log('Rho Indi are the traitors. Oh well... :)')
+                points[c] = 0
+                break
+            end
             points[c] = -2
             break
         end

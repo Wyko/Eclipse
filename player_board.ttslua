@@ -45,11 +45,11 @@ function spawnInfluenceDisc(pos, color)
             disc.setTags({'Influence'})
             -- log(pos, 'spawnInfluenceDisc:pos')
             if pos then disc.setPosition(pos) end
-            Wait.frames(function () disc.reload() end, 5)
+            Wait.condition(function () blip(disc) end,
+                function () return disc.resting end
+                )
         end,
-        function ()
-            return (not disc.spawning)
-        end,
+        function () return not (disc == nil or disc.spawning) end,
         4
         )
 
