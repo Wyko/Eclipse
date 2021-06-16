@@ -416,11 +416,11 @@ function chooseFirstPlayer()
     broadcastToAll("Randomly Chosen First Player\n" ..
         cText(Player[player_color].steam_name, player_color) ..
         " (" .. player_color .. ")")
-    printToAll("House rules are that this player will be the first to "..
-               "pick their race, with players in reverse turn order picking " ..
-               "their race afterwards. Then the last person to pick will "..
-               "be the first person to play, and turns advance in normal "..
-               "turn order. Feel free to ignore this and play your own way!")
+    -- printToAll("House rules are that this player will be the first to "..
+    --            "pick their race, with players in reverse turn order picking " ..
+    --            "their race afterwards. Then the last person to pick will "..
+    --            "be the first person to play, and turns advance in normal "..
+    --            "turn order. Feel free to ignore this and play your own way!")
     Turns.turn_color = player_color
 end
 

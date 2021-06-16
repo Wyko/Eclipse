@@ -11,6 +11,7 @@ local hivesLabel = "Include\nAncient Hives"
 local pyxisLabel = "Include Pyxis Unity"
 local lyraLabel = "Include Lyra"
 local rankedLabel = "Casual Game\n[sub]Click to enable ranked mode[/sub]"
+local scoreLabel = "View Score\nDuring Game"
 
 local switches = {
     [rotaLabel] = true,
@@ -21,6 +22,7 @@ local switches = {
     [pyxisLabel] = true,
     [lyraLabel] = false,
     ['ranked'] = false,
+    [scoreLabel] = false,
 }
 
 local toggleGroup_Fill = {warpLabel, guardianLabel, hybridLabel}
@@ -37,6 +39,7 @@ local lyraButton = {click_function = "lyraButtonFunc", function_owner = self, la
 local pyxisButton = {click_function = "pyxisButtonFunc", function_owner = self, label = pyxisLabel, position = {0, 0.300000011920929, -1}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[pyxisLabel]], tooltip = "Include Pyxis Unity"}
 
 local rankedButton = {click_function = "rankedButtonFunc", textAlignment = 'MiddleCenter', function_owner = self, label = rankedLabel, position = {1.3, 0.300000011920929, 0.6}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches['ranked']], tooltip = 'Set up this game for ranked play and upload player statistics. At the end of the game, each player\'s ELO will be calculated and updated!\n\nAdditional details can be found on the Steam Workshop page. The web interface to see player ELO is not active yet, but it will be soon!'}
+local scoreButton = {click_function = "scoreButtonFunc", textAlignment = 'MiddleCenter', function_owner = self, label = scoreLabel, position = {1.3, 0.300000011920929, 0.2}, scale = {0.100000001490116, 0.100000001490116, 0.100000001490116}, width = 5100, height = 1400, font_size = 500, color = toggleColors[switches[scoreLabel]], tooltip = 'Permit players to see the score before the end of the game.'}
 
 function onload()
     self.createButton(setupButton)
@@ -49,6 +52,7 @@ function onload()
     self.createButton(pyxisButton)
 
     self.createButton(rankedButton)
+    self.createButton(scoreButton)
 end
 
 function set_options(varName, value)
@@ -66,6 +70,7 @@ function setupButtonFunc(obj, color, alt_click)
     set_options('usePyxis', switches[pyxisLabel])
     set_options('useLyra', switches[lyraLabel])
     set_options('ranked', switches['ranked'])
+    set_options('viewScore', switches[scoreLabel])
 
     Global.call('setupFirstRound')
     self.destruct()
@@ -85,6 +90,10 @@ end
 
 function hivesButtonFunc()
     updateInterface(hivesLabel)
+end
+
+function scoreButtonFunc()
+    updateInterface(scoreLabel)
 end
 
 function rankedButtonFunc()

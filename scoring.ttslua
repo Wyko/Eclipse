@@ -7,10 +7,23 @@ function makeScoreButton()
 end
 
 function scoreButton(obj, color, alt_click)
+    scoringProcess(color)
+end
+
+
+function scoringProcess(color)
+    local eg = isEndGame()
+
+    if (eg == false and setup_options.viewScore == false) then
+        printToColor(ojText('Notice: ') .. 'In-game scoring was disabled '
+            ..'during setup. Scoring will be possible after the last player '
+            ..'has passed on the last turn.', color)
+        return
+    end
+
     scoreGame(color, true)
 
     -- Upload the game data
-    local eg = isEndGame()
     if setup_options.ranked and (eg or DEBUG) then
         log('Attempting to upload game to the Eclipse Analytics Project',
             'scoreButton')
