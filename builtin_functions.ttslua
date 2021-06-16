@@ -19,9 +19,9 @@ end
 
 function addContextMenus()
     addContextMenuItem("Score Game", function (c, _) scoringProcess(c) end)
-    addContextMenuItem("Debug (Dev Only)", addDebugMenu)
     addContextMenuItem("Orchestrate Combat", getTilesWithCombat)
     addContextMenuItem("Toggle Bag Visibility", toggleHiddenObjects)
+    addContextMenuItem("Debug (Dev Only)", addDebugMenu)
 end
 
 
