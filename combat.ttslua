@@ -1,44 +1,57 @@
 function getTilesWithCombat()
     local hexes = {}
+
+    function make_combat_table(t)
+        -- Make a table of all the ships on each hex
+        for _, ship in ipairs(t) do
+            local hex = castAndCheckForTag(ship.getPosition(), 'hex')
+
+            -- Create a table for each Hex that stores the ships on it
+            if hex then
+                if hexes[hex] == nil then hexes[hex] = {} end
+                table.insert(hexes[hex], ship)
+            end
+        end
+    end
+
     local ships = getItemsInZone{zone= TableZone, tag='Ship'}
-
-    -- Make a table of all the ships on each hex
-    for _, ship in ipairs(ships) do
-        local hex = castAndCheckForTag(ship.getPosition(), 'hex')
-
-        -- Create a table for each Hex that stores the ships on it
-        if hex then
-            if hexes[hex] == nil then hexes[hex] = {} end
-            table.insert(hexes[hex], ship)
-        end
-    end
-
     local ancients = getItemsInZone{zone= TableZone, tag='Ancient'}
-    -- Make a table of all the ships on each hex
-    for _, ship in ipairs(ancients) do
-        local hex = castAndCheckForTag(ship.getPosition(), 'hex')
+    local aliens = getItemsInZone{zone= TableZone, tag='Alien Not Draco Friend'}
 
-        -- Create a table for each Hex that stores the ships on it
-        if hex then
-            if hexes[hex] == nil then hexes[hex] = {} end
-            table.insert(hexes[hex], ship)
-        end
-    end
+    make_combat_table(ships)
+    make_combat_table(ancients)
+    make_combat_table(aliens)
 
     -- Check each hex to see if ships belonging to different players are on it
     local combat_hexes = {}
     for h, ships in pairs(hexes) do
+        local required_num = 2 -- Number of combatants required
 
         -- Check if multiple players have a ship in the hex
         local players_on_hex = {}
         for _, ship in ipairs(ships) do
             if ship.hasTag('Ancient') then
+                players_on_hex['Ancients'] = true
+
+            elseif ship.hasTag('Alien Not Draco Friend') then
                 players_on_hex['Aliens'] = true
+
             else
                 players_on_hex[getOwnerOfColoredObject(ship)] = true
             end
         end
-        if tableLen(players_on_hex) > 1 then
+
+        -- Check if Draco is with an ancient
+        local c = ownerOfRace('Descendants of Draco')
+        if (c ~= nil and
+            players_on_hex[c] == true and
+            players_on_hex['Ancients'] == true
+            ) then
+
+            required_num = required_num + 1
+        end
+
+        if tableLen(players_on_hex) >= required_num then
             table.insert(combat_hexes, h)
         end
     end
@@ -53,7 +66,7 @@ function highlightTilesWithCombat(combat_hexes)
 
     local highest = -1
     for i, hex in pairs(combat_hexes) do
-        hex.highlightOn('Red', 15)
+        hex.highlightOn('Red', 6)
         local num = hex.getVar('number')
         if num > highest then
             highest = num
@@ -70,7 +83,7 @@ function co_fade_highlight(obj, speed, seconds)
     -- Coroutine to highlight an object with a color that fades in and out
     speed = speed or 1
     obj = obj or highest_hex
-    seconds = seconds or 15
+    seconds = seconds or 6
 
     -- Set the amount of time to run for
     local end_time = os.clock() + seconds
@@ -90,7 +103,7 @@ function co_fade_highlight(obj, speed, seconds)
             coroutine.yield(0)
         end
     end
-
+    highest_hex = nil
     obj.highlightOff()
     return 1
 end
