@@ -1,5 +1,5 @@
 local hideStuff = true
-local VERSION = '4.4.3'
+local VERSION = '4.4.5'
 
 DEBUG = false
 
@@ -16,9 +16,8 @@ DEBUG = false
 #include camera
 #include race_setup
 #include resource_setup
-#include console++
 #include scoring
-#include debugging
+#include menus
 #include save_and_load
 #include web
 #include combat
@@ -33,6 +32,7 @@ DEBUG = false
 #include Misc\eclipse_helpers
 #include Misc\color_text_helpers
 #include Misc\queuing
+#include Misc\console++
 
 -- Error Checking
 #include error_checking\tests

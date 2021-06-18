@@ -119,3 +119,11 @@ function getOwnerOfColoredObject(obj)
     local c = obj.getColorTint()
     return c:toString()
 end
+
+
+function setModInfoText()
+    modInfoText.setValue(
+        "Scripted By: Wyko\n" ..
+        "Many Graphical Assets by: Naar\n" ..
+        "Mod Version: " .. VERSION)
+end

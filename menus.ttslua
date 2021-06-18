@@ -1,0 +1,36 @@
+function addContextMenus()
+    addContextMenuItem("Score Game", function (c, _) scoringProcess(c) end)
+    addContextMenuItem("Orchestrate Combat", getTilesWithCombat)
+    addContextMenuItem("Toggle Bag Visibility", toggleHiddenObjects)
+    addContextMenuItem("Debug (Dev Only)", addDebugMenu)
+end
+
+
+function addDebugMenu(c, _)
+    -- if Player[c].steam_id ~= get_host().steam_id then return end
+    if not isDev(Player[c]) then return end
+
+    DEBUG = not DEBUG
+    log('Debug Mode: '..tostring(DEBUG), 'addContextMenus')
+    printToColor('Debug Mode: '..tostring(DEBUG), c, 'Orange')
+
+    if not DEBUG then
+        clearContextMenu()
+        addContextMenus()
+        return
+    end
+
+    addContextMenuItem("Clear Save (Dev)", function (c, _)
+        if not isDev(Player[c]) then return end
+
+        printToColor('Clearing script save state.', c, 'Orange')
+        clearSaveState()
+        onSave()
+    end)
+
+    addContextMenuItem("Web Vars (Dev)", function (c, _)
+        if not isDev(Player[c]) then return end
+        printToColor(dump(dataToSave()), c, 'Orange')
+    end)
+
+end
