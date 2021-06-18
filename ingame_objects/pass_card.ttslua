@@ -46,8 +46,9 @@ function setButton()
     end
 end
 
-function flipThis()
-    if not self.is_face_down then
+function flipThis(obj, player_clicker_color, alt_click)
+    if (not self.is_face_down and
+        player_clicker_color == Turns.turn_color) then
         Turns.turn_color = Turns.getNextTurnColor()
     end
     self.setLock(false)
