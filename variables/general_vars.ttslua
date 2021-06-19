@@ -9,7 +9,11 @@ local ExtraS3Bag_GUID = '69b446'
 local OutpostBag_GUID = '54fe91'
 local AmbassadorBag_GUID = '460e45'
 local nextRoundButton_GUID = '3d6d3a'
+
+-- Text boxes
 local modInfoText_GUID = '897b9e'
+local readyCheckText_GUID = '9b560e'
+local readyCheckText = nil
 
 local TableZone = '4980a7'
 local TechTileZone_GUID = 'd22a87'

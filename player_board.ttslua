@@ -74,11 +74,57 @@ function spawnReturnInfluenceButton(board)
     board.createButton(data)
 end
 
-function returnInfluenceDiscs(board, color)
-    -- Returns influence discs from the action spots on the board and the pass
-    -- marker to the influence track for each player
 
+function checkIfAllPlayersAreReady()
+    log('Starting ready check.')
+    while true do
+
+        -- Wait while the game is starting
+        if getCurrentRound() < 1 then readyCheckText.setValue(' ') end
+        while getCurrentRound() < 1 do coroutine.yield(0) end
+
+        local text = ''
+        local ready = true
+        for _, color in pairs(getSeatedPlayers()) do
+            if playerHasUsedInfluenceDiscs(color) then
+                text = text .. color .. ': ' .. cText('Not Ready', Color.Red)
+                ready = false
+            end
+        end
+        if not ready then
+            readyCheckText.setValue(text)
+        else
+            readyCheckText.setValue('All players '.. cText('Ready!', 'Green'))
+        end
+        -- Set the amount of time to wait
+        local end_time = os.clock() + 5
+        while (os.clock() < end_time) do
+            coroutine.yield(0)
+        end
+
+    end
+    return 1
+end
+
+
+function playerHasUsedInfluenceDiscs(color)
+    local discs = getDiscsInInfluenceZone(color)
+
+    -- If there are no discs to return, exit
+    if not next(discs) then
+        return false
+    else
+        return true
+    end
+end
+
+
+function getDiscsInInfluenceZone(color)
+    log('Starting', 'getDiscsInInfluenceZone')
+    local board  = getBoardBelongingToColor(color)
+    if board == nil then return {} end
     local InvPos = boardInvertFactor(board)
+    log('1', 'getDiscsInInfluenceZone')
 
     -- First get all discs on the player board
     local boardObjects = Physics.cast({
@@ -92,7 +138,9 @@ function returnInfluenceDiscs(board, color)
     local discs = objectsHitByCast(boardObjects, 'Influence Disc')
 
     -- Now get all discs on the reaction board
+    log('2', 'getDiscsInInfluenceZone')
     local passCard = getObjectFromGUID(PassCards[ownerOfBoard(board).color])
+    log('3', 'getDiscsInInfluenceZone')
     local reactionObjects = Physics.cast({
         origin = passCard.getPosition(),
         type = 3,
@@ -107,6 +155,15 @@ function returnInfluenceDiscs(board, color)
     for _, v in ipairs(reactionDiscs) do
         table.insert(discs, v)
     end
+
+    return discs
+end
+
+function returnInfluenceDiscs(board, color)
+    -- Returns influence discs from the action spots on the board and the pass
+    -- marker to the influence track for each player
+    local InvPos = boardInvertFactor(board)
+    local discs  = getDiscsInInfluenceZone(color)
 
     -- If there are no discs to return, exit
     if not next(discs) then

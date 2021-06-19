@@ -43,10 +43,12 @@ function getControlledHexes(color)
     return owned_hexes
 end
 
+
 function getCurrentRound()
     local round = tonumber(RoundMarker.getDescription())
     return round
 end
+
 
 function getInfluenceDiscsOnHexes()
     local discs = getItemsInZone{zone   = TableZone,
@@ -62,6 +64,7 @@ function getInfluenceDiscsOnHexes()
 
     return results
 end
+
 
 function getObjectsInRepZone(args)
     -- Returns  objects in the reputation zone on a player board with the gvien

@@ -5,9 +5,9 @@ function onLoad(saved_data)
     shuffleEverything()
     onLoad_Camera()
     makeScoreButton()
-    makeDebugButton()
     addContextMenus()
     setModInfoText()
+    startLuaCoroutine(Global, 'checkIfAllPlayersAreReady')
 
     if hideStuff then hideAndLockStuff() end
     if isOngoingGame() then loadOngoingGame() end
