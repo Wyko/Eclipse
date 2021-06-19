@@ -87,7 +87,7 @@ function checkIfAllPlayersAreReady()
         local ready = true
         for _, color in pairs(getSeatedPlayers()) do
             if playerHasUsedInfluenceDiscs(color) then
-                text = text .. color .. ': ' .. cText('Not Ready', Color.Red)
+                text = text .. color .. ': ' .. cText('Not Ready', 'Red')
                 ready = false
             end
         end
@@ -120,11 +120,9 @@ end
 
 
 function getDiscsInInfluenceZone(color)
-    log('Starting', 'getDiscsInInfluenceZone')
     local board  = getBoardBelongingToColor(color)
     if board == nil then return {} end
     local InvPos = boardInvertFactor(board)
-    log('1', 'getDiscsInInfluenceZone')
 
     -- First get all discs on the player board
     local boardObjects = Physics.cast({
@@ -138,9 +136,7 @@ function getDiscsInInfluenceZone(color)
     local discs = objectsHitByCast(boardObjects, 'Influence Disc')
 
     -- Now get all discs on the reaction board
-    log('2', 'getDiscsInInfluenceZone')
     local passCard = getObjectFromGUID(PassCards[ownerOfBoard(board).color])
-    log('3', 'getDiscsInInfluenceZone')
     local reactionObjects = Physics.cast({
         origin = passCard.getPosition(),
         type = 3,

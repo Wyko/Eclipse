@@ -1,5 +1,5 @@
 local hideStuff = true
-local VERSION = '4.4.8'
+local VERSION = '4.4.9'
 
 DEBUG = false
 
