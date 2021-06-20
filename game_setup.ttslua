@@ -195,8 +195,11 @@ function basicSetup2(parameters)
     player_ad_board[PlayerColor] = a
 
     triggerFunctionIfResting(a, function ()
-        place_ambassadors(Box, takeParams, PlayerColor)
-        spawnExtraInfluence(PlayerColor, FactionName)
+        blip(a)
+        Wait.time(function ()
+            place_ambassadors(Box, takeParams, PlayerColor)
+            spawnExtraInfluence(PlayerColor, FactionName)
+        end, 1)
     end)
 
     -- take player board and position it
