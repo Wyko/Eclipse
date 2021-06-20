@@ -74,20 +74,34 @@ function spawnReturnInfluenceButton(board)
     board.createButton(data)
 end
 
+function waitSeconds(seconds)
+    -- Must be called in a coroutine
+
+    -- Set the amount of time to wait
+    local end_time = os.clock() + seconds
+    while (os.clock() < end_time) do
+        coroutine.yield(0)
+    end
+end
+
 
 function checkIfAllPlayersAreReady()
     log('Starting ready check.')
     while true do
 
         -- Wait while the game is starting
-        if getCurrentRound() < 1 then readyCheckText.setValue(' ') end
-        while getCurrentRound() < 1 do coroutine.yield(0) end
+        if not allPlayersPassed() or getCurrentRound() < 1 then
+            readyCheckText.setValue(' ')
+        end
+        while (not allPlayersPassed() or getCurrentRound() < 1) do
+            coroutine.yield(0)
+        end
 
-        local text = ''
+        local text = 'Players Not Ready:\n\n- '
         local ready = true
         for _, color in pairs(getSeatedPlayers()) do
             if playerHasUsedInfluenceDiscs(color) then
-                text = text .. color .. ': ' .. cText('Not Ready', 'Red')
+                text = text .. cText(color, color) .. ' - '
                 ready = false
             end
         end
@@ -97,10 +111,7 @@ function checkIfAllPlayersAreReady()
             readyCheckText.setValue('All players '.. cText('Ready!', 'Green'))
         end
         -- Set the amount of time to wait
-        local end_time = os.clock() + 5
-        while (os.clock() < end_time) do
-            coroutine.yield(0)
-        end
+        waitSeconds(3)
 
     end
     return 1

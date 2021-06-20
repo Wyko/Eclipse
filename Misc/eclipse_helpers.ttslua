@@ -131,3 +131,12 @@ function setModInfoText()
         "Many Graphical Assets by: Naar\n" ..
         "Mod Version: " .. VERSION)
 end
+
+function allPlayersPassed()
+    for _, color in pairs(getSeatedPlayers()) do
+        if passed[color] == false then
+            return false
+        end
+    end
+    return true
+end
