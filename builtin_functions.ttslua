@@ -8,6 +8,7 @@ function onLoad(saved_data)
     addContextMenus()
     setModInfoText()
     startLuaCoroutine(Global, 'checkIfAllPlayersAreReady')
+    Turns.enable = true
 
     if hideStuff then hideAndLockStuff() end
     if isOngoingGame() then loadOngoingGame() end
