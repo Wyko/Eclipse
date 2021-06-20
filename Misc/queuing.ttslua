@@ -20,7 +20,7 @@ function worker(
 
             local count = 0
             local wait_frames = math.random(20, 70)
-            log('worker: No task; waiting ['..tostring(wait_frames)..'] frames')
+            -- log('worker: No task; waiting ['..tostring(wait_frames)..'] frames')
             while count < wait_frames do
                 count = count + 1
                 coroutine.yield(0)
