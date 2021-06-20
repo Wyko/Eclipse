@@ -99,12 +99,12 @@ function makeShipBags(args)
         bags[ship_type].setColorTint(Color.fromString(args.PlayerColor))
     end
 
-    
+
     for ship_type, ship in pairs(bags) do
         while (
             bags[ship_type] == nil or
-            bags[ship_type].spawning or
-            not bags[ship_type].resting
+            bags[ship_type].spawning == true or
+            bags[ship_type].resting == false
             ) do
             for i = 1, 10 do coroutine.yield(0) end
         end
