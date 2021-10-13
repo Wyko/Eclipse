@@ -7,6 +7,7 @@ function onLoad(saved_data)
     makeScoreButton()
     makeDebugButton()
     addContextMenus()
+    loadCustomRaces()
 
     if hideStuff then hideAndLockStuff() end
     if isOngoingGame() then loadOngoingGame() end

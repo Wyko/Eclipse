@@ -1,0 +1,16 @@
+function loadCustomRaces()
+    -- Load all custom races into gameboard
+    for k,obj in ipairs(getAllObjects()) do
+        if (
+            obj.getDescription() == 'Custom Empire' or
+            obj.hasTag('Empire')
+        ) then
+            obj.call('addEmpireToGame', {})
+        end
+    end
+end
+
+function addFactions(args)
+    -- Helper function to add a custom faction to the faction list
+    factions[args[1]] = args[2]
+end

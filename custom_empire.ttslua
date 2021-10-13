@@ -1,0 +1,167 @@
+--------------------------------
+--   ADJUST FOR EACH EMPIRE   --
+--------------------------------
+-- local myFactionName = 'Reavers'
+-- local empirePassMarker = ''
+-- local empireBoard = ''
+-- local homeworld = false
+-- local shouldBeLocked = false
+--
+-- local newEmpire =  {
+--     ['startingShip'] = 'interceptor',
+--     ['numStartingShips'] = 2,
+--     ['numStartingInfluence'] = 13,
+--     ['materials'] = 2,
+--     ['science'] = 3,
+--     ['money'] = 3,
+--     ['Box_GUID'] = self.guid,
+--     ['PassMarker_GUID'] = empirePassMarker,
+--     ['available'] = true,
+--     ['selector_button_GUID'] = self.guid,
+--     ['replacement_functions'] = {},
+--     ['add_functions'] = {},
+--     ['colonyShips'] = 2,
+-- }
+
+
+--------------------------------
+-- END ADJUST FOR EACH EMPIRE --
+--------------------------------
+
+
+function onClick(obj, color, alt_click)
+    if alt_click == true then return true end
+
+    addEmpireToGame()
+
+    params = {
+      BoxGuid = self.guid,
+      PlayerColor = color,
+      FactionName = myFactionName,
+    }
+
+    if Global.call('basicSetup2', params) then
+        -- self.removeButton(0)
+        -- self.destruct()
+    end
+
+    --move the faction board and lock it
+    Wait.frames(
+        function()
+           local empireBoard = ''
+
+            for k,obj in ipairs(getAllObjects()) do
+                if obj.getName() == myFactionName then
+                    if obj.getDescription() == 'Player Board' then
+                        empireBoard = obj
+                    end
+                end
+            end
+
+            if empireBoard.getPosition().z <0 then
+                self.setPositionSmooth(Vector(empireBoard.getPosition()) + vector(0, 1, 10), false, true)
+            else
+                self.setPositionSmooth(Vector(empireBoard.getPosition()) + vector(0, 1, -10), false, true)
+            end
+
+             self.setRotation(empireBoard.getRotation())
+
+        end,120
+    )
+
+    self.clearButtons()
+    self.interactable = false
+    shouldBeLocked = true
+end
+
+local selectButton = {
+    click_function = "onClick",
+    function_owner = self,
+    label = 'Select \n'..myFactionName,
+    position = {0, 0.0, 0.7},
+    scale = {0.5, 0.5, 0.5},
+    width = 800,
+    height = 200,
+    font_size = 60,
+    tooltip = 'Select '..myFactionName,
+    alignment = 3}
+
+function onLoad()
+    enableOrLock()
+    self.setInvisibleTo()
+end
+
+function setButton()
+   self.createButton(selectButton)
+end
+
+function enableOrLock()
+    -- Check to see if homeworld is within bag, and if so, don't show the
+    -- button and lock in place. This is to stop issues when rewinding time
+    -- or loading from a save.
+    local bagData = self.getData()
+
+    for i, item in ipairs(bagData.ContainedObjects) do
+        if item.Nickname == 'Homeworld' then
+            homeworld = true
+        end
+    end
+
+    lockBag()
+end
+
+function addEmpireToGame()
+    --add turn token from box to turn bag
+    local bagData = self.getData()
+
+    -- see if turn token is already on the board for this race
+    for k,obj in ipairs(getAllObjects()) do
+        if obj.getName() == myFactionName then
+            if startsWith(obj.getDescription(), 'Player') then
+                newEmpire['PassMarker_GUID'] = obj.getGUID()
+            end
+        end
+    end
+
+    for i, item in ipairs(bagData.ContainedObjects) do
+        if item.Nickname == 'Turn Token' then
+            local targetPositon = {0, 2, 0}
+            local turnToken = spawnObjectData({data = item, position = targetPosition})
+            turnToken.setName(myFactionName)
+
+            empirePassMarker = turnToken.guid
+            -- put token in turn tokens
+            getObjectFromGUID('9d696e').putObject(turnToken)
+        end
+        if item.Nickname == 'Homeworld' then
+            homeworld = true
+        end
+    end
+
+    Global.call('addFactions', {myFactionName, newEmpire})
+
+    lockBag()
+end
+
+function lockBag()
+    if homeworld then
+        setButton()
+        shouldBeLocked = false
+    else
+        -- set feedback button
+        self.interactable = false
+        shouldBeLocked = true
+    end
+end
+
+function startsWith(String,Start)
+   return string.sub(String,1,string.len(Start))==Start
+end
+
+function tryObjectEnter(object)
+    if shouldBeLocked then
+        return false
+    else
+        return true
+    end
+end
